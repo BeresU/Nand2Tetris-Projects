@@ -57,14 +57,14 @@ CHIP ALU {
     Add16(a=selectnx ,b = selectny, out =aPlusy);
     Mux16(a=xAndy , b= aPlusy, sel=f , out=plusOrAnd );
     Not16(in=plusOrAnd , out=notPlusOrAnd );
-    Mux16(a=plusOrAnd , b= notPlusOrAnd, sel=no , out=out, out[0..7] = out8bit1, out[8..15]=out8bit2, out[15]=outlastbit );
+    Mux16(a=plusOrAnd , b= notPlusOrAnd, sel=no , out=out, out[0..7] = out8bit1, out[8..15]=out8bit2, out[15]=outmsb );
 
     // Check if output is zero and set zr
     Or8Way(in=out8bit1, out= isnotzero1);
     Or8Way(in=out8bit2, out= isnotzero2);
     Or(a= isnotzero1, b= isnotzero2, out= isoutputnotzero);
     Mux(a=true , b=false , sel=isoutputnotzero , out=zr );
-
+    
     // Check if output is negative by checking if the most significant bit is 1
-    Mux(a=false , b=true , sel=outlastbit , out=ng );
+    Mux(a=false , b=true , sel=outmsb , out=ng );
 }
