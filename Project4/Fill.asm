@@ -44,16 +44,18 @@
         M=0
         @SCREEN
         D=A
-        @n
-        M=D
         @addr   // Set addr to the screen base address
+        M=D
+        @8192   // Screen chunk size 
+        D=A
+        @n      
         M=D
 
         (FILL_SCREEN_LOOP)
             @i
             D=M
             @n
-            D=M-D
+            D=M-D   
             @MAIN_LOOP
             D;JEQ
             
