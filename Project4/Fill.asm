@@ -34,8 +34,6 @@
     (SET_R0_TO_BLACK)
         @R0
         M=-1
-        @FILL_SCREEN
-        0;JMP
 
     (FILL_SCREEN)
 
