@@ -1,0 +1,84 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/5/CPU.hdl
+/**
+ * The Hack Central Processing unit (CPU).
+ * Parses the binary code in the instruction input and executes it according to the
+ * Hack machine language specification. In the case of a C-instruction, computes the
+ * function specified by the instruction. If the instruction specifies to read a memory
+ * value, the inM input is expected to contain this value. If the instruction specifies
+ * to write a value to the memory, sets the outM output to this value, sets the addressM
+ * output to the target address, and asserts the writeM output (when writeM = 0, any
+ * value may appear in outM).
+ * If the reset input is 0, computes the address of the next instruction and sets the
+ * pc output to that value. If the reset input is 1, sets pc to 0.
+ * Note: The outM and writeM outputs are combinational: they are affected by the
+ * instruction's execution during the current cycle. The addressM and pc outputs are
+ * clocked: although they are affected by the instruction's execution, they commit to
+ * their new values only in the next cycle.
+ */
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+
+
+    // Decode instruction bits, if its A instruction set them to 0
+    Mux16(a=false , b=instruction  , sel=instruction[15] , out=actualInstruction, 
+    out[12]=controlBitA, 
+    out[11]=controlBit6, 
+    out[10]=controlBit5, 
+    out[9]=controlBit4, 
+    out[8]=controlBit3, 
+    out[7]=controlBit2, 
+    out[6]=controlBit1, 
+    out[5]=destBitA, 
+    out[4]=destBitD, 
+    out[3]=destBitM, 
+    out[2]=jumpBit3, 
+    out[1]=jumpBit2 , 
+    out[0]=jumpBit1);  
+
+    // Set A register according to the current instruction
+    Not(in=instruction[15] , out=isAInstruction );
+    Or(a=isAInstruction , b=destBitA , out=loadARegister );    
+    ARegister(in=selectedInstructionAddress , load=loadARegister , out=aRegisterOut, out[0..14]=addressM );  // A Register
+
+    // Select current address according to instruction
+    Mux16(a=instruction , b=outALU , sel=instruction[15] , out=selectedInstructionAddress );
+
+    DRegister(in=outALU , load=destBitD, out=dRegisterOut );  
+
+    Mux16(a=aRegisterOut , b=inM , sel=controlBitA , out=selectedData ); 
+
+    ALU(x=dRegisterOut , y=selectedData , zx=controlBit6 , nx=controlBit5 , zy=controlBit4 , ny=controlBit3 , f=controlBit2 , no=controlBit1 , out=outM, out=outALU , zr=zr , ng=ng );
+
+    // Jump bits logic
+    Not(in=zr, out=isNotZero);
+    Not(in=ng, out=isNotNegative);
+    And(a=isNotZero , b=isNotNegative , out=isGreaterThenZero );
+ 
+    And(a=jumpBit1 , b=isGreaterThenZero , out=jumpGreaterZero );
+    And(a=jumpBit2 , b=zr, out=jumpEqualZero);
+    And(a=jumpBit3 , b=ng, out=jumpLowerZero);
+
+    Or(a=jumpGreaterZero , b=jumpEqualZero , out=jumpGreaterEqualZero );
+    Or(a=jumpLowerZero , b=jumpGreaterEqualZero , out=shouldJump );
+
+    DMux(in=true , sel=shouldJump , a=inc , b=loadPc );
+
+    PC(in=aRegisterOut , load=loadPc , inc=inc , reset=reset , out[0..14]=pc );
+
+    And(a=true , b=destBitM , out=writeM );
+}
