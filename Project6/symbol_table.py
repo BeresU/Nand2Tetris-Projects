@@ -1,13 +1,16 @@
 import binary_converter
 
-class DataContainer:
+
+class SymbolTable:
+
     def __init__(self):
         self.data = dict()
         self.free_address = 16
         self._add_predefined_elements()
-        
+
     def _add_predefined_elements(self):
         dict = self.data
+
         dict["R0"] = binary_converter.convert_to_binary(0)
         dict["R1"] = binary_converter.convert_to_binary(1)
         dict["R2"] = binary_converter.convert_to_binary(2)
@@ -34,10 +37,10 @@ class DataContainer:
 
     def add(self, key, value):
         self.data[key] = binary_converter.convert_to_binary(value)
-            
+
     def get(self, key):
         if key not in self.data:
             self.data[key] = binary_converter.convert_to_binary(self.free_address)
             self.free_address += 1
-        
+
         return self.data[key]
