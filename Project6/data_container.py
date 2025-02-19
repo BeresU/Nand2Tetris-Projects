@@ -32,12 +32,12 @@ class DataContainer:
         dict["THIS"] = binary_converter.convert_to_binary(3)
         dict["THAT"] = binary_converter.convert_to_binary(4)
 
+    def add(self, key, value):
+        self.data[key] = binary_converter.convert_to_binary(value)
+            
     def get(self, key):
-        return self.data[key]
-    
-    def get_variable(self, variable):
-        if variable not in self.data:
-            self.data[variable] = binary_converter.convert_to_binary(self.free_address)
+        if key not in self.data:
+            self.data[key] = binary_converter.convert_to_binary(self.free_address)
             self.free_address += 1
         
-        return self.data[variable]
+        return self.data[key]
