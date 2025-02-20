@@ -16,7 +16,6 @@ def parse_and_create_file(data, file_name):
 
 asm_input_files = io_module.get_asm_file_lines()
 
-# Use ThreadPoolExecutor to process files in parallel
 with concurrent.futures.ThreadPoolExecutor(8) as executor:
     futures = {
         executor.submit(
@@ -26,4 +25,4 @@ with concurrent.futures.ThreadPoolExecutor(8) as executor:
     }
 
     for future in concurrent.futures.as_completed(futures):
-        future.result()  # This will raise any exception occurred inside process_file
+        future.result()  
