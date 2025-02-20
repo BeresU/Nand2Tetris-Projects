@@ -11,7 +11,7 @@ def parse_lines(file_lines, symbol_table):
         line_results = line_parser.parse_line(line)
 
         match line_results.resultsType:
-            case ParseResultsType.EMPTY:
+            case ParseResultsType.EMPTY | ParseResultsType.LABEL:
                 continue
             case ParseResultsType.CONSTANT:
                 constant_to_binary = binary_converter.convert_to_binary(int(line_results.resultsData))
