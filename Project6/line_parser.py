@@ -15,10 +15,11 @@ ParseResults = namedtuple("ParseResults", ["resultsType", "resultsData"])
 
 
 def parse_line(line):
-    if not line or line.strip() == "" or line.startswith("//"):
-        return ParseResults(ParseResultsType.EMPTY, None)
 
     cleaned_line = _remove_comment(line)
+
+    if not cleaned_line or cleaned_line.strip() == "":
+        return ParseResults(ParseResultsType.EMPTY, None)
 
     if cleaned_line.startswith("@"):
 

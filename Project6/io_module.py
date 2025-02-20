@@ -11,8 +11,9 @@ def get_asm_file_lines():
     asm_files_data = []
 
     for file_path in files:
+        print(f"opening: ${file_path}")
         with open(file_path, "r", encoding="utf-8") as file:
-            asm_data = AsmData(file_path.name, file.readlines())
+            asm_data = AsmData(file_path.stem, file.readlines())
             asm_files_data.append(asm_data)
 
     return asm_files_data

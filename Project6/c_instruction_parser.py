@@ -3,6 +3,7 @@ DEST_MAP = {
     "M": "001",
     "D": "010",
     "DM": "011",
+    "MD": "011",
     "A": "100",
     "AM": "101",
     "AD": "110",
@@ -57,6 +58,7 @@ def parse(line):
     split_dst = split_jmp[0].split("=")
     
     jmp_bits = JUMP_MAP["null"] if len(split_jmp) == 1 else JUMP_MAP[split_jmp[1]]
+
     comp_bits = COMP_MAP[split_dst[0]] if len(split_dst) == 1 else COMP_MAP[split_dst[1]]
     dest_bits = DEST_MAP["null"] if len(split_dst) == 1 else DEST_MAP[split_dst[0]]
 
