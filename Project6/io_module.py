@@ -30,5 +30,5 @@ def create_hack_file(file_name, lines):
 
     output_path.parent.mkdir(parents=True, exist_ok=True) 
     
-    output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    output_path.write_text("\n".join(lines), encoding="utf-8")
 
