@@ -12,13 +12,11 @@ def get_vm_file_data(path):
 
 
 def create_assembly_file(file_name, lines, target_path):
-    output_path = Path(target_path) / f"{file_name}".asm
+    output_path = Path(target_path) / f"{file_name}.asm"
     counter = 0
 
     while output_path.exists():
-        output_path = output_path / f"{file_name}{counter}.asm"
+        output_path = target_path / f"{file_name}{counter}.asm"
         counter += 1
-
-    output_path.parent.mkdir(parents=True, exist_ok=True)
 
     output_path.write_text("\n".join(lines), encoding="utf-8")
