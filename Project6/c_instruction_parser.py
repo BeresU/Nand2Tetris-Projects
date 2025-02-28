@@ -56,11 +56,10 @@ JUMP_MAP = {
 def parse(line):
     split_jmp = line.split(";")
     split_dst = split_jmp[0].split("=")
-    
+
     jmp_bits = JUMP_MAP["null"] if len(split_jmp) == 1 else JUMP_MAP[split_jmp[1]]
 
     comp_bits = COMP_MAP[split_dst[0]] if len(split_dst) == 1 else COMP_MAP[split_dst[1]]
     dest_bits = DEST_MAP["null"] if len(split_dst) == 1 else DEST_MAP[split_dst[0]]
 
     return f"111{comp_bits}{dest_bits}{jmp_bits}"
-

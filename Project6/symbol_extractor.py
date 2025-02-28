@@ -1,6 +1,6 @@
 import line_parser
-from line_parser import ParseResults
 from line_parser import ParseResultsType
+
 
 def extract_symbols(file_lines, symbol_table):
     line_number = 0
@@ -15,5 +15,3 @@ def extract_symbols(file_lines, symbol_table):
             continue
 
         line_number += 1
-        
-

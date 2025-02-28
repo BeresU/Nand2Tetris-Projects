@@ -1,6 +1,5 @@
 from symbol_table import SymbolTable
 import io_module
-from io_module import AsmData
 import symbol_extractor
 import assembler
 import concurrent.futures
@@ -14,7 +13,6 @@ def parse_and_create_file(file_lines, file_name):
 
 
 asm_input_files = io_module.get_asm_file_lines()
-
 
 with concurrent.futures.ThreadPoolExecutor(8) as executor:
     futures = {
