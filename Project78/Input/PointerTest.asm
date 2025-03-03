@@ -1,3 +1,4 @@
+// passed 
 
 // push: constant: 3030
 @3030
@@ -91,7 +92,7 @@ M=D
 
 // push pointer: THIS
 @THIS
-D=A
+D=M
 
 // RAM[SP] = D, SP++
 @SP
@@ -101,7 +102,7 @@ M=D
 
 // push pointer: THAT
 @THAT
-D=A
+D=M
 
 // RAM[SP] = D, SP++
 @SP

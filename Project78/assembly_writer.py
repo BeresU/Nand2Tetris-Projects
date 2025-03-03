@@ -126,7 +126,7 @@ class AssemblyWriter:
         AssemblyWriter._write_comment(assembly_arr, f"push pointer: {pointer_type}")
 
         assembly_arr.append(f"@{pointer_type}")
-        assembly_arr.append(f"D=A")
+        assembly_arr.append(f"D=M")
         AssemblyWriter._push_to_stack(assembly_arr)
 
     @staticmethod
