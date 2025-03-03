@@ -67,6 +67,7 @@ class AssemblyWriter:
                 AssemblyWriter._pop_temp(assembly_arr, value)
 
     def _do_logic_arithemetic(self, assembly_arr, method_type):
+        AssemblyWriter._write_comment(assembly_arr, f"do {method_type}")
         match method_type:
             case "add" | "sub" | "and" | "or":
                 expression = "D+M" if method_type == "add" else "M-D" if method_type == "sub" else "D&M" if method_type == "and" else "D|M"
@@ -91,9 +92,14 @@ class AssemblyWriter:
         AssemblyWriter._write_comment(assembly_arr, f"push: {value_type} {value}")
 
         assembly_arr.append(f"@{value_type}")
-        assembly_arr.append(f"D=M")
-        assembly_arr.append(f"@{value}")
-        assembly_arr.append(f"A=D+A")
+
+        if value > 0:
+            assembly_arr.append(f"D=M")
+            assembly_arr.append(f"@{value}")
+            assembly_arr.append(f"A=D+A")
+        else:
+            assembly_arr.append(f"A=M")
+
         assembly_arr.append(f"D=M")
         AssemblyWriter._push_to_stack(assembly_arr)
 
@@ -146,8 +152,11 @@ class AssemblyWriter:
         AssemblyWriter._write_comment(assembly_arr, f"pop: {value_type} {value}")
         assembly_arr.append(f"@{value_type}")
         assembly_arr.append(f"D=M")
-        assembly_arr.append(f"{value}")
-        assembly_arr.append(f"D=D+A")
+
+        if value > 0:
+            assembly_arr.append(f"@{value}")
+            assembly_arr.append(f"D=D+A")
+
         assembly_arr.append(f"@R13")
         assembly_arr.append(f"M=D")
         AssemblyWriter._pop_stack(assembly_arr)
