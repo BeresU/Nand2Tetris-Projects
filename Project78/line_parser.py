@@ -34,8 +34,6 @@ class LineParser:
         if split[0] == "pop":
             return ParseResults(ParseResultsType.C_POP, split[1], int(split[2]))
 
-        pass
-
     @staticmethod
     def _remove_comment(line):
         return line.split("//")[0].strip()
