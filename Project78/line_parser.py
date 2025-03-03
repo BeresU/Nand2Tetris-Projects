@@ -18,7 +18,7 @@ class ParseResultsType(Enum):
 
 class LineParser:
     def parse_line(self, line):
-        clean_line = self._remove_comment(line)
+        clean_line = LineParser._remove_comment(line)
 
         if not clean_line or clean_line == "":
             return ParseResults(ParseResultsType.NONE, None, None)
