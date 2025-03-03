@@ -76,7 +76,7 @@ class AssemblyWriter:
                 expression = "-M" if method_type == "neg" else "!M"
                 AssemblyWriter._do_logic_arithmetic_1_value(assembly_arr, expression)
             case "eq":
-                AssemblyWriter.do_eq(assembly_arr)
+                AssemblyWriter._do_eq(assembly_arr)
             case "gt" | "lt":
                 jump_expression = "JGT" if method_type == "gt" else "JLT"
                 label_name = "SET_GREATER_THEN" if method_type == "gt" else "SET_LOWER_THEN"
@@ -224,7 +224,7 @@ class AssemblyWriter:
         assembly_arr.append(f"(CONTINUE_{label_count})")
 
     @staticmethod
-    def do_eq(assembly_arr):
+    def _do_eq(assembly_arr):
         AssemblyWriter._pop_stack(assembly_arr)
         assembly_arr.append(f"A=A-1")
         assembly_arr.append(f"D=M-D")
