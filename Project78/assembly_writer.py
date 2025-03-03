@@ -75,12 +75,13 @@ class AssemblyWriter:
             case "not" | "neg":
                 expression = "-M" if method_type == "neg" else "!M"
                 AssemblyWriter._do_logic_arithmetic_1_value(assembly_arr, expression)
-            case "eq" | "gt" | "lt":
-                jump_expression = "JEQ" if method_type == "eq" else "JGT" if method_type == "gt" else "JLT"
-                label_name = "SET_EQUAL" if method_type == "eq" else "SET_GREATER_THEN" if method_type == "gt" else "SET_LOWER_THEN"
+            case "eq":
+                AssemblyWriter.do_eq(assembly_arr)
+            case "gt" | "lt":
+                jump_expression = "JGT" if method_type == "gt" else "JLT"
+                label_name = "SET_GREATER_THEN" if method_type == "gt" else "SET_LOWER_THEN"
                 AssemblyWriter._do_boolean_logic(assembly_arr, jump_expression, self.label_count, label_name)
                 self.label_count += 1
-        pass
 
     @staticmethod
     def set_end_code():
@@ -221,6 +222,18 @@ class AssemblyWriter:
         assembly_arr.append(f"A=M-1")
         assembly_arr.append(f"M=-1")
         assembly_arr.append(f"(CONTINUE_{label_count})")
+
+    @staticmethod
+    def do_eq(assembly_arr):
+        AssemblyWriter._pop_stack(assembly_arr)
+        assembly_arr.append(f"A=A-1")
+        assembly_arr.append(f"D=M-D")
+        assembly_arr.append(f"D=D+1")
+        assembly_arr.append(f"@1")
+        assembly_arr.append(f"D=D&A")
+        assembly_arr.append(f"@{AssemblyWriter.SP_KEYWORD}")
+        assembly_arr.append(f"A=M-1")
+        assembly_arr.append(f"M=-D")
 
     @staticmethod
     def _pop_stack(assembly_arr):
