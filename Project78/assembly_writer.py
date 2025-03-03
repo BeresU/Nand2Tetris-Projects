@@ -194,7 +194,7 @@ class AssemblyWriter:
     @staticmethod
     def _do_logic_arithmetic_1_value(assembly_arr, expression):
         assembly_arr.append(f"@{AssemblyWriter.SP_KEYWORD}")
-        assembly_arr.append(f"AM=M-1")
+        assembly_arr.append(f"A=M-1")
         assembly_arr.append(f"M={expression}")
 
     @staticmethod
