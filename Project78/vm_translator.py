@@ -1,6 +1,13 @@
 from assembly_writer import AssemblyWriter
 from line_parser import LineParser, ParseResultsType
 
+def translate_vm_code_multiple_files(file_data_array):
+    output = []
+    for data in file_data_array:
+        assembly_code = translate_vm_code(data.data, data.file_name)
+        output.extend(assembly_code)
+
+    return output
 
 def translate_vm_code(file_data, file_name):
     output = []
@@ -15,8 +22,5 @@ def translate_vm_code(file_data, file_name):
 
         assembly_code = writer.translate_to_assembly(parse_results)
         output.extend(assembly_code)
-
-    assembly_code = AssemblyWriter.set_end_code()
-    output.extend(assembly_code)
 
     return output

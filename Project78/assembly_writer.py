@@ -84,11 +84,6 @@ class AssemblyWriter:
                 self.label_count += 1
 
     @staticmethod
-    def set_end_code():
-        assembly_arr = ["(END)", "@END", "0;JMP"]
-        return assembly_arr
-
-    @staticmethod
     def _push_regular_value(assembly_arr, value_type, value):
         AssemblyWriter._write_comment(assembly_arr, f"push: {value_type} {value}")
 
