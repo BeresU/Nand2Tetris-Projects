@@ -20,264 +20,244 @@ class AssemblyWriter:
 
     file_name = ""
     label_count = 0
+    assembly_arr = []
 
     def set_file_name(self, file_name):
         self.file_name = file_name
 
-    @staticmethod
-    def write_init_code():
-        assembly_code = [f"@{AssemblyWriter.SP_KEYWORD}", f"M={AssemblyWriter.STACK_BASE_ADDR}"]
-        return assembly_code
+    def write_init_code(self):
+        self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
+        self._write_assembly(f"M={AssemblyWriter.STACK_BASE_ADDR}")
 
     def translate_to_assembly(self, parse_results):
-        assembly_arr = []
-
         match parse_results.command_type:
             case ParseResultsType.C_POP:
-                self._pop(assembly_arr, parse_results.arg1, parse_results.arg2)
+                self._pop(parse_results.arg1, parse_results.arg2)
             case ParseResultsType.C_PUSH:
-                self._push(assembly_arr, parse_results.arg1, parse_results.arg2)
+                self._push(parse_results.arg1, parse_results.arg2)
             case ParseResultsType.C_ARITHMETIC:
-                self._do_logic_arithemetic(assembly_arr, parse_results.arg1)
+                self._do_logic_arithemetic(parse_results.arg1)
             case ParseResultsType.C_LABEL:
-                self._write_label(assembly_arr, parse_results.arg1)
+                self._write_label(parse_results.arg1)
             case ParseResultsType.C_GOTO:
-                self._write_goto(assembly_arr, parse_results.arg1)
+                self._write_goto(parse_results.arg1)
             case ParseResultsType.C_IF:
-                self._write_if(assembly_arr, parse_results.arg1)
+                self._write_if(parse_results.arg1)
             case ParseResultsType.C_FUNCTION:
-                self._write_function(assembly_arr, parse_results.arg1, parse_results.arg2)
+                self._write_function(parse_results.arg1, parse_results.arg2)
             case ParseResultsType.C_RETURN:
-                self._write_return(assembly_arr)
+                self._write_return()
             case ParseResultsType.C_CALL:
-                self._write_call(assembly_arr, parse_results.arg1, parse_results.arg2)
+                self._write_call(parse_results.arg1, parse_results.arg2)
 
-        return assembly_arr
-
-    def _push(self, assembly_arr, value_type, value):
+    def _push(self, value_type, value):
         match value_type:
             case "local" | "argument" | "this" | "that":
-                AssemblyWriter._push_regular_value(assembly_arr, AssemblyWriter.KEYWORDS_MAP[value_type], value)
+                self._push_regular_value(AssemblyWriter.KEYWORDS_MAP[value_type], value)
             case "constant":
-                AssemblyWriter._push_constant(assembly_arr, value)
+                self._push_constant(value)
             case "static":
-                AssemblyWriter._push_static(assembly_arr, self.file_name, value)
+                self._push_static(self.file_name, value)
             case "pointer":
-                AssemblyWriter._push_pointer(assembly_arr, value)
+                self._push_pointer(value)
             case "temp":
-                AssemblyWriter._push_temp(assembly_arr, value)
+                self._push_temp(value)
 
-    def _pop(self, assembly_arr, value_type, value):
+    def _pop(self, value_type, value):
         match value_type:
             case "local" | "argument" | "this" | "that":
-                AssemblyWriter._pop_regular_value(assembly_arr, AssemblyWriter.KEYWORDS_MAP[value_type], value)
+                self._pop_regular_value(AssemblyWriter.KEYWORDS_MAP[value_type], value)
             case "static":
-                AssemblyWriter._pop_static(assembly_arr, self.file_name, value)
+                self._pop_static(self.file_name, value)
             case "pointer":
-                AssemblyWriter._pop_pointer(assembly_arr, value)
+                self._pop_pointer(value)
             case "temp":
-                AssemblyWriter._pop_temp(assembly_arr, value)
+                self._pop_temp(value)
 
-    def _do_logic_arithemetic(self, assembly_arr, method_type):
-        AssemblyWriter._write_comment(assembly_arr, f"do {method_type}")
+    def _do_logic_arithemetic(self, method_type):
+        self._write_comment(f"do {method_type}")
         match method_type:
             case "add" | "sub" | "and" | "or":
                 expression = "D+M" if method_type == "add" else "M-D" if method_type == "sub" else "D&M" if method_type == "and" else "D|M"
-                AssemblyWriter._do_logic_arithmetic_2_values(assembly_arr, expression)
+                self._do_logic_arithmetic_2_values(expression)
             case "not" | "neg":
                 expression = "-M" if method_type == "neg" else "!M"
-                AssemblyWriter._do_logic_arithmetic_1_value(assembly_arr, expression)
+                self._do_logic_arithmetic_1_value(expression)
             case "eq":
-                AssemblyWriter._do_eq(assembly_arr)
+                self._do_eq()
             case "gt" | "lt":
                 jump_expression = "JGT" if method_type == "gt" else "JLT"
                 label_name = "SET_GREATER_THEN" if method_type == "gt" else "SET_LOWER_THEN"
-                AssemblyWriter._do_boolean_logic(assembly_arr, jump_expression, self.label_count, label_name)
+                self._do_boolean_logic(jump_expression, self.label_count, label_name)
                 self.label_count += 1
 
-    @staticmethod
-    def _push_regular_value(assembly_arr, value_type, value):
-        AssemblyWriter._write_comment(assembly_arr, f"push: {value_type} {value}")
+    def _push_regular_value(self, value_type, value):
+        self._write_comment(f"push: {value_type} {value}")
 
-        assembly_arr.append(f"@{value_type}")
+        self._write_assembly(f"@{value_type}")
 
         if value > 0:
-            assembly_arr.append(f"D=M")
-            assembly_arr.append(f"@{value}")
-            assembly_arr.append(f"A=D+A")
+            self._write_assembly(f"D=M")
+            self._write_assembly(f"@{value}")
+            self._write_assembly(f"A=D+A")
         else:
-            assembly_arr.append(f"A=M")
+            self._write_assembly(f"A=M")
 
-        assembly_arr.append(f"D=M")
-        AssemblyWriter._push_to_stack(assembly_arr)
+        self._write_assembly(f"D=M")
+        self._push_to_stack()
 
-    @staticmethod
-    def _push_constant(assembly_arr, value):
-        AssemblyWriter._write_comment(assembly_arr, f"push: constant: {value}")
+    def _push_constant(self, value):
+        self._write_comment(f"push: constant: {value}")
 
-        assembly_arr.append(f"@{value}")
-        assembly_arr.append(f"D=A")
-        AssemblyWriter._push_to_stack(assembly_arr)
+        self._write_assembly(f"@{value}")
+        self._write_assembly(f"D=A")
+        self._push_to_stack()
 
-    @staticmethod
-    def _push_static(assembly_arr, static_name, value):
-        AssemblyWriter._write_comment(assembly_arr, f"push static: {static_name}.{value}")
+    def _push_static(self, static_name, value):
+        self._write_comment(f"push static: {static_name}.{value}")
 
-        assembly_arr.append(f"@{static_name}.{value}")
-        assembly_arr.append(f"D=M")
-        AssemblyWriter._push_to_stack(assembly_arr)
+        self._write_assembly(f"@{static_name}.{value}")
+        self._write_assembly(f"D=M")
+        self._push_to_stack()
 
-    @staticmethod
-    def _push_pointer(assembly_arr, value):
+    def _push_pointer(self, value):
         pointer_type = AssemblyWriter._get_pointer_type(value)
 
-        AssemblyWriter._write_comment(assembly_arr, f"push pointer: {pointer_type}")
+        self._write_comment(f"push pointer: {pointer_type}")
 
-        assembly_arr.append(f"@{pointer_type}")
-        assembly_arr.append(f"D=M")
-        AssemblyWriter._push_to_stack(assembly_arr)
+        self._write_assembly(f"@{pointer_type}")
+        self._write_assembly(f"D=M")
+        self._push_to_stack()
 
-    @staticmethod
-    def _push_temp(assembly_arr, value):
-        AssemblyWriter._write_comment(assembly_arr, f"push temp: {value}")
+    def _push_temp(self, value):
+        self._write_comment(f"push temp: {value}")
 
-        AssemblyWriter._point_at_temp_addr(assembly_arr, value)
-        assembly_arr.append(f"D=M")
-        AssemblyWriter._push_to_stack(assembly_arr)
+        self._point_at_temp_addr(value)
+        self._write_assembly(f"D=M")
+        self._push_to_stack()
 
-    @staticmethod
-    def _push_to_stack(assembly_arr):
-        AssemblyWriter._write_comment(assembly_arr,
-                                      f"RAM[{AssemblyWriter.SP_KEYWORD}] = D, {AssemblyWriter.SP_KEYWORD}++")
+    def _push_to_stack(self):
+        self._write_comment(f"RAM[{AssemblyWriter.SP_KEYWORD}] = D, {AssemblyWriter.SP_KEYWORD}++")
 
-        assembly_arr.append(f"@{AssemblyWriter.SP_KEYWORD}")
-        assembly_arr.append(f"AM=M+1")
-        assembly_arr.append(f"A=A-1")
-        assembly_arr.append(f"M=D")
+        self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
+        self._write_assembly(f"AM=M+1")
+        self._write_assembly(f"A=A-1")
+        self._write_assembly(f"M=D")
 
-    @staticmethod
-    def _pop_regular_value(assembly_arr, value_type, value):
-        AssemblyWriter._write_comment(assembly_arr, f"pop: {value_type} {value}")
-        assembly_arr.append(f"@{value_type}")
-        assembly_arr.append(f"D=M")
+    def _pop_regular_value(self, value_type, value):
+        self._write_comment(f"pop: {value_type} {value}")
+        self._write_assembly(f"@{value_type}")
+        self._write_assembly(f"D=M")
 
         if value > 0:
-            assembly_arr.append(f"@{value}")
-            assembly_arr.append(f"D=D+A")
+            self._write_assembly(f"@{value}")
+            self._write_assembly(f"D=D+A")
 
-        assembly_arr.append(f"@R13")
-        assembly_arr.append(f"M=D")
-        AssemblyWriter._pop_stack(assembly_arr)
-        assembly_arr.append(f"@R13")
-        assembly_arr.append(f"A=M")
-        assembly_arr.append(f"M=D")
+        self._write_assembly(f"@R13")
+        self._write_assembly(f"M=D")
+        self._pop_stack()
+        self._write_assembly(f"@R13")
+        self._write_assembly(f"A=M")
+        self._write_assembly(f"M=D")
 
-    @staticmethod
-    def _pop_static(assembly_arr, static_name, value):
-        AssemblyWriter._write_comment(assembly_arr, f"pop static: {static_name}.{value}")
-        AssemblyWriter._pop_stack(assembly_arr)
+    def _pop_static(self, static_name, value):
+        self._write_comment(f"pop static: {static_name}.{value}")
+        self._pop_stack()
 
-        assembly_arr.append(f"@{static_name}.{value}")
-        assembly_arr.append(f"M=D")
+        self._write_assembly(f"@{static_name}.{value}")
+        self._write_assembly(f"M=D")
 
-    @staticmethod
-    def _pop_pointer(assembly_arr, value):
+    def _pop_pointer(self, value):
         pointer_type = AssemblyWriter._get_pointer_type(value)
-        AssemblyWriter._write_comment(assembly_arr, f"pop pointer: {pointer_type}")
-        AssemblyWriter._pop_stack(assembly_arr)
-        assembly_arr.append(f"@{pointer_type}")
-        assembly_arr.append(f"M=D")
+        self._write_comment(f"pop pointer: {pointer_type}")
+        self._pop_stack()
+        self._write_assembly(f"@{pointer_type}")
+        self._write_assembly(f"M=D")
 
-    @staticmethod
-    def _pop_temp(assembly_arr, value):
-        AssemblyWriter._write_comment(assembly_arr, f"pop temp: {value}")
-        AssemblyWriter._pop_stack(assembly_arr)
-        AssemblyWriter._point_at_temp_addr(assembly_arr, value)
-        assembly_arr.append(f"M=D")
+    def _pop_temp(self, value):
+        self._write_comment(f"pop temp: {value}")
+        self._pop_stack()
+        self._point_at_temp_addr(value)
+        self._write_assembly(f"M=D")
 
     @staticmethod
     def _get_pointer_type(value):
         return AssemblyWriter.THIS_KEYWORD if value == 0 else AssemblyWriter.THAT_KEYWORD
 
-    @staticmethod
-    def _do_logic_arithmetic_1_value(assembly_arr, expression):
-        assembly_arr.append(f"@{AssemblyWriter.SP_KEYWORD}")
-        assembly_arr.append(f"A=M-1")
-        assembly_arr.append(f"M={expression}")
+    def _do_logic_arithmetic_1_value(self, expression):
+        self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
+        self._write_assembly(f"A=M-1")
+        self._write_assembly(f"M={expression}")
 
-    @staticmethod
-    def _do_logic_arithmetic_2_values(assembly_arr, expression):
-        AssemblyWriter._pop_stack(assembly_arr)
-        assembly_arr.append(f"A=A-1")
-        assembly_arr.append(f"M={expression}")
+    def _do_logic_arithmetic_2_values(self, expression):
+        self._pop_stack()
+        self._write_assembly(f"A=A-1")
+        self._write_assembly(f"M={expression}")
 
-    @staticmethod
-    def _do_boolean_logic(assembly_arr, jump_expression, label_count, label_name):
-        AssemblyWriter._pop_stack(assembly_arr)
-        assembly_arr.append(f"A=A-1")
-        assembly_arr.append(f"D=M-D")
-        assembly_arr.append(f"@{label_name}_{label_count}")
-        assembly_arr.append(f"D;{jump_expression}")
+    def _do_boolean_logic(self, jump_expression, label_count, label_name):
+        self._pop_stack()
+        self._write_assembly(f"A=A-1")
+        self._write_assembly(f"D=M-D")
+        self._write_assembly(f"@{label_name}_{label_count}")
+        self._write_assembly(f"D;{jump_expression}")
 
-        assembly_arr.append(f"@{AssemblyWriter.SP_KEYWORD}")
-        assembly_arr.append(f"A=M-1")
-        assembly_arr.append(f"M=0")
-        assembly_arr.append(f"@CONTINUE_{label_count}")
-        assembly_arr.append(f"0;JMP")
-        assembly_arr.append(f"({label_name}_{label_count})")
-        assembly_arr.append(f"@{AssemblyWriter.SP_KEYWORD}")
-        assembly_arr.append(f"A=M-1")
-        assembly_arr.append(f"M=-1")
-        assembly_arr.append(f"(CONTINUE_{label_count})")
+        self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
+        self._write_assembly(f"A=M-1")
+        self._write_assembly(f"M=0")
+        self._write_assembly(f"@CONTINUE_{label_count}")
+        self._write_assembly(f"0;JMP")
+        self._write_assembly(f"({label_name}_{label_count})")
+        self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
+        self._write_assembly(f"A=M-1")
+        self._write_assembly(f"M=-1")
+        self._write_assembly(f"(CONTINUE_{label_count})")
 
-    @staticmethod
-    def _do_eq(assembly_arr):
-        AssemblyWriter._pop_stack(assembly_arr)
-        assembly_arr.append(f"A=A-1")
-        assembly_arr.append(f"D=M-D")
-        assembly_arr.append(f"D=D+1")
-        assembly_arr.append(f"@1")
-        assembly_arr.append(f"D=D&A")
-        assembly_arr.append(f"@{AssemblyWriter.SP_KEYWORD}")
-        assembly_arr.append(f"A=M-1")
-        assembly_arr.append(f"M=-D")
+    def _do_eq(self):
+        self._pop_stack()
+        self._write_assembly(f"A=A-1")
+        self._write_assembly(f"D=M-D")
+        self._write_assembly(f"D=D+1")
+        self._write_assembly(f"@1")
+        self._write_assembly(f"D=D&A")
+        self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
+        self._write_assembly(f"A=M-1")
+        self._write_assembly(f"M=-D")
 
-    @staticmethod
-    def _pop_stack(assembly_arr):
-        AssemblyWriter._write_comment(assembly_arr, f"{AssemblyWriter.SP_KEYWORD}--")
-        assembly_arr.append(f"@{AssemblyWriter.SP_KEYWORD}")
-        assembly_arr.append(f"AM=M-1")
-        assembly_arr.append(f"D=M")
+    def _pop_stack(self):
+        self._write_comment(f"{AssemblyWriter.SP_KEYWORD}--")
+        self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
+        self._write_assembly(f"AM=M-1")
+        self._write_assembly(f"D=M")
 
-    @staticmethod
-    def _point_at_temp_addr(assembly_arr, value):
+    def _point_at_temp_addr(self, value):
         temp_addr = AssemblyWriter.TEMP_BASE_ADDR + value
-        assembly_arr.append(f"@{temp_addr}")
+        self._write_assembly(f"@{temp_addr}")
 
-    @staticmethod
-    def _write_comment(assembly_arr, comment):
+    def _write_comment(self, comment):
         if AssemblyWriter.GENERATE_COMMENTS:
-            assembly_arr.append(f"\n// {comment}")
+            self._write_assembly(f"\n// {comment}")
 
-    def _write_label(self, assembly_code, label_name):
+    def _write_assembly(self, assembly_code):
+        self.assembly_arr.append(assembly_code)
+
+    def _write_label(self, label_name):
         pass
 
-    def _write_goto(self, assembly_code, label_name):
+    def _write_goto(self, label_name):
         pass
 
     # TODO: handle labels properly
-    @staticmethod
-    def _write_if(assembly_arr, label_name):
-        AssemblyWriter._write_comment(assembly_arr, f"if-goto {label_name}")
-        AssemblyWriter._pop_stack(assembly_arr)
-        assembly_arr.append(f"@{label_name}")
-        assembly_arr.append(f"D;JNE")
+    def _write_if(self, label_name):
+        self._write_comment(f"if-goto {label_name}")
+        self._pop_stack()
+        self._write_assembly(f"@{label_name}")
+        self._write_assembly(f"D;JNE")
 
-    def _write_function(self, assembly_code, function_name, vars_count):
+    def _write_function(self, function_name, vars_count):
         pass
 
-    def _write_return(self, assembly_code):
+    def _write_return(self):
         pass
 
-    def _write_call(self, assembly_code, function_name, args_count):
+    def _write_call(self, function_name, args_count):
         pass
