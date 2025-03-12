@@ -30,29 +30,29 @@ class AssemblyWriter:
         return assembly_code
 
     def translate_to_assembly(self, parse_results):
-        assembly_code = []
+        assembly_arr = []
 
         match parse_results.command_type:
             case ParseResultsType.C_POP:
-                self._pop(assembly_code, parse_results.arg1, parse_results.arg2)
+                self._pop(assembly_arr, parse_results.arg1, parse_results.arg2)
             case ParseResultsType.C_PUSH:
-                self._push(assembly_code, parse_results.arg1, parse_results.arg2)
+                self._push(assembly_arr, parse_results.arg1, parse_results.arg2)
             case ParseResultsType.C_ARITHMETIC:
-                self._do_logic_arithemetic(assembly_code, parse_results.arg1)
+                self._do_logic_arithemetic(assembly_arr, parse_results.arg1)
             case ParseResultsType.C_LABEL:
-                self._write_label(assembly_code, parse_results.arg1)
+                self._write_label(assembly_arr, parse_results.arg1)
             case ParseResultsType.C_GOTO:
-                self._write_goto(assembly_code, parse_results.arg1)
+                self._write_goto(assembly_arr, parse_results.arg1)
             case ParseResultsType.C_IF:
-                self._write_if(assembly_code, parse_results.arg1)
+                self._write_if(assembly_arr, parse_results.arg1)
             case ParseResultsType.C_FUNCTION:
-                self._write_function(assembly_code, parse_results.arg1, parse_results.arg2)
+                self._write_function(assembly_arr, parse_results.arg1, parse_results.arg2)
             case ParseResultsType.C_RETURN:
-                self._write_return(assembly_code)
+                self._write_return(assembly_arr)
             case ParseResultsType.C_CALL:
-                self._write_call(assembly_code, parse_results.arg1, parse_results.arg2)
+                self._write_call(assembly_arr, parse_results.arg1, parse_results.arg2)
 
-        return assembly_code
+        return assembly_arr
 
     def _push(self, assembly_arr, value_type, value):
         match value_type:
@@ -265,9 +265,13 @@ class AssemblyWriter:
     def _write_goto(self, assembly_code, label_name):
         pass
 
-    # TODO: handle labels
-    def _write_if(self, assembly_code, label_name):
-        pass
+    # TODO: handle labels properly
+    @staticmethod
+    def _write_if(assembly_arr, label_name):
+        AssemblyWriter._write_comment(assembly_arr, f"if-goto {label_name}")
+        AssemblyWriter._pop_stack(assembly_arr)
+        assembly_arr.append(f"@{label_name}")
+        assembly_arr.append(f"D;JNE")
 
     def _write_function(self, assembly_code, function_name, vars_count):
         pass
