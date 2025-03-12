@@ -2,12 +2,7 @@ from line_parser import ParseResultsType
 
 
 class AssemblyWriter:
-    # TODO: see where I initialize this addresses
     STACK_BASE_ADDR = 256
-    LCL_BASE_ADDR = 300
-    ARB_BASE_ADDR = 400
-    THIS_BASE_ADDR = 3000
-    THAT_BASE_ADDR = 3010
     TEMP_BASE_ADDR = 5
 
     SP_KEYWORD = "SP"
