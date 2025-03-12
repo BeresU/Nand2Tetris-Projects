@@ -9,6 +9,12 @@ class ParseResultsType(Enum):
     C_ARITHMETIC = 0
     C_PUSH = 1
     C_POP = 2
+    C_LABEL = 3
+    C_GOTO = 4
+    C_IF = 5
+    C_FUNCTION = 6
+    C_RETURN = 7
+    C_CALL = 8
 
 
 # example of commands:
@@ -25,14 +31,25 @@ class LineParser:
 
         split = clean_line.split()
 
-        if len(split) == 1:
-            return ParseResults(ParseResultsType.C_ARITHMETIC, split[0], None)
-
-        if split[0] == "push":
-            return ParseResults(ParseResultsType.C_PUSH, split[1], int(split[2]))
-
-        if split[0] == "pop":
-            return ParseResults(ParseResultsType.C_POP, split[1], int(split[2]))
+        match split[0]:
+            case "add" | "sub" | "neg" | "eq" | "gt" | "lt" | "and" | "or" | "not":
+                return ParseResults(ParseResultsType.C_ARITHMETIC, split[0], None)
+            case "push":
+                return ParseResults(ParseResultsType.C_PUSH, split[1], int(split[2]))
+            case "pop":
+                return ParseResults(ParseResultsType.C_POP, split[1], int(split[2]))
+            case "label":
+                return ParseResults(ParseResultsType.C_LABEL, split[1], None)
+            case "goto":
+                return ParseResults(ParseResultsType.C_GOTO, split[1], None)
+            case "if-goto":
+                return ParseResults(ParseResultsType.C_IF, split[1], None)
+            case "function":
+                return ParseResults(ParseResultsType.C_FUNCTION, split[1], split[2])
+            case "return":
+                return ParseResults(ParseResultsType.C_RETURN, None, None)
+            case "call":
+                return ParseResults(ParseResultsType.C_CALL, split[1], split[2])
 
         return ParseResults(ParseResultsType.NONE, None, None)
 
