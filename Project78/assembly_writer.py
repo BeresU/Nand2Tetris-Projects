@@ -26,8 +26,13 @@ class AssemblyWriter:
     file_name = ""
     label_count = 0
 
-    def __init__(self, file_name):
+    def set_file_name(self, file_name):
         self.file_name = file_name
+
+    @staticmethod
+    def write_init_code():
+        assembly_code = [f"@{AssemblyWriter.SP_KEYWORD}", f"M={AssemblyWriter.STACK_BASE_ADDR}"]
+        return assembly_code
 
     def translate_to_assembly(self, parse_results):
         assembly_code = []
