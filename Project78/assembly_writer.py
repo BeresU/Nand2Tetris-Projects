@@ -39,6 +39,18 @@ class AssemblyWriter:
                 self._push(assembly_code, parse_results.arg1, parse_results.arg2)
             case ParseResultsType.C_ARITHMETIC:
                 self._do_logic_arithemetic(assembly_code, parse_results.arg1)
+            case ParseResultsType.C_LABEL:
+                self._write_label(assembly_code, parse_results.arg1)
+            case ParseResultsType.C_GOTO:
+                self._write_goto(assembly_code, parse_results.arg1)
+            case ParseResultsType.C_IF:
+                self._write_if(assembly_code, parse_results.arg1)
+            case ParseResultsType.C_FUNCTION:
+                self._write_function(assembly_code, parse_results.arg1, parse_results.arg2)
+            case ParseResultsType.C_RETURN:
+                self._write_return(assembly_code)
+            case ParseResultsType.C_CALL:
+                self._write_call(assembly_code, parse_results.arg1, parse_results.arg2)
 
         return assembly_code
 
@@ -246,3 +258,22 @@ class AssemblyWriter:
     def _write_comment(assembly_arr, comment):
         if AssemblyWriter.GENERATE_COMMENTS:
             assembly_arr.append(f"\n// {comment}")
+
+    def _write_label(self, assembly_code, label_name):
+        pass
+
+    def _write_goto(self, assembly_code, label_name):
+        pass
+
+    # TODO: handle labels
+    def _write_if(self, assembly_code, label_name):
+        pass
+
+    def _write_function(self, assembly_code, function_name, vars_count):
+        pass
+
+    def _write_return(self, assembly_code):
+        pass
+
+    def _write_call(self, assembly_code, function_name, args_count):
+        pass
