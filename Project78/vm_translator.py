@@ -1,5 +1,6 @@
 from assembly_writer import AssemblyWriter
-from line_parser import LineParser, ParseResultsType
+import line_parser
+from line_parser import ParseResultsType
 
 
 def translate_vm_code_multiple_files(file_data_array):
@@ -15,11 +16,10 @@ def translate_vm_code_multiple_files(file_data_array):
 
 
 def translate_vm_code(file_data, file_name, writer):
-    parser = LineParser()
     writer.set_file_name(file_name)
 
     for line in file_data:
-        parse_results = parser.parse_line(line)
+        parse_results = line_parser.parse_line(line)
 
         if parse_results.command_type == ParseResultsType.NONE:
             continue

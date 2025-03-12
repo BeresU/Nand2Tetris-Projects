@@ -22,37 +22,37 @@ class ParseResultsType(Enum):
 # push <variable_name> <number>
 # <arithmetic_logic_command>
 
-class LineParser:
-    def parse_line(self, line):
-        clean_line = LineParser._remove_comment(line)
 
-        if not clean_line or clean_line == "":
-            return ParseResults(ParseResultsType.NONE, None, None)
+def parse_line(line):
+    clean_line = _remove_comment(line)
 
-        split = clean_line.split()
-
-        match split[0]:
-            case "add" | "sub" | "neg" | "eq" | "gt" | "lt" | "and" | "or" | "not":
-                return ParseResults(ParseResultsType.C_ARITHMETIC, split[0], None)
-            case "push":
-                return ParseResults(ParseResultsType.C_PUSH, split[1], int(split[2]))
-            case "pop":
-                return ParseResults(ParseResultsType.C_POP, split[1], int(split[2]))
-            case "label":
-                return ParseResults(ParseResultsType.C_LABEL, split[1], None)
-            case "goto":
-                return ParseResults(ParseResultsType.C_GOTO, split[1], None)
-            case "if-goto":
-                return ParseResults(ParseResultsType.C_IF, split[1], None)
-            case "function":
-                return ParseResults(ParseResultsType.C_FUNCTION, split[1], split[2])
-            case "return":
-                return ParseResults(ParseResultsType.C_RETURN, None, None)
-            case "call":
-                return ParseResults(ParseResultsType.C_CALL, split[1], split[2])
-
+    if not clean_line or clean_line == "":
         return ParseResults(ParseResultsType.NONE, None, None)
 
-    @staticmethod
-    def _remove_comment(line):
-        return line.split("//")[0].strip()
+    split = clean_line.split()
+
+    match split[0]:
+        case "add" | "sub" | "neg" | "eq" | "gt" | "lt" | "and" | "or" | "not":
+            return ParseResults(ParseResultsType.C_ARITHMETIC, split[0], None)
+        case "push":
+            return ParseResults(ParseResultsType.C_PUSH, split[1], int(split[2]))
+        case "pop":
+            return ParseResults(ParseResultsType.C_POP, split[1], int(split[2]))
+        case "label":
+            return ParseResults(ParseResultsType.C_LABEL, split[1], None)
+        case "goto":
+            return ParseResults(ParseResultsType.C_GOTO, split[1], None)
+        case "if-goto":
+            return ParseResults(ParseResultsType.C_IF, split[1], None)
+        case "function":
+            return ParseResults(ParseResultsType.C_FUNCTION, split[1], split[2])
+        case "return":
+            return ParseResults(ParseResultsType.C_RETURN, None, None)
+        case "call":
+            return ParseResults(ParseResultsType.C_CALL, split[1], split[2])
+
+    return ParseResults(ParseResultsType.NONE, None, None)
+
+
+def _remove_comment(line):
+    return line.split("//")[0].strip()
