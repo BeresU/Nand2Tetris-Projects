@@ -138,13 +138,13 @@ class AssemblyWriter:
         self._write_assembly(f"D=M")
         self._push_to_stack()
 
-    def _push_to_stack(self):
-        self._write_comment(f"RAM[{AssemblyWriter.SP_KEYWORD}] = D, {AssemblyWriter.SP_KEYWORD}++")
+    def _push_to_stack(self, comp = "D"):
+        self._write_comment(f"RAM[{AssemblyWriter.SP_KEYWORD}] = {comp}, {AssemblyWriter.SP_KEYWORD}++")
 
         self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
         self._write_assembly(f"AM=M+1")
         self._write_assembly(f"A=A-1")
-        self._write_assembly(f"M=D")
+        self._write_assembly(f"M={comp}")
 
     def _pop_regular_value(self, value_type, value):
         self._write_comment(f"pop: {value_type} {value}")
@@ -278,10 +278,20 @@ class AssemblyWriter:
         self._write_assembly(f"D;JNE")
 
     def _write_function(self, function_name, vars_count):
+        self._write_comment(f"start function: {function_name}, vars: {vars_count}")
+
+        self._write_assembly(f"@({self.file_name}.{function_name})")
+        self._write_comment(f"LCL=SP")
+        self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
+        self._write_assembly(f"D=M")
+        self._write_assembly(f"@{AssemblyWriter.LCL_KEYWORD}")
+        self._write_assembly(f"M=D")
+
+        for _ in vars_count:
+            self._push_to_stack("0")
+
+    def _write_call(self, function_name, args_count):
         pass
 
     def _write_return(self):
-        pass
-
-    def _write_call(self, function_name, args_count):
         pass
