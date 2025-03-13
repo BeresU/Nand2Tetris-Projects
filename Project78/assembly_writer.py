@@ -264,7 +264,11 @@ class AssemblyWriter:
         self._write_assembly(f"({full_label_name})")
 
     def _write_goto(self, label_name):
-        pass
+        self._write_comment(f"goto {label_name}")
+
+        full_label_name = self._get_full_label_name(label_name)
+        self._write_assembly(f"@{full_label_name}")
+        self._write_assembly(f"0;JMP")
 
     def _write_if(self, label_name):
         full_label_name = self._get_full_label_name(label_name)
