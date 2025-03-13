@@ -19,8 +19,9 @@ class AssemblyWriter:
     GENERATE_COMMENTS = True
 
     file_name = ""
-    label_count = 0
     assembly_arr = []
+    function_trace = []
+    label_count_dict = dict()
 
     def set_file_name(self, file_name):
         self.file_name = file_name
@@ -44,9 +45,11 @@ class AssemblyWriter:
             case ParseResultsType.C_IF:
                 self._write_if(parse_results.arg1)
             case ParseResultsType.C_FUNCTION:
+                self.function_trace.append(parse_results)
                 self._write_function(parse_results.arg1, parse_results.arg2)
             case ParseResultsType.C_RETURN:
                 self._write_return()
+                self.function_trace.pop()
             case ParseResultsType.C_CALL:
                 self._write_call(parse_results.arg1, parse_results.arg2)
 
@@ -88,8 +91,7 @@ class AssemblyWriter:
             case "gt" | "lt":
                 jump_expression = "JGT" if method_type == "gt" else "JLT"
                 label_name = "SET_GREATER_THEN" if method_type == "gt" else "SET_LOWER_THEN"
-                self._do_boolean_logic(jump_expression, self.label_count, label_name)
-                self.label_count += 1
+                self._do_boolean_logic(jump_expression, label_name)
 
     def _push_regular_value(self, value_type, value):
         self._write_comment(f"push: {value_type} {value}")
@@ -194,23 +196,26 @@ class AssemblyWriter:
         self._write_assembly(f"A=A-1")
         self._write_assembly(f"M={expression}")
 
-    def _do_boolean_logic(self, jump_expression, label_count, label_name):
+    def _do_boolean_logic(self, jump_expression, label_name):
+        full_label_name = f"{self._get_full_label_name(label_name)}_{self.get_label_count(label_name)}"
+        continue_label = f"{self._get_full_label_name('CONTINUE')}_{self.get_label_count('CONTINUE')}"
+
         self._pop_stack()
         self._write_assembly(f"A=A-1")
         self._write_assembly(f"D=M-D")
-        self._write_assembly(f"@{label_name}_{label_count}")
+        self._write_assembly(f"@{full_label_name}")
         self._write_assembly(f"D;{jump_expression}")
 
         self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
         self._write_assembly(f"A=M-1")
         self._write_assembly(f"M=0")
-        self._write_assembly(f"@CONTINUE_{label_count}")
+        self._write_assembly(f"@{continue_label}")
         self._write_assembly(f"0;JMP")
-        self._write_assembly(f"({label_name}_{label_count})")
+        self._write_assembly(f"({full_label_name})")
         self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
         self._write_assembly(f"A=M-1")
         self._write_assembly(f"M=-1")
-        self._write_assembly(f"(CONTINUE_{label_count})")
+        self._write_assembly(f"({continue_label})")
 
     def _do_eq(self):
         self._pop_stack()
@@ -240,17 +245,31 @@ class AssemblyWriter:
     def _write_assembly(self, assembly_code):
         self.assembly_arr.append(assembly_code)
 
+    def _get_full_label_name(self, label_name):
+        func_name = ""
+
+        if len(self.function_trace) > 0:
+            func_name = f".{self.function_trace[-1].arg1}"
+
+        return f"{self.file_name}{func_name}${label_name}"
+
+    def get_label_count(self, label_name):
+        full_name = self._get_full_label_name(label_name)
+        label_count = self.label_count_dict.get(full_name, 0)
+        self.label_count_dict[full_name] = label_count + 1
+        return label_count
+
     def _write_label(self, label_name):
         pass
 
     def _write_goto(self, label_name):
         pass
 
-    # TODO: handle labels properly
     def _write_if(self, label_name):
-        self._write_comment(f"if-goto {label_name}")
+        full_label_name = self._get_full_label_name(label_name)
+        self._write_comment(f"if-goto {full_label_name}")
         self._pop_stack()
-        self._write_assembly(f"@{label_name}")
+        self._write_assembly(f"@{full_label_name}")
         self._write_assembly(f"D;JNE")
 
     def _write_function(self, function_name, vars_count):
