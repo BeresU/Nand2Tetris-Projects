@@ -260,7 +260,8 @@ class AssemblyWriter:
         return label_count
 
     def _write_label(self, label_name):
-        pass
+        full_label_name = self._get_full_label_name(label_name)
+        self._write_assembly(f"({full_label_name})")
 
     def _write_goto(self, label_name):
         pass
