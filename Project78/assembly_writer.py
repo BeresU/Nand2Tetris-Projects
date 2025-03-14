@@ -306,8 +306,6 @@ class AssemblyWriter:
         count = self.label_count_dict.get(return_label, 0)
         full_return_label = f"{return_label}.{count}"
 
-        # TODO: should set args?
-
         # TODO: see if need to increase count here
         self._write_comment(f"save return address")
         self._write_assembly(f"@{full_return_label}")
@@ -368,12 +366,66 @@ class AssemblyWriter:
             self._push_to_stack("0")
 
     # TODO: handle a case where the return is not inside a function
+    # NOTE: didn't set retAddress since using function_trace is more optimal
+
     def _write_return(self):
         current_function = self._get_current_function()
         return_label = self.get_return_label(current_function)
         count = self.label_count_dict.get(return_label)
 
         self._write_comment(f"return: {current_function}")
+        self._write_comment(f"Put endframe (LCL) in temp variable")
+        self._write_assembly(f"@{AssemblyWriter.LCL_KEYWORD}")
+        self._write_assembly(f"D=M")
+        self._write_assembly(f"@R14")
+        self._write_assembly(f"M=D")
+
+        self._write_comment(f"put return value in ARG")
+        self._pop_stack()
+        self._write_assembly(f"@{AssemblyWriter.ARG_KEYWORD}")
+        self._write_assembly(f"A=M")
+        self._write_assembly(f"M=D")
+
+        self._write_comment(f"reposition SP, SP=ARG+1 to return value")
+        self._write_assembly(f"@{AssemblyWriter.ARG_KEYWORD}")
+        self._write_assembly(f"D=A")
+        self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
+        self._write_assembly(f"M=D+1")
+
+        self._write_comment(f"restore THAT = (endframe-1)")
+        self._write_assembly(f"@R14")
+        self._write_assembly(f"A=M-1")
+        self._write_assembly(f"D=M")
+        self._write_assembly(f"@{AssemblyWriter.THAT_KEYWORD}")
+        self._write_assembly(f"M=D")
+
+        self._write_comment(f"restore THIS = (endframe-2)")
+        self._write_assembly(f"@R14")
+        self._write_assembly(f"D=M")
+        self._write_assembly(f"@2")
+        self._write_assembly(f"A=D-A")
+        self._write_assembly(f"D=M")
+        self._write_assembly(f"@{AssemblyWriter.THIS_KEYWORD}")
+        self._write_assembly(f"M=D")
+
+        self._write_comment(f"restore ARG = (endframe-3)")
+        self._write_assembly(f"@R14")
+        self._write_assembly(f"D=M")
+        self._write_assembly(f"@3")
+        self._write_assembly(f"A=D-A")
+        self._write_assembly(f"D=M")
+        self._write_assembly(f"@{AssemblyWriter.ARG_KEYWORD}")
+        self._write_assembly(f"M=D")
+
+        self._write_comment(f"restore LCL = (endframe-4)")
+        self._write_assembly(f"@R14")
+        self._write_assembly(f"D=M")
+        self._write_assembly(f"@4")
+        self._write_assembly(f"A=D-A")
+        self._write_assembly(f"D=M")
+        self._write_assembly(f"@{AssemblyWriter.LCL_KEYWORD}")
+        self._write_assembly(f"M=D")
+
         self._write_assembly(f"@{return_label}.{count}")
         self._write_assembly(f"0;JMP")
         self.label_count_dict[return_label] = count + 1
