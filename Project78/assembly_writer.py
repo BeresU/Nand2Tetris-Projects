@@ -27,8 +27,10 @@ class AssemblyWriter:
         self.file_name = file_name
 
     def write_init_code(self):
+        self._write_assembly(f"@{AssemblyWriter.STACK_BASE_ADDR}")
+        self._write_assembly(f"D=A")
         self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
-        self._write_assembly(f"M={AssemblyWriter.STACK_BASE_ADDR}")
+        self._write_assembly(f"M=D")
 
     def translate_to_assembly(self, parse_results):
         match parse_results.command_type:
@@ -48,7 +50,7 @@ class AssemblyWriter:
                 self._write_call(parse_results.arg1, parse_results.arg2)
             case ParseResultsType.C_FUNCTION:
                 self._current_function = parse_results.arg1
-                self._write_function(parse_results.arg1, int(parse_results.arg2))
+                self._write_function(parse_results.arg1, parse_results.arg2)
             case ParseResultsType.C_RETURN:
                 self._write_return()
 

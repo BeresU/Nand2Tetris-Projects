@@ -45,11 +45,11 @@ def parse_line(line):
         case "if-goto":
             return ParseResults(ParseResultsType.C_IF, split[1], None)
         case "function":
-            return ParseResults(ParseResultsType.C_FUNCTION, split[1], split[2])
+            return ParseResults(ParseResultsType.C_FUNCTION, split[1], int(split[2]))
         case "return":
             return ParseResults(ParseResultsType.C_RETURN, None, None)
         case "call":
-            return ParseResults(ParseResultsType.C_CALL, split[1], split[2])
+            return ParseResults(ParseResultsType.C_CALL, split[1], int(split[2]))
 
     return ParseResults(ParseResultsType.NONE, None, None)
 
