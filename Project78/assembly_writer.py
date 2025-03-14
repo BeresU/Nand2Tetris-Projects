@@ -301,7 +301,7 @@ class AssemblyWriter:
         self.label_count_dict[return_label] = count + 1
 
         self._write_comment(f"save return address")
-        self._write_assembly(f"@{full_return_label}")
+        self._write_assembly(f"@{full_return_label}")   #Save return label here, probably issue
         self._write_assembly(f"D=A")
         self._push_to_stack()
 
@@ -366,6 +366,13 @@ class AssemblyWriter:
         self._write_assembly(f"@R14")
         self._write_assembly(f"M=D")
 
+        self._write_comment(f"Set return address (endframe-5)")
+        self._write_assembly(f"@5")
+        self._write_assembly(f"A=D-A")
+        self._write_assembly(f"D=M")
+        self._write_assembly(f"@R13")
+        self._write_assembly(f"M=D")
+
         self._write_comment(f"put return value in ARG")
         self._pop_stack()
         self._write_assembly(f"@{AssemblyWriter.ARG_KEYWORD}")
@@ -412,9 +419,7 @@ class AssemblyWriter:
         self._write_assembly(f"@{AssemblyWriter.LCL_KEYWORD}")
         self._write_assembly(f"M=D")
 
-        self._write_comment(f"Set return address (endframe-5)")
-        self._write_assembly(f"@R14")
-        self._write_assembly(f"D=M")
-        self._write_assembly(f"@5")
-        self._write_assembly(f"A=D-A")
+        self._write_comment(f"return to caller")
+        self._write_assembly(f"@R13")
+        self._write_assembly(f"A=M")
         self._write_assembly(f"A;JMP")
