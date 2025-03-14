@@ -366,14 +366,9 @@ class AssemblyWriter:
             self._push_to_stack("0")
 
     # TODO: handle a case where the return is not inside a function
-    # NOTE: didn't set retAddress since using function_trace is more optimal
 
     def _write_return(self):
-        current_function = self._get_current_function()
-        return_label = self.get_return_label(current_function)
-        count = self.label_count_dict.get(return_label)
-
-        self._write_comment(f"return: {current_function}")
+        self._write_comment(f"RETURN")
         self._write_comment(f"Put endframe (LCL) in temp variable")
         self._write_assembly(f"@{AssemblyWriter.LCL_KEYWORD}")
         self._write_assembly(f"D=M")
@@ -426,6 +421,10 @@ class AssemblyWriter:
         self._write_assembly(f"@{AssemblyWriter.LCL_KEYWORD}")
         self._write_assembly(f"M=D")
 
-        self._write_assembly(f"@{return_label}.{count}")
-        self._write_assembly(f"0;JMP")
-        self.label_count_dict[return_label] = count + 1
+        self._write_comment(f"Set return address (endframe-5")
+        self._write_assembly(f"@R14")
+        self._write_assembly(f"D=M")
+        self._write_assembly(f"@5")
+        self._write_assembly(f"A=D-A")
+        self._write_assembly(f"A;JMP")
+
