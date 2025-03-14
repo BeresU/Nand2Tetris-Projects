@@ -48,7 +48,7 @@ class AssemblyWriter:
                 self._write_call(parse_results.arg1, parse_results.arg2)
             case ParseResultsType.C_FUNCTION:
                 self._current_function = parse_results.arg1
-                self._write_function(parse_results.arg1, parse_results.arg2)
+                self._write_function(parse_results.arg1, int(parse_results.arg2))
             case ParseResultsType.C_RETURN:
                 self._write_return()
 
@@ -353,7 +353,7 @@ class AssemblyWriter:
         full_func_name = f"{self.get_full_function_name(function_name)}"
         self._write_assembly(f"({full_func_name})")
 
-        for _ in vars_count:
+        for _ in range(vars_count):
             self._push_to_stack("0")
 
     def _write_return(self):
@@ -372,7 +372,7 @@ class AssemblyWriter:
 
         self._write_comment(f"reposition SP, SP=ARG+1 to return value")
         self._write_assembly(f"@{AssemblyWriter.ARG_KEYWORD}")
-        self._write_assembly(f"D=A")
+        self._write_assembly(f"D=M")
         self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
         self._write_assembly(f"M=D+1")
 
@@ -410,7 +410,7 @@ class AssemblyWriter:
         self._write_assembly(f"@{AssemblyWriter.LCL_KEYWORD}")
         self._write_assembly(f"M=D")
 
-        self._write_comment(f"Set return address (endframe-5")
+        self._write_comment(f"Set return address (endframe-5)")
         self._write_assembly(f"@R14")
         self._write_assembly(f"D=M")
         self._write_assembly(f"@5")
