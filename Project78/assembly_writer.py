@@ -44,14 +44,14 @@ class AssemblyWriter:
                 self._write_goto(parse_results.arg1)
             case ParseResultsType.C_IF:
                 self._write_if(parse_results.arg1)
+            case ParseResultsType.C_CALL:
+                self._write_call(parse_results.arg1, parse_results.arg2)
             case ParseResultsType.C_FUNCTION:
                 self.function_trace.append(parse_results)
                 self._write_function(parse_results.arg1, parse_results.arg2)
             case ParseResultsType.C_RETURN:
                 self._write_return()
                 self.function_trace.pop()
-            case ParseResultsType.C_CALL:
-                self._write_call(parse_results.arg1, parse_results.arg2)
 
     def _push(self, value_type, value):
         match value_type:
@@ -138,7 +138,7 @@ class AssemblyWriter:
         self._write_assembly(f"D=M")
         self._push_to_stack()
 
-    def _push_to_stack(self, comp = "D"):
+    def _push_to_stack(self, comp="D"):
         self._write_comment(f"RAM[{AssemblyWriter.SP_KEYWORD}] = {comp}, {AssemblyWriter.SP_KEYWORD}++")
 
         self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
@@ -277,6 +277,9 @@ class AssemblyWriter:
         self._write_assembly(f"@{full_label_name}")
         self._write_assembly(f"D;JNE")
 
+    def _write_call(self, function_name, args_count):
+        pass
+
     def _write_function(self, function_name, vars_count):
         self._write_comment(f"start function: {function_name}, vars: {vars_count}")
 
@@ -289,9 +292,6 @@ class AssemblyWriter:
 
         for _ in vars_count:
             self._push_to_stack("0")
-
-    def _write_call(self, function_name, args_count):
-        pass
 
     def _write_return(self):
         pass
