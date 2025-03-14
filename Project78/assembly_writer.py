@@ -200,6 +200,9 @@ class AssemblyWriter:
         full_label_name = f"{self._get_full_label_name(label_name)}_{self.get_label_count(label_name)}"
         continue_label = f"{self._get_full_label_name('CONTINUE')}_{self.get_label_count('CONTINUE')}"
 
+        self.increase_label_count(label_name)
+        self.increase_label_count("CONTINUE")
+
         self._pop_stack()
         self._write_assembly(f"A=A-1")
         self._write_assembly(f"D=M-D")
@@ -246,18 +249,36 @@ class AssemblyWriter:
         self.assembly_arr.append(assembly_code)
 
     def _get_full_label_name(self, label_name):
-        func_name = ""
+        func_name = self._get_current_function()  # TODO: probably its for the best to get it out of here, will do later...
 
-        if len(self.function_trace) > 0:
-            func_name = f".{self.function_trace[-1].arg1}"
+        if func_name != "":
+            func_name = f".{func_name}"
 
         return f"{self.file_name}{func_name}${label_name}"
 
+    def _get_current_function(self):
+        func_name = ""
+
+        if len(self.function_trace) > 0:
+            func_name = self.function_trace[-1].arg1
+
+        return func_name
+
+    def get_full_function_name(self, function_name):
+        return f"{self.file_name}.{function_name}"
+
+    def get_return_label(self, function_name):
+        full_name = self.get_full_function_name(function_name)
+        return f"{full_name}$ret"
+
     def get_label_count(self, label_name):
+        full_name = self._get_full_label_name(label_name)
+        return self.label_count_dict.get(full_name, 0)
+
+    def increase_label_count(self, label_name):
         full_name = self._get_full_label_name(label_name)
         label_count = self.label_count_dict.get(full_name, 0)
         self.label_count_dict[full_name] = label_count + 1
-        return label_count
 
     def _write_label(self, label_name):
         full_label_name = self._get_full_label_name(label_name)
@@ -278,20 +299,81 @@ class AssemblyWriter:
         self._write_assembly(f"D;JNE")
 
     def _write_call(self, function_name, args_count):
-        pass
+        self._write_comment(f"start function: {function_name}, args: {args_count}")
+        full_func_name = self.get_full_function_name(function_name)
 
-    def _write_function(self, function_name, vars_count):
-        self._write_comment(f"start function: {function_name}, vars: {vars_count}")
+        return_label = self.get_return_label(function_name)
+        count = self.label_count_dict.get(return_label, 0)
+        full_return_label = f"{return_label}.{count}"
 
-        self._write_assembly(f"@({self.file_name}.{function_name})")
+        # TODO: should set args?
+
+        # TODO: see if need to increase count here
+        self._write_comment(f"save return address")
+        self._write_assembly(f"@{full_return_label}")
+        self._write_assembly(f"D=A")
+        self._push_to_stack()
+
+        self._write_comment(f"push LCL of current segment")
+        self._write_assembly(f"@{AssemblyWriter.LCL_KEYWORD}")
+        self._write_assembly(f"D=M")
+        self._push_to_stack()
+
+        self._write_comment(f"push ARG of current segment")
+        self._write_assembly(f"@{AssemblyWriter.ARG_KEYWORD}")
+        self._write_assembly(f"D=M")
+        self._push_to_stack()
+
+        self._write_comment(f"push THIS of current segment")
+        self._write_assembly(f"@{AssemblyWriter.THIS_KEYWORD}")
+        self._write_assembly(f"D=M")
+        self._push_to_stack()
+
+        self._write_comment(f"push THAT of current segment")
+        self._write_assembly(f"@{AssemblyWriter.THAT_KEYWORD}")
+        self._write_assembly(f"D=M")
+        self._push_to_stack()
+
+        self._write_comment(f"ARG=SP-5-{args_count}")
+        self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
+        self._write_assembly(f"D=M")
+        self._write_assembly(f"@5")
+        self._write_assembly(f"D=D-A")
+
+        if args_count > 0:
+            self._write_assembly(f"@{args_count}")
+            self._write_assembly(f"D=D-A")
+
+        self._write_assembly(f"@{AssemblyWriter.ARG_KEYWORD}")
+        self._write_assembly(f"M=D")
+
         self._write_comment(f"LCL=SP")
         self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
         self._write_assembly(f"D=M")
         self._write_assembly(f"@{AssemblyWriter.LCL_KEYWORD}")
         self._write_assembly(f"M=D")
 
+        self._write_assembly(f"@{full_func_name}")
+        self._write_assembly(f"0;JMP")
+
+        self._write_assembly(f"({full_return_label})")
+
+    def _write_function(self, function_name, vars_count):
+        self._write_comment(f"start function: {function_name}, vars: {vars_count}")
+
+        full_func_name = f"{self.get_full_function_name(function_name)}"
+        self._write_assembly(f"({full_func_name})")
+
         for _ in vars_count:
             self._push_to_stack("0")
 
+    # TODO: handle a case where the return is not inside a function
     def _write_return(self):
-        pass
+        current_function = self._get_current_function()
+        return_label = self.get_return_label(current_function)
+        count = self.label_count_dict.get(return_label)
+
+        self._write_comment(f"return: {current_function}")
+        self._write_assembly(f"@{return_label}.{count}")
+        self._write_assembly(f"0;JMP")
+        self.label_count_dict[return_label] = count + 1
