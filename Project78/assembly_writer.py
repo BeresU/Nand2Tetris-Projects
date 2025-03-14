@@ -20,7 +20,7 @@ class AssemblyWriter:
 
     file_name = ""
     assembly_arr = []
-    function_trace = []
+    _current_function = ""
     label_count_dict = dict()
 
     def set_file_name(self, file_name):
@@ -47,11 +47,10 @@ class AssemblyWriter:
             case ParseResultsType.C_CALL:
                 self._write_call(parse_results.arg1, parse_results.arg2)
             case ParseResultsType.C_FUNCTION:
-                self.function_trace.append(parse_results)
+                self._current_function = parse_results.arg1
                 self._write_function(parse_results.arg1, parse_results.arg2)
             case ParseResultsType.C_RETURN:
                 self._write_return()
-                self.function_trace.pop()
 
     def _push(self, value_type, value):
         match value_type:
@@ -249,20 +248,12 @@ class AssemblyWriter:
         self.assembly_arr.append(assembly_code)
 
     def _get_full_label_name(self, label_name):
-        func_name = self._get_current_function()  # TODO: probably its for the best to get it out of here, will do later...
+        func_name = self._current_function
 
         if func_name != "":
             func_name = f".{func_name}"
 
         return f"{self.file_name}{func_name}${label_name}"
-
-    def _get_current_function(self):
-        func_name = ""
-
-        if len(self.function_trace) > 0:
-            func_name = self.function_trace[-1].arg1
-
-        return func_name
 
     def get_full_function_name(self, function_name):
         return f"{self.file_name}.{function_name}"
@@ -305,8 +296,8 @@ class AssemblyWriter:
         return_label = self.get_return_label(function_name)
         count = self.label_count_dict.get(return_label, 0)
         full_return_label = f"{return_label}.{count}"
+        self.label_count_dict[return_label] = count + 1
 
-        # TODO: see if need to increase count here
         self._write_comment(f"save return address")
         self._write_assembly(f"@{full_return_label}")
         self._write_assembly(f"D=A")
@@ -364,8 +355,6 @@ class AssemblyWriter:
 
         for _ in vars_count:
             self._push_to_stack("0")
-
-    # TODO: handle a case where the return is not inside a function
 
     def _write_return(self):
         self._write_comment(f"RETURN")
@@ -427,4 +416,3 @@ class AssemblyWriter:
         self._write_assembly(f"@5")
         self._write_assembly(f"A=D-A")
         self._write_assembly(f"A;JMP")
-
