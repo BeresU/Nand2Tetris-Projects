@@ -8,6 +8,8 @@ def translate_vm_code_multiple_files(file_data_array):
 
     if len(file_data_array) > 1:
         writer.write_init_code()
+        bootstrap_code = line_parser.parse_line("call Sys.init 0")
+        writer.translate_to_assembly(bootstrap_code)
 
     for data in file_data_array:
         translate_vm_code(data.data, data.file_name, writer)

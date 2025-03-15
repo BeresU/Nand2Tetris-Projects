@@ -14,9 +14,8 @@ def get_files_data(path):
         files_data.append(vm_file_data)
     else:
         vm_files = list(data_path.glob("*.vm"))
-        sorted_files = sorted(vm_files, key=_sort_files)
 
-        for vm_file in sorted_files:
+        for vm_file in vm_files:
             vm_file_data = get_vm_file_data(vm_file)
             files_data.append(vm_file_data)
 
@@ -44,11 +43,3 @@ def create_assembly_file(file_name, lines, target_path):
         counter += 1
 
     output_path.write_text("\n".join(lines), encoding="utf-8")
-
-
-def _sort_files(file):
-    if file.stem == "Sys":
-        return -2, file.name  # "Sys" comes first
-    elif file.stem == "Main":
-        return -1, file.name  # "Main" comes second
-    return 0, file.name  # For all other files, sort normally

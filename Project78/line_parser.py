@@ -17,12 +17,6 @@ class ParseResultsType(Enum):
     C_CALL = 8
 
 
-# example of commands:
-# pop <variable_name> <number>
-# push <variable_name> <number>
-# <arithmetic_logic_command>
-
-
 def parse_line(line):
     clean_line = _remove_comment(line)
 
