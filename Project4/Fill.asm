@@ -25,15 +25,11 @@
     D=D-A
 
     // If space pressed set R0 to -1
-    @SET_R0_TO_BLACK    
-    D;JEQ   
+    @FILL_SCREEN    
+    D;JNE   
 
-    @FILL_SCREEN
-    0;JMP
-
-    (SET_R0_TO_BLACK)
-        @R0
-        M=-1
+    @R0
+    M=-1
 
     (FILL_SCREEN)
 
