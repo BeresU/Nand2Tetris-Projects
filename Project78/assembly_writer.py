@@ -218,6 +218,7 @@ class AssemblyWriter:
         self._write_assembly(f"\n({full_label_name})")
 
     def _do_eq(self):
+        self._write_comment("EQ")
         self._pop_stack()
         self._write_assembly(f"A=A-1")
         self._write_assembly(f"D=M-D")
