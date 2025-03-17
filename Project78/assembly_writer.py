@@ -90,7 +90,7 @@ class AssemblyWriter:
             case "eq":
                 self._do_eq()
             case "gt" | "lt":
-                jump_expression = "JGT" if method_type == "gt" else "JLT"
+                jump_expression = "JLE" if method_type == "gt" else "JGE"
                 label_name = "SET_GREATER_THEN" if method_type == "gt" else "SET_LOWER_THEN"
                 self._do_boolean_logic(jump_expression, label_name)
 
@@ -198,28 +198,24 @@ class AssemblyWriter:
         self._write_assembly(f"M={expression}")
 
     def _do_boolean_logic(self, jump_expression, label_name):
-        full_label_name = f"{self._get_full_label_name(label_name)}_{self.get_label_count(label_name)}"
-        continue_label = f"{self._get_full_label_name('CONTINUE')}_{self.get_label_count('CONTINUE')}"
+        end_label_name = self._get_full_label_name(f"END_{label_name}")
+        full_label_name = f"{end_label_name}_{self.get_label_count(end_label_name)}"
 
-        self.increase_label_count(label_name)
-        self.increase_label_count("CONTINUE")
+        self.increase_label_count(end_label_name)
 
         self._pop_stack()
         self._write_assembly(f"A=A-1")
         self._write_assembly(f"D=M-D")
+        self._write_assembly(f"M=0")
+
         self._write_assembly(f"@{full_label_name}")
         self._write_assembly(f"D;{jump_expression}")
 
         self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
         self._write_assembly(f"A=M-1")
-        self._write_assembly(f"M=0")
-        self._write_assembly(f"@{continue_label}")
-        self._write_assembly(f"0;JMP")
-        self._write_assembly(f"\n({full_label_name})")
-        self._write_assembly(f"@{AssemblyWriter.SP_KEYWORD}")
-        self._write_assembly(f"A=M-1")
         self._write_assembly(f"M=-1")
-        self._write_assembly(f"\n({continue_label})")
+
+        self._write_assembly(f"\n({full_label_name})")
 
     def _do_eq(self):
         self._pop_stack()
