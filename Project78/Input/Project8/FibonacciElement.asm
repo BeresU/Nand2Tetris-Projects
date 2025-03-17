@@ -86,20 +86,14 @@ AM=M-1
 D=M
 A=A-1
 D=M-D
-@Main.Main.fibonacci$SET_LOWER_THEN_1
-D;JLT
-@SP
-A=M-1
 M=0
-@Main.Main.fibonacci$CONTINUE_1
-0;JMP
-
-(Main.Main.fibonacci$SET_LOWER_THEN_1)
+@END_LOWER_THEN_1
+D;JGE
 @SP
 A=M-1
 M=-1
 
-(Main.Main.fibonacci$CONTINUE_1)
+(END_LOWER_THEN_1)
 // if-goto Main.Main.fibonacci$N_LT_2
 // SP--
 @SP

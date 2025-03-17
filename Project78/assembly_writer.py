@@ -91,7 +91,7 @@ class AssemblyWriter:
                 self._do_eq()
             case "gt" | "lt":
                 jump_expression = "JLE" if method_type == "gt" else "JGE"
-                label_name = "SET_GREATER_THEN" if method_type == "gt" else "SET_LOWER_THEN"
+                label_name = "GREATER_THEN" if method_type == "gt" else "LOWER_THEN"
                 self._do_boolean_logic(jump_expression, label_name)
 
     def _push_regular_value(self, value_type, value):
@@ -198,7 +198,7 @@ class AssemblyWriter:
         self._write_assembly(f"M={expression}")
 
     def _do_boolean_logic(self, jump_expression, label_name):
-        end_label_name = self._get_full_label_name(f"END_{label_name}")
+        end_label_name = f"END_{label_name}"
         full_label_name = f"{end_label_name}_{self.get_label_count(end_label_name)}"
 
         self.increase_label_count(end_label_name)
