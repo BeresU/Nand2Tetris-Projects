@@ -1,0 +1,8 @@
+class Main {
+    function void main() {
+        var Graphics graphics;
+        do graphics.drawBackground(0);
+        return; 
+    }
+} 
+

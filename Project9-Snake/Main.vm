@@ -1,0 +1,7 @@
+function Main.main 1
+    push local 0
+    push constant 0
+    call Graphics.drawBackground 2
+    pop temp 0
+    push constant 0
+    return
