@@ -1,7 +1,9 @@
 class Main {
     function void main() {
-        var Graphics graphics;
-        do graphics.drawBackground(0);
+        var SnakeGame snakeGame;
+        let snakeGame = SnakeGame.new();
+        do snakeGame.run();
+        do snakeGame.dispose();
         return; 
     }
 } 

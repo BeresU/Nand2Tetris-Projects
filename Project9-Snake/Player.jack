@@ -1,0 +1,37 @@
+class Player {
+    field int size;
+    field int position;
+    field int moveSteps;
+
+    constructor Player new (int playerPosition, int playerSize) {
+       do Graphics.drawPlayer(playerPosition);
+       let position = playerPosition;
+       let size = playerSize;
+       let moveSteps = 1;
+       return this;
+    }
+
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void moveUp(){
+        return;
+    }
+
+    method void moveDown(){
+        return;
+    }
+
+    method void moveRight(){
+        //do Graphics.erasePlayer(position);
+        let position = position + moveSteps;
+        do Graphics.drawPlayer(position);
+        return;
+    }
+
+    method void moveLeft(){
+        return;
+    }
+}

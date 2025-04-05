@@ -1,11 +1,11 @@
 class Graphics {
-    method void drawBackground (int location) {
-        do drawLeftRightSides();
-        do drawBottomUpperSides();
+    function void drawBackground () {
+        do Graphics.drawLeftRightSides();
+        do Graphics.drawBottomUpperSides();
         return;
     }
 
-    method void drawLeftRightSides(){
+    function void drawLeftRightSides(){
         var int i;
         var int rows;
         var int rowAddress;
@@ -15,14 +15,14 @@ class Graphics {
 
         while(i < rows) {
             let rowAddress = 512*i;
-            do drawBackgroundBlock(rowAddress);
-            do drawBackgroundBlock(31+rowAddress);
+            do Graphics.drawBackgroundBlock(rowAddress);
+            do Graphics.drawBackgroundBlock(31+rowAddress);
             let i = i + 1;
         }
         return;
     }
 
-    method void drawBottomUpperSides(){
+    function void drawBottomUpperSides(){
         var int i;
         var int columns;
         var int bottomPixels;
@@ -32,14 +32,14 @@ class Graphics {
         let bottomPixels = 512*15;
 
         while(i < columns) {
-            do drawBackgroundBlock(i);
-            do drawBackgroundBlock(bottomPixels + i);
+            do Graphics.drawBackgroundBlock(i);
+            do Graphics.drawBackgroundBlock(bottomPixels + i);
             let i = i + 1;
         }
         return;
     }
 
-    method void drawBackgroundBlock (int location) {
+    function void drawBackgroundBlock (int location) {
         var int memAddress; 
         let memAddress = 16384+location;
         // column 0
@@ -59,6 +59,40 @@ class Graphics {
         do Memory.poke(memAddress +416, -31807);
         do Memory.poke(memAddress +448, -31807);
         do Memory.poke(memAddress +480, -1);
+        return;
+    }
+
+    function void drawPlayer(int location) {
+        var int memAddress; 
+        let memAddress = 16384+location;
+        // column 0
+        // column 1
+        // column 2
+        do Memory.poke(memAddress +2, 255);
+        do Memory.poke(memAddress +34, 129);
+        do Memory.poke(memAddress +66, 129);
+        do Memory.poke(memAddress +98, 153);
+        do Memory.poke(memAddress +130, 153);
+        do Memory.poke(memAddress +162, 129);
+        do Memory.poke(memAddress +194, 129);
+        do Memory.poke(memAddress +226, 255);
+        return;
+    }
+
+    function void erasePlayer(int location) {
+        var int memAddress; 
+        let memAddress = 16384+location;
+        // column 0
+        // column 1
+        // column 2
+        do Memory.poke(memAddress +2, 0);
+        do Memory.poke(memAddress +34, 0);
+        do Memory.poke(memAddress +66, 0);
+        do Memory.poke(memAddress +98, 0);
+        do Memory.poke(memAddress +130, 0);
+        do Memory.poke(memAddress +162, 0);
+        do Memory.poke(memAddress +194, 0);
+        do Memory.poke(memAddress +226, 0);
         return;
     }
 }
