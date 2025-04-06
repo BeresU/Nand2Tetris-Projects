@@ -8,7 +8,7 @@ class SnakeGame {
         do Graphics.drawBackground();
         let player = Player.new(24*256+200, 1);
         let direction = 0;
-        let waitTime = 500;
+        let waitTime = 70;
         return this;
     }
 
@@ -31,10 +31,34 @@ class SnakeGame {
         let key = Keyboard.keyPressed();
 
         if (key = 81)  { let exit = true; }     
-        if (key = 131) { let direction = 1; }   // up arrow
-        if (key = 133) { let direction = 2; }   // down arrow
-        if (key = 130) { let direction = 3; }   // left arrow
-        if (key = 132) { let direction = 4; }   // right arrow
+
+        // up arrow
+        if (key = 131) { 
+            if (~(direction = 2)){
+              let direction = 1; 
+            }
+        }   
+
+        // down arrow
+        if (key = 133) { 
+            if (~(direction = 1)){
+             let direction = 2;
+            }
+        }
+
+        // left arrow
+        if (key = 130) {
+            if(~(direction = 4)){
+             let direction = 3; 
+            }
+        }
+
+        // right arrow
+        if (key = 132) { 
+            if(~(direction = 3)){
+                let direction = 4; 
+            }
+        }   
         
         do movePlayer();
      } 

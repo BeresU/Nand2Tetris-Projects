@@ -14,7 +14,7 @@ function SnakeGame.new 0
     pop this 0
     push constant 0
     pop this 1
-    push constant 500
+    push constant 70
     pop this 2
     push pointer 0
     return
@@ -108,8 +108,17 @@ label SnakeGame_12
     eq
     not
     if-goto SnakeGame_15
+    push this 1
+    push constant 2
+    eq
+    not
+    not
+    if-goto SnakeGame_17
     push constant 1
     pop this 1
+    goto SnakeGame_16
+label SnakeGame_17
+label SnakeGame_16
     goto SnakeGame_14
 label SnakeGame_15
 label SnakeGame_14
@@ -117,32 +126,59 @@ label SnakeGame_14
     push constant 133
     eq
     not
-    if-goto SnakeGame_17
-    push constant 2
-    pop this 1
-    goto SnakeGame_16
-label SnakeGame_17
-label SnakeGame_16
-    push local 0
-    push constant 130
+    if-goto SnakeGame_19
+    push this 1
+    push constant 1
     eq
     not
-    if-goto SnakeGame_19
-    push constant 3
-    pop this 1
-    goto SnakeGame_18
-label SnakeGame_19
-label SnakeGame_18
-    push local 0
-    push constant 132
-    eq
     not
     if-goto SnakeGame_21
-    push constant 4
+    push constant 2
     pop this 1
     goto SnakeGame_20
 label SnakeGame_21
 label SnakeGame_20
+    goto SnakeGame_18
+label SnakeGame_19
+label SnakeGame_18
+    push local 0
+    push constant 130
+    eq
+    not
+    if-goto SnakeGame_23
+    push this 1
+    push constant 4
+    eq
+    not
+    not
+    if-goto SnakeGame_25
+    push constant 3
+    pop this 1
+    goto SnakeGame_24
+label SnakeGame_25
+label SnakeGame_24
+    goto SnakeGame_22
+label SnakeGame_23
+label SnakeGame_22
+    push local 0
+    push constant 132
+    eq
+    not
+    if-goto SnakeGame_27
+    push this 1
+    push constant 3
+    eq
+    not
+    not
+    if-goto SnakeGame_29
+    push constant 4
+    pop this 1
+    goto SnakeGame_28
+label SnakeGame_29
+label SnakeGame_28
+    goto SnakeGame_26
+label SnakeGame_27
+label SnakeGame_26
     push pointer 0
     call SnakeGame.movePlayer 1
     pop temp 0
