@@ -3,47 +3,98 @@ class SnakeGame {
     field Player player;
     field int direction; 
     field int waitTime;
+    field int column, row;
+    field int score;
 
     constructor SnakeGame new () {
         do Graphics.drawBackground();
-        let player = Player.new(24*256+200, 4);
+        let row = 512*12;
+        let column = 6;
+        let player = Player.new(row + column, 4);
         let direction = 0;
         let waitTime = 150;
+        let score = 0;
         return this;
     }   
     
     method void movePlayer() {
         do player.moveAccordingToDirection(direction);
-        do Sys.wait(waitTime);  
+        do setCoordinatePosition();
+        do Sys.wait(waitTime);
         return;
-   }
+    }
 
-   method void run() {
-      var char key;  
-      var boolean exit;
-      let exit = false;
-      
-      while (~exit) {
-        let key = Keyboard.keyPressed();
+    method void setCoordinatePosition() {
+        if (direction = 1) {let row = row - 512;}
+        if (direction = 2) {let row = row + 512;}
+        if (direction = 3) {let column = column - 1;}
+        if (direction = 4) {let column = column + 1;}
+        return;
+    }
 
-        if (key = 81)  { let exit = true; }     
-
-        // up arrow
-        if ((key = 131) & (~(direction = 2))) { let direction = 1;}   
-
-        // down arrow
-        if ((key = 133) & (~(direction = 1))) { let direction = 2;}
-
-        // left arrow
-        if ((key = 130) & (~(direction = 4))) {let direction = 3;}
-
-        // right arrow
-        if ((key = 132) & (~(direction = 3))) { let direction = 4;}   
+    method void run() {
+        var char key;  
+        var boolean exit;
+        let exit = false;
         
-        do movePlayer();
-     } 
-     return;
-   }
+        while (~exit) {
+            let key = Keyboard.keyPressed();
+
+            // q
+            if (key = 113)  { let exit = true; }     
+
+            // up arrow
+            if ((key = 131) & (~(direction = 2))) { let direction = 1;}   
+
+            // down arrow
+            if ((key = 133) & (~(direction = 1))) { let direction = 2;}
+
+            // left arrow
+            if ((key = 130) & (~(direction = 4))) {let direction = 3;}
+
+            // right arrow
+            if ((key = 132) & (~(direction = 3))) { let direction = 4;}   
+            
+            do movePlayer();
+
+            if(isGameOver()) {let exit = true;}
+        } 
+
+        do showGameOver();
+        return;
+    }
+
+    method void showGameOver(){
+        do player.hide();
+        do Graphics.drawBackground();
+
+        do Output.moveCursor(9, 27);
+        do Output.printString("Game Over");
+        do Output.moveCursor(12, 27);
+        do Output.printString("Score: ");
+        do Output.printInt(score);
+        return;
+    }
+
+    method boolean isGameOver(){
+        var boolean isColideWithWall;
+        var boolean isColideWithSelf;
+        
+        let isColideWithWall = checkWallColision();
+        let isColideWithSelf = false;
+        
+        return isColideWithWall | isColideWithSelf;
+    }
+
+    method boolean checkWallColision() {
+        var int playerPosition;
+        let playerPosition = player.getPosition();
+
+        if (((playerPosition - column) = 0) | ((playerPosition - row) = 0)) {return true;}
+        if (((31 - (playerPosition - row) = 0)) | (((512*15) - (playerPosition - column) = 0))) {return true;}
+
+        return false;
+    }
 
     method void dispose(){
         do player.dispose();

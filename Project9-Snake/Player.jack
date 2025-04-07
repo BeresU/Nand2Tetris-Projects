@@ -67,6 +67,17 @@ class Player {
         return;
     }
 
+    method void hide() { 
+        var int i;
+        let i = 0;
+
+        while(i < size) {
+            do Graphics.erasePlayer(positions[i]);
+            let i = i + 1;
+        }
+        return;
+    }
+
     method void moveAccordingToDirection(int direction) {
         if (direction = 0) { return; }
         let moveDirection = direction;
@@ -74,7 +85,6 @@ class Player {
         if (direction = 2) { do moveDown(); }
         if (direction = 3) { do moveLeft(); }
         if (direction = 4) { do moveRight(); }
-        do Sys.wait(150);  
         return;
     }
 
