@@ -262,7 +262,8 @@ function SnakeGame.isGameOver 2
     push pointer 0
     call SnakeGame.checkWallColision 1
     pop local 0
-    push constant 0
+    push this 0
+    call Player.isCollideWithSelf 1
     pop local 1
     push local 0
     push local 1

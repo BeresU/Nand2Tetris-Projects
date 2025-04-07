@@ -77,13 +77,13 @@ class SnakeGame {
     }
 
     method boolean isGameOver(){
-        var boolean isColideWithWall;
-        var boolean isColideWithSelf;
+        var boolean isCollideWithWall;
+        var boolean isCollideWithSelf;
         
-        let isColideWithWall = checkWallColision();
-        let isColideWithSelf = false;
+        let isCollideWithWall = checkWallColision();
+        let isCollideWithSelf = player.isCollideWithSelf();
         
-        return isColideWithWall | isColideWithSelf;
+        return isCollideWithWall | isCollideWithSelf;
     }
 
     method boolean checkWallColision() {

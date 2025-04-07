@@ -26,6 +26,23 @@ class Player {
         return positions[0];
     }
 
+    method boolean isCollideWithSelf() {
+        var int position;
+        var int i;
+
+        let position = getPosition();
+
+        let i = 1;
+
+        while(i < size) {
+
+            if(positions[i] = position) {return true;}
+            let i = i + 1;
+        }
+
+        return false;
+    }
+
     method void increaseSize() {
         var Array tempArray;
         var int i;
