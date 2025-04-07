@@ -6,9 +6,9 @@ function Graphics.drawBackground 0
     push constant 0
     return
 function Graphics.drawVeritcalSides 3
-    push constant 0
+    push constant 1
     pop local 0
-    push constant 16
+    push constant 15
     pop local 1
 label Graphics_0
     push local 0
@@ -21,12 +21,12 @@ label Graphics_0
     call Math.multiply 2
     pop local 2
     push local 2
-    call Graphics.drawLeftBackgroundBlock 1
+    call Graphics.drawBackgroundBlock 1
     pop temp 0
     push constant 31
     push local 2
     add
-    call Graphics.drawRightBackgroundBlock 1
+    call Graphics.drawBackgroundBlock 1
     pop temp 0
     push local 0
     push constant 1
@@ -41,8 +41,8 @@ function Graphics.drawHorizontalSides 3
     pop local 0
     push constant 32
     pop local 1
-    push constant 256
-    push constant 31
+    push constant 512
+    push constant 15
     call Math.multiply 2
     pop local 2
 label Graphics_2
@@ -52,12 +52,12 @@ label Graphics_2
     not
     if-goto Graphics_3
     push local 0
-    call Graphics.drawHorizontalBackgroundBlock 1
+    call Graphics.drawBackgroundBlock 1
     pop temp 0
     push local 2
     push local 0
     add
-    call Graphics.drawHorizontalBackgroundBlock 1
+    call Graphics.drawBackgroundBlock 1
     pop temp 0
     push local 0
     push constant 1
@@ -67,7 +67,7 @@ label Graphics_2
 label Graphics_3
     push constant 0
     return
-function Graphics.drawHorizontalBackgroundBlock 1
+function Graphics.drawBackgroundBlock 1
     push constant 16384
     push argument 0
     add
@@ -80,267 +80,105 @@ function Graphics.drawHorizontalBackgroundBlock 1
     push local 0
     push constant 32
     add
-    push constant 28143
+    push constant 32631
     neg
     call Memory.poke 2
     pop temp 0
     push local 0
     push constant 64
     add
-    push constant 32767
+    push constant 22527
     neg
     call Memory.poke 2
     pop temp 0
     push local 0
     push constant 96
     add
-    push constant 30687
+    push constant 30559
     neg
     call Memory.poke 2
     pop temp 0
     push local 0
     push constant 128
     add
-    push constant 32765
+    push constant 32759
     neg
     call Memory.poke 2
     pop temp 0
     push local 0
     push constant 160
     add
-    push constant 31679
+    push constant 28383
     neg
     call Memory.poke 2
     pop temp 0
     push local 0
     push constant 192
     add
-    push constant 32767
+    push constant 32635
     neg
     call Memory.poke 2
     pop temp 0
     push local 0
     push constant 224
+    add
+    push constant 31727
+    neg
+    call Memory.poke 2
+    pop temp 0
+    push local 0
+    push constant 256
+    add
+    push constant 28663
+    neg
+    call Memory.poke 2
+    pop temp 0
+    push local 0
+    push constant 288
+    add
+    push constant 32639
+    neg
+    call Memory.poke 2
+    pop temp 0
+    push local 0
+    push constant 320
+    add
+    push constant 23999
+    neg
+    call Memory.poke 2
+    pop temp 0
+    push local 0
+    push constant 352
+    add
+    push constant 32621
+    neg
+    call Memory.poke 2
+    pop temp 0
+    push local 0
+    push constant 384
+    add
+    push constant 27647
+    neg
+    call Memory.poke 2
+    pop temp 0
+    push local 0
+    push constant 416
+    add
+    push constant 16095
+    neg
+    call Memory.poke 2
+    pop temp 0
+    push local 0
+    push constant 448
+    add
+    push constant 30717
+    neg
+    call Memory.poke 2
+    pop temp 0
+    push local 0
+    push constant 480
     add
     push constant 1
-    neg
-    call Memory.poke 2
-    pop temp 0
-    push constant 0
-    return
-function Graphics.drawLeftBackgroundBlock 1
-    push constant 16384
-    push argument 0
-    add
-    pop local 0
-    push local 0
-    push constant 255
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 32
-    add
-    push constant 137
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 64
-    add
-    push constant 129
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 96
-    add
-    push constant 133
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 128
-    add
-    push constant 129
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 160
-    add
-    push constant 129
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 192
-    add
-    push constant 193
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 224
-    add
-    push constant 129
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 256
-    add
-    push constant 133
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 288
-    add
-    push constant 161
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 320
-    add
-    push constant 129
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 352
-    add
-    push constant 137
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 384
-    add
-    push constant 129
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 416
-    add
-    push constant 133
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 448
-    add
-    push constant 161
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 480
-    add
-    push constant 255
-    call Memory.poke 2
-    pop temp 0
-    push constant 0
-    return
-function Graphics.drawRightBackgroundBlock 1
-    push constant 16384
-    push argument 0
-    add
-    pop local 0
-    push local 0
-    push constant 256
-    neg
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 32
-    add
-    push constant 32512
-    neg
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 64
-    add
-    push constant 28416
-    neg
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 96
-    add
-    push constant 30464
-    neg
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 128
-    add
-    push constant 32512
-    neg
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 160
-    add
-    push constant 32512
-    neg
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 192
-    add
-    push constant 16128
-    neg
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 224
-    add
-    push constant 30464
-    neg
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 256
-    add
-    push constant 28416
-    neg
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 288
-    add
-    push constant 32512
-    neg
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 320
-    add
-    push constant 30464
-    neg
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 352
-    add
-    push constant 32512
-    neg
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 384
-    add
-    push constant 24320
-    neg
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 416
-    add
-    push constant 32512
-    neg
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 448
-    add
-    push constant 31488
-    neg
-    call Memory.poke 2
-    pop temp 0
-    push local 0
-    push constant 480
-    add
-    push constant 256
     neg
     call Memory.poke 2
     pop temp 0
