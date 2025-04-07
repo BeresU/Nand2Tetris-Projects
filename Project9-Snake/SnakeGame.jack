@@ -50,14 +50,16 @@ class SnakeGame {
             if ((key = 133) & (~(direction = 1))) { let direction = 2;}
 
             // left arrow
-            if ((key = 130) & (~(direction = 4))) {let direction = 3;}
+            if ((key = 130) & (~(direction = 4))) { let direction = 3;}
 
             // right arrow
             if ((key = 132) & (~(direction = 3))) { let direction = 4;}   
             
-            do movePlayer();
-
             if(isGameOver()) {let exit = true;}
+            
+            if (exit = false){
+                do movePlayer();
+            }
         } 
 
         do showGameOver();
@@ -88,10 +90,17 @@ class SnakeGame {
 
     method boolean checkWallColision() {
         var int playerPosition;
+        var int targetPosition;
         let playerPosition = player.getPosition();
 
-        if (((playerPosition - column) = 0) | ((playerPosition - row) = 0)) {return true;}
-        if (((31 - (playerPosition - row) = 0)) | (((512*15) - (playerPosition - column) = 0))) {return true;}
+        if(direction = 1) {let targetPosition = playerPosition - 512;}
+        if(direction = 2) {let targetPosition = playerPosition + 512;}
+        if(direction = 3) {let targetPosition = playerPosition - 1;}
+        if(direction = 4) {let targetPosition = playerPosition + 1;}
+
+
+        if (((targetPosition - column) = 0) | ((targetPosition - row) = 0)) {return true;}
+        if (((31 - (targetPosition - row) = 0)) | (((512*15) - (targetPosition - column) = 0))) {return true;}
 
         return false;
     }
