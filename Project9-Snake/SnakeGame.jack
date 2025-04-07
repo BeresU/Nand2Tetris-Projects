@@ -6,20 +6,16 @@ class SnakeGame {
 
     constructor SnakeGame new () {
         do Graphics.drawBackground();
-        let player = Player.new(24*256+200, 1);
+        let player = Player.new(24*256+200, 4);
         let direction = 0;
-        let waitTime = 70;
+        let waitTime = 150;
         return this;
-    }
-
-   method void movePlayer() {
-      if (direction = 0) { return; }
-      if (direction = 1) { do player.moveUp(); }
-      if (direction = 2) { do player.moveDown(); }
-      if (direction = 3) { do player.moveLeft(); }
-      if (direction = 4) { do player.moveRight(); }
-      do Sys.wait(waitTime);  
-      return;
+    }   
+    
+    method void movePlayer() {
+        do player.moveAccordingToDirection(direction);
+        do Sys.wait(waitTime);  
+        return;
    }
 
    method void run() {
@@ -33,32 +29,16 @@ class SnakeGame {
         if (key = 81)  { let exit = true; }     
 
         // up arrow
-        if (key = 131) { 
-            if (~(direction = 2)){
-              let direction = 1; 
-            }
-        }   
+        if ((key = 131) & (~(direction = 2))) { let direction = 1;}   
 
         // down arrow
-        if (key = 133) { 
-            if (~(direction = 1)){
-             let direction = 2;
-            }
-        }
+        if ((key = 133) & (~(direction = 1))) { let direction = 2;}
 
         // left arrow
-        if (key = 130) {
-            if(~(direction = 4)){
-             let direction = 3; 
-            }
-        }
+        if ((key = 130) & (~(direction = 4))) {let direction = 3;}
 
         // right arrow
-        if (key = 132) { 
-            if(~(direction = 3)){
-                let direction = 4; 
-            }
-        }   
+        if ((key = 132) & (~(direction = 3))) { let direction = 4;}   
         
         do movePlayer();
      } 
