@@ -17,8 +17,9 @@ class SnakeGame {
         return this;
     }   
     
-    method void movePlayer() {
-        do player.moveAccordingToDirection(direction);
+    method void movePlayer(int nextPosition) {
+        if (direction = 0) {return;}
+        do player.moveAccordingToDirection(direction, nextPosition);
         do setCoordinatePosition();
         do Sys.wait(waitTime);
         return;
@@ -35,8 +36,9 @@ class SnakeGame {
     method void run() {
         var char key;  
         var boolean exit;
+        var int nextPosition;
         let exit = false;
-        
+
         while (~exit) {
             let key = Keyboard.keyPressed();
 
@@ -53,12 +55,14 @@ class SnakeGame {
             if ((key = 130) & (~(direction = 4))) { let direction = 3;}
 
             // right arrow
-            if ((key = 132) & (~(direction = 3))) { let direction = 4;}   
+            if ((key = 132) & (~(direction = 3))) { let direction = 4;}  
+
+            let nextPosition = getNextPosition(); 
             
-            if(isGameOver()) {let exit = true;}
+            if(isGameOver(nextPosition)) {let exit = true;}
             
             if (exit = false){
-                do movePlayer();
+                do movePlayer(nextPosition);
             }
         } 
 
@@ -78,31 +82,29 @@ class SnakeGame {
         return;
     }
 
-    method boolean isGameOver(){
-        var boolean isCollideWithWall;
-        var boolean isCollideWithSelf;
-        
-        let isCollideWithWall = checkWallColision();
-        let isCollideWithSelf = player.isCollideWithSelf();
-        
-        return isCollideWithWall | isCollideWithSelf;
+    method boolean isGameOver(int nextPosition){        
+        return checkWallColision(nextPosition) | player.isCollideWithSelf(nextPosition);
     }
 
-    method boolean checkWallColision() {
+    method boolean checkWallColision(int nextPosition) {
         var int playerPosition;
-        var int targetPosition;
-        let playerPosition = player.getPosition();
-
-        if(direction = 1) {let targetPosition = playerPosition - 512;}
-        if(direction = 2) {let targetPosition = playerPosition + 512;}
-        if(direction = 3) {let targetPosition = playerPosition - 1;}
-        if(direction = 4) {let targetPosition = playerPosition + 1;}
-
-
-        if (((targetPosition - column) = 0) | ((targetPosition - row) = 0)) {return true;}
-        if (((31 - (targetPosition - row) = 0)) | (((512*15) - (targetPosition - column) = 0))) {return true;}
+        
+        if (((nextPosition - column) = 0) | ((nextPosition - row) = 0)) {return true;}
+        if (((31 - (nextPosition - row) = 0)) | (((512*15) - (nextPosition - column) = 0))) {return true;}
 
         return false;
+    }
+
+    method int getNextPosition(){
+        var int playerPosition;
+        let playerPosition = player.getPosition();
+
+        if(direction = 1) {return playerPosition - 512;}
+        if(direction = 2) {return playerPosition + 512;}
+        if(direction = 3) {return playerPosition - 1;}
+        if(direction = 4) {return playerPosition + 1;}
+
+        return 0;
     }
 
     method void dispose(){

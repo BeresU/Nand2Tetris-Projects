@@ -26,17 +26,13 @@ class Player {
         return positions[0];
     }
 
-    method boolean isCollideWithSelf() {
-        var int position;
+    method boolean isCollideWithSelf(int nextPosition) {
         var int i;
-
-        let position = getPosition();
-
         let i = 1;
 
         while(i < size) {
 
-            if(positions[i] = position) {return true;}
+            if(positions[i] = nextPosition) {return true;}
             let i = i + 1;
         }
 
@@ -95,37 +91,13 @@ class Player {
         return;
     }
 
-    method void moveAccordingToDirection(int direction) {
-        if (direction = 0) { return; }
+    method void moveAccordingToDirection(int direction, int position) {
         let moveDirection = direction;
-        if (direction = 1) { do moveUp(); }
-        if (direction = 2) { do moveDown(); }
-        if (direction = 3) { do moveLeft(); }
-        if (direction = 4) { do moveRight(); }
+        do move(position);
         return;
     }
 
-    method void moveUp() {
-        do move(-512);
-        return;
-    }
-
-    method void moveDown() {
-        do move(512);
-        return;
-    }
-
-    method void moveRight() {
-        do move(1);
-        return;
-    }
-
-    method void moveLeft() {
-        do move(-1);
-        return;
-    }
-
-    method void move(int target) {
+    method void move(int position) {
         var int i;
         var int headPosition;
         var int partPosition;
@@ -138,7 +110,7 @@ class Player {
         }
 
         let headPosition = positions[0];
-        let positions[0] = headPosition + target;
+        let positions[0] = position;
         do Graphics.drawPlayer(positions[0]);
 
         let i = 1;

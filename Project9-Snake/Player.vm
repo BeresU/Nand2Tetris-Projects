@@ -49,26 +49,23 @@ function Player.getPosition 0
     pop pointer 1
     push that 0
     return
-function Player.isCollideWithSelf 2
+function Player.isCollideWithSelf 1
     push argument 0
     pop pointer 0
-    push pointer 0
-    call Player.getPosition 1
-    pop local 0
     push constant 1
-    pop local 1
+    pop local 0
 label Player_2
-    push local 1
+    push local 0
     push this 0
     lt
     not
     if-goto Player_3
-    push local 1
+    push local 0
     push this 1
     add
     pop pointer 1
     push that 0
-    push local 0
+    push argument 1
     eq
     not
     if-goto Player_5
@@ -78,10 +75,10 @@ label Player_2
     goto Player_4
 label Player_5
 label Player_4
-    push local 1
+    push local 0
     push constant 1
     add
-    pop local 1
+    pop local 0
     goto Player_2
 label Player_3
     push constant 0
@@ -247,97 +244,9 @@ function Player.moveAccordingToDirection 0
     push argument 0
     pop pointer 0
     push argument 1
-    push constant 0
-    eq
-    not
-    if-goto Player_19
-    push constant 0
-    return
-    goto Player_18
-label Player_19
-label Player_18
-    push argument 1
     pop this 2
-    push argument 1
-    push constant 1
-    eq
-    not
-    if-goto Player_21
     push pointer 0
-    call Player.moveUp 1
-    pop temp 0
-    goto Player_20
-label Player_21
-label Player_20
-    push argument 1
-    push constant 2
-    eq
-    not
-    if-goto Player_23
-    push pointer 0
-    call Player.moveDown 1
-    pop temp 0
-    goto Player_22
-label Player_23
-label Player_22
-    push argument 1
-    push constant 3
-    eq
-    not
-    if-goto Player_25
-    push pointer 0
-    call Player.moveLeft 1
-    pop temp 0
-    goto Player_24
-label Player_25
-label Player_24
-    push argument 1
-    push constant 4
-    eq
-    not
-    if-goto Player_27
-    push pointer 0
-    call Player.moveRight 1
-    pop temp 0
-    goto Player_26
-label Player_27
-label Player_26
-    push constant 0
-    return
-function Player.moveUp 0
-    push argument 0
-    pop pointer 0
-    push pointer 0
-    push constant 512
-    neg
-    call Player.move 2
-    pop temp 0
-    push constant 0
-    return
-function Player.moveDown 0
-    push argument 0
-    pop pointer 0
-    push pointer 0
-    push constant 512
-    call Player.move 2
-    pop temp 0
-    push constant 0
-    return
-function Player.moveRight 0
-    push argument 0
-    pop pointer 0
-    push pointer 0
-    push constant 1
-    call Player.move 2
-    pop temp 0
-    push constant 0
-    return
-function Player.moveLeft 0
-    push argument 0
-    pop pointer 0
-    push pointer 0
-    push constant 1
-    neg
+    push argument 2
     call Player.move 2
     pop temp 0
     push constant 0
@@ -347,12 +256,12 @@ function Player.move 3
     pop pointer 0
     push constant 0
     pop local 0
-label Player_28
+label Player_18
     push local 0
     push this 0
     lt
     not
-    if-goto Player_29
+    if-goto Player_19
     push local 0
     push this 1
     add
@@ -364,8 +273,8 @@ label Player_28
     push constant 1
     add
     pop local 0
-    goto Player_28
-label Player_29
+    goto Player_18
+label Player_19
     push constant 0
     push this 1
     add
@@ -375,9 +284,7 @@ label Player_29
     push constant 0
     push this 1
     add
-    push local 1
     push argument 1
-    add
     pop temp 0
     pop pointer 1
     push temp 0
@@ -391,12 +298,12 @@ label Player_29
     pop temp 0
     push constant 1
     pop local 0
-label Player_30
+label Player_20
     push local 0
     push this 0
     lt
     not
-    if-goto Player_31
+    if-goto Player_21
     push local 0
     push this 1
     add
@@ -424,7 +331,7 @@ label Player_30
     push constant 1
     add
     pop local 0
-    goto Player_30
-label Player_31
+    goto Player_20
+label Player_21
     push constant 0
     return
