@@ -107,4 +107,50 @@ class Graphics {
         do Memory.poke(memAddress +480, 0);
         return;
     }
+
+    function void drawFood(int location) {
+        var int memAddress; 
+        let memAddress = 16384+location;
+        // column 0
+        do Memory.poke(memAddress, 1632);
+        do Memory.poke(memAddress +32, 1440);
+        do Memory.poke(memAddress +64, 1056);
+        do Memory.poke(memAddress +96, 1056);
+        do Memory.poke(memAddress +128, 960);
+        do Memory.poke(memAddress +160, -4081);
+        do Memory.poke(memAddress +192, -30703);
+        do Memory.poke(memAddress +224, 18450);
+        do Memory.poke(memAddress +256, 18450);
+        do Memory.poke(memAddress +288, -30703);
+        do Memory.poke(memAddress +320, -4081);
+        do Memory.poke(memAddress +352, 960);
+        do Memory.poke(memAddress +384, 1056);
+        do Memory.poke(memAddress +416, 1056);
+        do Memory.poke(memAddress +448, 1440);
+        do Memory.poke(memAddress +480, 1632);
+        return;
+    }
+
+    function void eraseFood(int location) {
+        var int memAddress; 
+        let memAddress = 16384+location;
+        // column 0
+        do Memory.poke(memAddress, 0);
+        do Memory.poke(memAddress +32, 0);
+        do Memory.poke(memAddress +64, 0);
+        do Memory.poke(memAddress +96, 0);
+        do Memory.poke(memAddress +128, 0);
+        do Memory.poke(memAddress +160, 0);
+        do Memory.poke(memAddress +192, 0);
+        do Memory.poke(memAddress +224, 0);
+        do Memory.poke(memAddress +256, 0);
+        do Memory.poke(memAddress +288, 0);
+        do Memory.poke(memAddress +320, 0);
+        do Memory.poke(memAddress +352, 0);
+        do Memory.poke(memAddress +384, 0);
+        do Memory.poke(memAddress +416, 0);
+        do Memory.poke(memAddress +448, 0);
+        do Memory.poke(memAddress +480, 0);
+        return;
+    }
 }

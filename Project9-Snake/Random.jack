@@ -1,0 +1,32 @@
+class Random {
+    field int state;
+
+    constructor Random new (int seed) {
+        let state = seed;
+        return this;
+    }
+    
+    method int next() {
+        var int a;
+        var int c;
+        var int m;
+
+        let a = 1665;
+        let c = 1013;
+        let m = 32767;
+
+        let state = a * state + c;
+        let state = mod(state, m);
+        let state = Math.abs(state);
+
+        return state;
+    }
+
+    method int nextInRange(int maxValue) {
+        return mod(next(), maxValue);
+    }
+
+    method int mod (int a, int b) {
+        return  a - (b * (a / b));
+    }
+}
