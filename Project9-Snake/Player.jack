@@ -31,7 +31,6 @@ class Player {
         let i = 1;
 
         while(i < size) {
-
             if(positions[i] = nextPosition) {return true;}
             let i = i + 1;
         }

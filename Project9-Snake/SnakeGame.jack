@@ -61,9 +61,9 @@ class SnakeGame {
 
             let nextPosition = getNextPosition(); 
 
-            //do handleFood(nextPosition);
+            do handleFood(nextPosition);
             
-            if(isGameOver(nextPosition)) {let exit = true;}
+            //if(isGameOver(nextPosition)) {let exit = true;}
             
             if (exit = false){
                 do movePlayer(nextPosition);
@@ -95,6 +95,7 @@ class SnakeGame {
         if (~(nextPosition = food.getPosition())) {return;}
 
         // TODO: Increase player size
+        do food.hide();
         do food.spawn();
 
         return;

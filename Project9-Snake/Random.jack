@@ -6,6 +6,11 @@ class Random {
         return this;
     }
 
+    method void setSeed(int newSeed){
+        let state = newSeed;
+        return;
+    }
+
     method void dispose() { 
         do Memory.deAlloc(this);
         return;
@@ -16,20 +21,14 @@ class Random {
         var int c;
         var int m;
 
-        let a = 1665;
-        let c = 1013;
+        let a = 1680;
+        let c = 992;
         let m = 32767;
 
         let state = a * state + c;
-        let state = mod(state, m);
-        let state = Math.abs(state);
+        let state = mod(state, m) / 16 * 16;
 
         return state;
-    }
-
-    // TODO: max value should be 8192
-    method int nextInRange(int maxValue) {
-        return mod(next(), maxValue) / 16;
     }
 
     method int mod (int a, int b) {

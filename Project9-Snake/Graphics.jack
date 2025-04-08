@@ -65,6 +65,7 @@ class Graphics {
     function void drawPlayer(int location) {
         var int memAddress; 
         let memAddress = 16384+location;
+
         // column 0
         do Memory.poke(memAddress, -1);
         do Memory.poke(memAddress +32, -32767);
