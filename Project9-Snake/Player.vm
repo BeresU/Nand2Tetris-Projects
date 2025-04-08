@@ -83,7 +83,7 @@ label Player_4
 label Player_3
     push constant 0
     return
-function Player.increaseSize 3
+function Player.increaseSize 2
     push argument 0
     pop pointer 0
     push this 0
@@ -117,11 +117,9 @@ label Player_6
     pop local 1
     goto Player_6
 label Player_7
-    push this 2
-    push constant 1
-    eq
-    not
-    if-goto Player_9
+    push this 0
+    push local 0
+    add
     push this 0
     push constant 1
     sub
@@ -129,70 +127,6 @@ label Player_7
     add
     pop pointer 1
     push that 0
-    push constant 512
-    add
-    pop local 2
-    goto Player_8
-label Player_9
-label Player_8
-    push this 2
-    push constant 2
-    eq
-    not
-    if-goto Player_11
-    push this 0
-    push constant 1
-    sub
-    push local 0
-    add
-    pop pointer 1
-    push that 0
-    push constant 512
-    sub
-    pop local 2
-    goto Player_10
-label Player_11
-label Player_10
-    push this 2
-    push constant 1
-    eq
-    not
-    if-goto Player_13
-    push this 0
-    push constant 1
-    sub
-    push local 0
-    add
-    pop pointer 1
-    push that 0
-    push constant 1
-    add
-    pop local 2
-    goto Player_12
-label Player_13
-label Player_12
-    push this 2
-    push constant 1
-    eq
-    not
-    if-goto Player_15
-    push this 0
-    push constant 1
-    sub
-    push local 0
-    add
-    pop pointer 1
-    push that 0
-    push constant 1
-    sub
-    pop local 2
-    goto Player_14
-label Player_15
-label Player_14
-    push this 0
-    push local 0
-    add
-    push local 2
     pop temp 0
     pop pointer 1
     push temp 0
@@ -214,6 +148,9 @@ label Player_14
 function Player.dispose 0
     push argument 0
     pop pointer 0
+    push this 1
+    call Array.dispose 1
+    pop temp 0
     push pointer 0
     call Memory.deAlloc 1
     pop temp 0
@@ -224,12 +161,12 @@ function Player.hide 1
     pop pointer 0
     push constant 0
     pop local 0
-label Player_16
+label Player_8
     push local 0
     push this 0
     lt
     not
-    if-goto Player_17
+    if-goto Player_9
     push local 0
     push this 1
     add
@@ -241,8 +178,8 @@ label Player_16
     push constant 1
     add
     pop local 0
-    goto Player_16
-label Player_17
+    goto Player_8
+label Player_9
     push constant 0
     return
 function Player.moveAccordingToDirection 0
@@ -259,27 +196,11 @@ function Player.moveAccordingToDirection 0
 function Player.move 3
     push argument 0
     pop pointer 0
+    push pointer 0
+    call Player.hide 1
+    pop temp 0
     push constant 0
     pop local 0
-label Player_18
-    push local 0
-    push this 0
-    lt
-    not
-    if-goto Player_19
-    push local 0
-    push this 1
-    add
-    pop pointer 1
-    push that 0
-    call Graphics.erasePlayer 1
-    pop temp 0
-    push local 0
-    push constant 1
-    add
-    pop local 0
-    goto Player_18
-label Player_19
     push constant 0
     push this 1
     add
@@ -303,12 +224,12 @@ label Player_19
     pop temp 0
     push constant 1
     pop local 0
-label Player_20
+label Player_10
     push local 0
     push this 0
     lt
     not
-    if-goto Player_21
+    if-goto Player_11
     push local 0
     push this 1
     add
@@ -336,7 +257,7 @@ label Player_20
     push constant 1
     add
     pop local 0
-    goto Player_20
-label Player_21
+    goto Player_10
+label Player_11
     push constant 0
     return

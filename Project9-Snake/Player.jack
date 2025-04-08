@@ -41,7 +41,6 @@ class Player {
     method void increaseSize() {
         var Array tempArray;
         var int i;
-        var int tailPosition;
 
         let tempArray = Array.new(size + 1);
 
@@ -52,28 +51,12 @@ class Player {
             let i = i + 1;
         }
 
-        if (moveDirection = 1) {
-            let tailPosition = tempArray[size - 1] + 512;
-        }
-
-        if (moveDirection = 2) {
-            let tailPosition = tempArray[size - 1] - 512;
-        }
-
-        if (moveDirection = 1) {
-            let tailPosition = tempArray[size - 1] + 1;
-        }
-
-        if (moveDirection = 1) {
-            let tailPosition = tempArray[size - 1] - 1;
-        }
-
-        let tempArray[size] = tailPosition;
+        let tempArray[size] = tempArray[size - 1];
 
         do positions.dispose();
 
         let positions = tempArray;
-
+        
         do tempArray.dispose();
 
         let size = size + 1;
@@ -82,6 +65,7 @@ class Player {
     }
 
     method void dispose() { 
+        do positions.dispose();
         do Memory.deAlloc(this);
         return;
     }
@@ -108,13 +92,8 @@ class Player {
         var int headPosition;
         var int partPosition;
 
+        do hide();
         let i = 0;
-
-        while (i < size){
-            do Graphics.erasePlayer(positions[i]);
-            let i = i + 1;
-        }
-
         let headPosition = positions[0];
         let positions[0] = position;
         do Graphics.drawPlayer(positions[0]);
