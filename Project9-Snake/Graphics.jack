@@ -85,6 +85,30 @@ class Graphics {
         return;
     }
 
+    function boolean isTileOccupied(int location) {
+        var int memAddress; 
+        let memAddress = 16384+location;
+        
+        if (~(Memory.peek(memAddress) = 0)) {return true;}
+        if (~(Memory.peek(memAddress + 32) = 0)) {return true;}
+        if (~(Memory.peek(memAddress + 64) = 0)) {return true;}
+        if (~(Memory.peek(memAddress + 96) = 0)) {return true;}
+        if (~(Memory.peek(memAddress + 128) = 0)) {return true;}
+        if (~(Memory.peek(memAddress + 160) = 0)) {return true;}
+        if (~(Memory.peek(memAddress + 192) = 0)) {return true;}
+        if (~(Memory.peek(memAddress + 224) = 0)) {return true;}
+        if (~(Memory.peek(memAddress + 256) = 0)) {return true;}
+        if (~(Memory.peek(memAddress + 288) = 0)) {return true;}
+        if (~(Memory.peek(memAddress + 320) = 0)) {return true;}
+        if (~(Memory.peek(memAddress + 352) = 0)) {return true;}
+        if (~(Memory.peek(memAddress + 384) = 0)) {return true;}
+        if (~(Memory.peek(memAddress + 416) = 0)) {return true;}
+        if (~(Memory.peek(memAddress + 448) = 0)) {return true;}
+        if (~(Memory.peek(memAddress + 480) = 0)) {return true;}
+
+        return false;
+    }
+
     function void erasePlayer(int location) {
         var int memAddress; 
         let memAddress = 16384+location;

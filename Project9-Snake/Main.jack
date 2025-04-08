@@ -4,6 +4,7 @@ class Main {
         let snakeGame = SnakeGame.new();
         do snakeGame.run();
         do snakeGame.dispose();
+
         return; 
     }
 } 

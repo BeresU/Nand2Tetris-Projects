@@ -5,6 +5,11 @@ class Random {
         let state = seed;
         return this;
     }
+
+    method void dispose() { 
+        do Memory.deAlloc(this);
+        return;
+    }
     
     method int next() {
         var int a;
@@ -22,8 +27,9 @@ class Random {
         return state;
     }
 
+    // TODO: max value should be 8192
     method int nextInRange(int maxValue) {
-        return mod(next(), maxValue);
+        return mod(next(), maxValue) / 16;
     }
 
     method int mod (int a, int b) {

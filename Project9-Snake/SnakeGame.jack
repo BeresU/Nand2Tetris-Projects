@@ -1,6 +1,7 @@
 class SnakeGame {
 
     field Player player;
+    field Food food;
     field int direction; 
     field int waitTime;
     field int column, row;
@@ -11,6 +12,7 @@ class SnakeGame {
         let row = 512*12;
         let column = 6;
         let player = Player.new(row + column, 4);
+        let food = Food.new();
         let direction = 0;
         let waitTime = 150;
         let score = 0;
@@ -58,6 +60,8 @@ class SnakeGame {
             if ((key = 132) & (~(direction = 3))) { let direction = 4;}  
 
             let nextPosition = getNextPosition(); 
+
+            //do handleFood(nextPosition);
             
             if(isGameOver(nextPosition)) {let exit = true;}
             
@@ -72,6 +76,7 @@ class SnakeGame {
 
     method void showGameOver(){
         do player.hide();
+        do food.hide();
         do Graphics.drawBackground();
 
         do Output.moveCursor(9, 27);
@@ -84,6 +89,15 @@ class SnakeGame {
 
     method boolean isGameOver(int nextPosition){        
         return checkWallColision(nextPosition) | player.isCollideWithSelf(nextPosition);
+    }
+
+    method void handleFood(int nextPosition) {
+        if (~(nextPosition = food.getPosition())) {return;}
+
+        // TODO: Increase player size
+        do food.spawn();
+
+        return;
     }
 
     method boolean checkWallColision(int nextPosition) {
@@ -109,6 +123,7 @@ class SnakeGame {
 
     method void dispose(){
         do player.dispose();
+        do food.dispose();
         do Memory.deAlloc(this);
         return;
     }

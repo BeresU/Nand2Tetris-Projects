@@ -1,0 +1,77 @@
+function Food.new 0
+    push constant 3
+    call Memory.alloc 1
+    pop pointer 0
+    push constant 0
+    pop this 0
+    push constant 8192
+    pop this 1
+    push constant 42
+    call Random.new 1
+    pop this 2
+    push pointer 0
+    call Food.spawn 1
+    pop temp 0
+    push pointer 0
+    return
+function Food.getPosition 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    return
+function Food.spawn 2
+    push argument 0
+    pop pointer 0
+    push this 2
+    push this 1
+    call Random.nextInRange 2
+    pop local 0
+    push local 0
+    call Graphics.isTileOccupied 1
+    pop local 1
+label Food_0
+    push local 1
+    push constant 1
+    neg
+    eq
+    not
+    if-goto Food_1
+    push this 2
+    push this 1
+    call Random.nextInRange 2
+    pop local 0
+    push local 0
+    call Graphics.isTileOccupied 1
+    pop local 1
+    goto Food_0
+label Food_1
+    push local 0
+    pop this 0
+    push this 0
+    call Graphics.drawFood 1
+    pop temp 0
+    push this 2
+    push this 1
+    call Random.nextInRange 2
+    pop local 0
+    push constant 0
+    return
+function Food.hide 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    call Graphics.eraseFood 1
+    pop temp 0
+    push constant 0
+    return
+function Food.dispose 0
+    push argument 0
+    pop pointer 0
+    push this 2
+    call Random.dispose 1
+    pop temp 0
+    push pointer 0
+    call Memory.deAlloc 1
+    pop temp 0
+    push constant 0
+    return

@@ -301,6 +301,251 @@ function Graphics.drawPlayer 1
     pop temp 0
     push constant 0
     return
+function Graphics.isTileOccupied 1
+    push constant 16384
+    push argument 0
+    add
+    pop local 0
+    push local 0
+    call Memory.peek 1
+    push constant 0
+    eq
+    not
+    not
+    if-goto Graphics_5
+    push constant 1
+    neg
+    return
+    goto Graphics_4
+label Graphics_5
+label Graphics_4
+    push local 0
+    push constant 32
+    add
+    call Memory.peek 1
+    push constant 0
+    eq
+    not
+    not
+    if-goto Graphics_7
+    push constant 1
+    neg
+    return
+    goto Graphics_6
+label Graphics_7
+label Graphics_6
+    push local 0
+    push constant 64
+    add
+    call Memory.peek 1
+    push constant 0
+    eq
+    not
+    not
+    if-goto Graphics_9
+    push constant 1
+    neg
+    return
+    goto Graphics_8
+label Graphics_9
+label Graphics_8
+    push local 0
+    push constant 96
+    add
+    call Memory.peek 1
+    push constant 0
+    eq
+    not
+    not
+    if-goto Graphics_11
+    push constant 1
+    neg
+    return
+    goto Graphics_10
+label Graphics_11
+label Graphics_10
+    push local 0
+    push constant 128
+    add
+    call Memory.peek 1
+    push constant 0
+    eq
+    not
+    not
+    if-goto Graphics_13
+    push constant 1
+    neg
+    return
+    goto Graphics_12
+label Graphics_13
+label Graphics_12
+    push local 0
+    push constant 160
+    add
+    call Memory.peek 1
+    push constant 0
+    eq
+    not
+    not
+    if-goto Graphics_15
+    push constant 1
+    neg
+    return
+    goto Graphics_14
+label Graphics_15
+label Graphics_14
+    push local 0
+    push constant 192
+    add
+    call Memory.peek 1
+    push constant 0
+    eq
+    not
+    not
+    if-goto Graphics_17
+    push constant 1
+    neg
+    return
+    goto Graphics_16
+label Graphics_17
+label Graphics_16
+    push local 0
+    push constant 224
+    add
+    call Memory.peek 1
+    push constant 0
+    eq
+    not
+    not
+    if-goto Graphics_19
+    push constant 1
+    neg
+    return
+    goto Graphics_18
+label Graphics_19
+label Graphics_18
+    push local 0
+    push constant 256
+    add
+    call Memory.peek 1
+    push constant 0
+    eq
+    not
+    not
+    if-goto Graphics_21
+    push constant 1
+    neg
+    return
+    goto Graphics_20
+label Graphics_21
+label Graphics_20
+    push local 0
+    push constant 288
+    add
+    call Memory.peek 1
+    push constant 0
+    eq
+    not
+    not
+    if-goto Graphics_23
+    push constant 1
+    neg
+    return
+    goto Graphics_22
+label Graphics_23
+label Graphics_22
+    push local 0
+    push constant 320
+    add
+    call Memory.peek 1
+    push constant 0
+    eq
+    not
+    not
+    if-goto Graphics_25
+    push constant 1
+    neg
+    return
+    goto Graphics_24
+label Graphics_25
+label Graphics_24
+    push local 0
+    push constant 352
+    add
+    call Memory.peek 1
+    push constant 0
+    eq
+    not
+    not
+    if-goto Graphics_27
+    push constant 1
+    neg
+    return
+    goto Graphics_26
+label Graphics_27
+label Graphics_26
+    push local 0
+    push constant 384
+    add
+    call Memory.peek 1
+    push constant 0
+    eq
+    not
+    not
+    if-goto Graphics_29
+    push constant 1
+    neg
+    return
+    goto Graphics_28
+label Graphics_29
+label Graphics_28
+    push local 0
+    push constant 416
+    add
+    call Memory.peek 1
+    push constant 0
+    eq
+    not
+    not
+    if-goto Graphics_31
+    push constant 1
+    neg
+    return
+    goto Graphics_30
+label Graphics_31
+label Graphics_30
+    push local 0
+    push constant 448
+    add
+    call Memory.peek 1
+    push constant 0
+    eq
+    not
+    not
+    if-goto Graphics_33
+    push constant 1
+    neg
+    return
+    goto Graphics_32
+label Graphics_33
+label Graphics_32
+    push local 0
+    push constant 480
+    add
+    call Memory.peek 1
+    push constant 0
+    eq
+    not
+    not
+    if-goto Graphics_35
+    push constant 1
+    neg
+    return
+    goto Graphics_34
+label Graphics_35
+label Graphics_34
+    push constant 0
+    return
 function Graphics.erasePlayer 1
     push constant 16384
     push argument 0

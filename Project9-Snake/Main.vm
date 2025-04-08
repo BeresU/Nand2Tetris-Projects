@@ -1,27 +1,11 @@
-function Main.main 2
-    push constant 42
-    call Random.new 1
+function Main.main 1
+    call SnakeGame.new 0
     pop local 0
-    push constant 0
-    pop local 1
-label Main_0
-    push local 1
-    push constant 10
-    lt
-    not
-    if-goto Main_1
-    call Output.println 0
+    push local 0
+    call SnakeGame.run 1
     pop temp 0
     push local 0
-    push constant 1000
-    call Random.nextInRange 2
-    call Output.printInt 1
+    call SnakeGame.dispose 1
     pop temp 0
-    push local 1
-    push constant 1
-    add
-    pop local 1
-    goto Main_0
-label Main_1
     push constant 0
     return

@@ -1,0 +1,50 @@
+class Food {
+    field int position;
+    field int maxTiles;
+    field Random random;
+
+    constructor Food new () {
+        let position = 0;
+        let maxTiles = 8192;
+        let random = Random.new(42);
+
+        do spawn();
+
+        return this;
+    }
+
+    method int getPosition() {return position;}  
+
+    method void spawn() {
+        var int newPosition;
+        var boolean isTileOccupied;
+        
+        let newPosition = random.nextInRange(maxTiles);
+
+        let isTileOccupied = Graphics.isTileOccupied(newPosition);
+
+        while(isTileOccupied = true) {
+            let newPosition = random.nextInRange(maxTiles);
+            let isTileOccupied = Graphics.isTileOccupied(newPosition);            
+        }
+
+        let position = newPosition;
+
+        do Graphics.drawFood(position);
+
+        let newPosition = random.nextInRange(maxTiles);
+
+        return;
+    }
+
+    method void hide() {
+        do Graphics.eraseFood(position);
+        return;
+    }
+
+    method void dispose() { 
+        do random.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+}
