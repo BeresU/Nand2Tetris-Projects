@@ -20,7 +20,7 @@ function SnakeGame.new 0
     pop this 1
     push constant 0
     pop this 2
-    push constant 150
+    push constant 20
     pop this 3
     push constant 0
     pop this 6
@@ -287,6 +287,30 @@ function SnakeGame.showGameOver 0
     push this 6
     call Output.printInt 1
     pop temp 0
+    push constant 15
+    push constant 27
+    call Output.moveCursor 2
+    pop temp 0
+    push constant 6
+    call String.new 1
+    push constant 83
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 122
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 58
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    call Output.printString 1
+    pop temp 0
+    push this 0
+    call Player.getSize 1
+    call Output.printInt 1
+    pop temp 0
     push constant 0
     return
 function SnakeGame.isGameOver 0
@@ -325,6 +349,33 @@ label SnakeGame_26
     push this 2
     call Food.spawn 2
     pop temp 0
+    push this 6
+    push constant 5
+    add
+    pop this 6
+    push this 6
+    call Utils.maxValue 0
+    push constant 100
+    sub
+    gt
+    not
+    if-goto SnakeGame_29
+    call Utils.maxValue 0
+    push constant 100
+    sub
+    pop this 6
+    goto SnakeGame_28
+label SnakeGame_29
+label SnakeGame_28
+    push constant 0
+    return
+function SnakeGame.setWaitTime 0
+    push argument 0
+    pop pointer 0
+    push this 3
+    push constant 2
+    sub
+    pop this 3
     push constant 0
     return
 function SnakeGame.checkWallColision 1
@@ -342,13 +393,13 @@ function SnakeGame.checkWallColision 1
     eq
     or
     not
-    if-goto SnakeGame_29
+    if-goto SnakeGame_31
     push constant 1
     neg
     return
-    goto SnakeGame_28
-label SnakeGame_29
-label SnakeGame_28
+    goto SnakeGame_30
+label SnakeGame_31
+label SnakeGame_30
     push constant 31
     push argument 1
     push this 5
@@ -367,13 +418,13 @@ label SnakeGame_28
     eq
     or
     not
-    if-goto SnakeGame_31
+    if-goto SnakeGame_33
     push constant 1
     neg
     return
-    goto SnakeGame_30
-label SnakeGame_31
-label SnakeGame_30
+    goto SnakeGame_32
+label SnakeGame_33
+label SnakeGame_32
     push constant 0
     return
 function SnakeGame.getNextPosition 1
@@ -386,50 +437,50 @@ function SnakeGame.getNextPosition 1
     push constant 1
     eq
     not
-    if-goto SnakeGame_33
-    push local 0
-    push constant 512
-    sub
-    return
-    goto SnakeGame_32
-label SnakeGame_33
-label SnakeGame_32
-    push this 2
-    push constant 2
-    eq
-    not
     if-goto SnakeGame_35
     push local 0
     push constant 512
-    add
+    sub
     return
     goto SnakeGame_34
 label SnakeGame_35
 label SnakeGame_34
     push this 2
-    push constant 3
+    push constant 2
     eq
     not
     if-goto SnakeGame_37
     push local 0
-    push constant 1
-    sub
+    push constant 512
+    add
     return
     goto SnakeGame_36
 label SnakeGame_37
 label SnakeGame_36
     push this 2
-    push constant 4
+    push constant 3
     eq
     not
     if-goto SnakeGame_39
     push local 0
     push constant 1
-    add
+    sub
     return
     goto SnakeGame_38
 label SnakeGame_39
 label SnakeGame_38
+    push this 2
+    push constant 4
+    eq
+    not
+    if-goto SnakeGame_41
+    push local 0
+    push constant 1
+    add
+    return
+    goto SnakeGame_40
+label SnakeGame_41
+label SnakeGame_40
     push constant 0
     return
 function SnakeGame.dispose 0

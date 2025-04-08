@@ -41,8 +41,8 @@ class Food {
         var int columnPos;
         var int rowPos;
 
-        let columnPos = random.next(16);
-        let rowPos = random.next(16) * 512;
+        let columnPos = random.next(15);
+        let rowPos = random.next(15) * 512;
 
         return rowPos + columnPos;
     }

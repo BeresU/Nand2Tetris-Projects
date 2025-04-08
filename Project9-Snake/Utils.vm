@@ -7,3 +7,6 @@ function Utils.mod 0
     call Math.multiply 2
     sub
     return
+function Utils.maxValue 0
+    push constant 32767
+    return

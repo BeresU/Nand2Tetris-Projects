@@ -28,7 +28,7 @@ function Random.next 3
     pop local 0
     push constant 1013
     pop local 1
-    push constant 32767
+    call Utils.maxValue 0
     pop local 2
     push local 0
     push this 0

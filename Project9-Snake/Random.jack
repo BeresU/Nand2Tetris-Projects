@@ -23,7 +23,7 @@ class Random {
 
         let a = 1665;
         let c = 1013;
-        let m = 32767;
+        let m = Utils.maxValue();
 
         let state = a * state + c;
         let state = Utils.mod(state, m);

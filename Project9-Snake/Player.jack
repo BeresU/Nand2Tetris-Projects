@@ -26,6 +26,10 @@ class Player {
         return positions[0];
     }
 
+    method int getSize() {
+        return size;
+    }
+
     method boolean isCollideWithSelf(int nextPosition) {
         var int i;
         let i = 1;

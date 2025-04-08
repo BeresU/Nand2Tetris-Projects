@@ -61,11 +61,11 @@ function Food.getNewPosition 2
     push argument 0
     pop pointer 0
     push this 1
-    push constant 16
+    push constant 15
     call Random.next 2
     pop local 0
     push this 1
-    push constant 16
+    push constant 15
     call Random.next 2
     push constant 512
     call Math.multiply 2
