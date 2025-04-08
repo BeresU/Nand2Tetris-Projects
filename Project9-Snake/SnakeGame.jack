@@ -102,8 +102,8 @@ class SnakeGame {
         do food.spawn(direction);
         let score = score + 5;
 
-        if (score > Utils.maxNumber() - 100){
-            let score = Utils.maxNumber() - 100;
+        if (score > Utils.maxValue() - 100){
+            let score = Utils.maxValue() - 100;
         }
     
         return;
