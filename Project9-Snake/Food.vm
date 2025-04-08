@@ -4,13 +4,14 @@ function Food.new 0
     pop pointer 0
     push constant 0
     pop this 0
-    push constant 213
+    push constant 123
     pop this 2
     push this 2
     call Random.new 1
     pop this 1
     push pointer 0
-    call Food.spawn 1
+    push constant 1
+    call Food.spawn 2
     pop temp 0
     push pointer 0
     return
@@ -22,8 +23,14 @@ function Food.getPosition 0
 function Food.spawn 2
     push argument 0
     pop pointer 0
-    push this 1
-    call Random.next 1
+    push this 2
+    push argument 1
+    call Math.multiply 2
+    push constant 32767
+    call Utils.mod 2
+    pop this 2
+    push pointer 0
+    call Food.getNewPosition 1
     pop local 0
     push local 0
     call Graphics.isTileOccupied 1
@@ -36,14 +43,7 @@ label Food_0
     not
     if-goto Food_1
     push pointer 0
-    push this 2
-    push constant 23
-    add
-    push constant 32767
-    call Food.mod 3
-    pop this 2
-    push this 1
-    call Random.next 1
+    call Food.getNewPosition 1
     pop local 0
     push local 0
     call Graphics.isTileOccupied 1
@@ -56,6 +56,23 @@ label Food_1
     call Graphics.drawFood 1
     pop temp 0
     push constant 0
+    return
+function Food.getNewPosition 2
+    push argument 0
+    pop pointer 0
+    push this 1
+    push constant 16
+    call Random.next 2
+    pop local 0
+    push this 1
+    push constant 16
+    call Random.next 2
+    push constant 512
+    call Math.multiply 2
+    pop local 1
+    push local 1
+    push local 0
+    add
     return
 function Food.hide 0
     push argument 0
@@ -75,15 +92,4 @@ function Food.dispose 0
     call Memory.deAlloc 1
     pop temp 0
     push constant 0
-    return
-function Food.mod 0
-    push argument 0
-    pop pointer 0
-    push argument 1
-    push argument 2
-    push argument 1
-    push argument 2
-    call Math.divide 2
-    call Math.multiply 2
-    sub
     return

@@ -42,34 +42,41 @@ class Player {
         var Array tempArray;
         var int i;
         var int tailPosition;
-        let size = size + 1;
-        let tempArray = positions;
-        let positions = Array.new(size);
+
+        let tempArray = Array.new(size + 1);
 
         let i = 0;
 
-        while (i < tempArray - 1) {
-            let positions[i] = tempArray[i];
+        while (i < size) {
+            let tempArray[i] = positions[i];
+            let i = i + 1;
         }
 
         if (moveDirection = 1) {
-            let tailPosition = positions[size - 2] + 512;
+            let tailPosition = tempArray[size - 1] + 512;
         }
 
         if (moveDirection = 2) {
-            let tailPosition = positions[size - 2] - 512;
+            let tailPosition = tempArray[size - 1] - 512;
         }
 
         if (moveDirection = 1) {
-            let tailPosition = positions[size - 2] + 1;
+            let tailPosition = tempArray[size - 1] + 1;
         }
 
         if (moveDirection = 1) {
-            let tailPosition = positions[size - 2] - 1;
+            let tailPosition = tempArray[size - 1] - 1;
         }
 
-        let positions[size - 1] = tailPosition;
-        do Graphics.drawPlayer(tailPosition);
+        let tempArray[size] = tailPosition;
+
+        do positions.dispose();
+
+        let positions = tempArray;
+
+        do tempArray.dispose();
+
+        let size = size + 1;
 
         return this;
     }

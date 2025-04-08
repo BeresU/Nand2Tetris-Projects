@@ -5,27 +5,28 @@ class Food {
 
     constructor Food new () {
         let position = 0;
-        let seed = 213;
+        let seed = 123;
         let random = Random.new(seed);
 
-        do spawn();
+        do spawn(1);
 
         return this;
     }
 
     method int getPosition() {return position;}  
 
-    method void spawn() {
+    method void spawn(int nextSeed) {
         var int newPosition;
         var boolean isTileOccupied;
         
-        let newPosition = random.next();
+        let seed = Utils.mod(seed * nextSeed, 32767);
+        //do random.setSeed(seed);
+        let newPosition = getNewPosition();
 
         let isTileOccupied = Graphics.isTileOccupied(newPosition);
 
         while(isTileOccupied = true) {
-            let seed = mod(seed + 23, 32767);
-            let newPosition = random.next();
+            let newPosition = getNewPosition();
             let isTileOccupied = Graphics.isTileOccupied(newPosition);            
         }
 
@@ -34,6 +35,16 @@ class Food {
         do Graphics.drawFood(position);
 
         return;
+    }
+
+    method int getNewPosition() {
+        var int columnPos;
+        var int rowPos;
+
+        let columnPos = random.next(16);
+        let rowPos = random.next(16) * 512;
+
+        return rowPos + columnPos;
     }
 
     method void hide() {
@@ -45,9 +56,5 @@ class Food {
         do random.dispose();
         do Memory.deAlloc(this);
         return;
-    }
-
-    method int mod (int a, int b) {
-        return  a - (b * (a / b));
     }
 }

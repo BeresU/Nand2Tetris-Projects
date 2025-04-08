@@ -16,22 +16,18 @@ class Random {
         return;
     }
     
-    method int next() {
+    method int next(int maxNumber) {
         var int a;
         var int c;
         var int m;
 
-        let a = 1680;
-        let c = 992;
+        let a = 1665;
+        let c = 1013;
         let m = 32767;
 
         let state = a * state + c;
-        let state = mod(state, m) / 16 * 16;
+        let state = Utils.mod(state, m);
 
-        return state;
-    }
-
-    method int mod (int a, int b) {
-        return  a - (b * (a / b));
+        return Utils.mod(state, maxNumber);
     }
 }

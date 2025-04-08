@@ -42,7 +42,6 @@ class Graphics {
     function void drawBackgroundBlock(int location) {
         var int memAddress; 
         let memAddress = 16384+location;
-        // column 0
         do Memory.poke(memAddress, -1);
         do Memory.poke(memAddress +32, -32631);
         do Memory.poke(memAddress +64, -22527);
@@ -66,7 +65,6 @@ class Graphics {
         var int memAddress; 
         let memAddress = 16384+location;
 
-        // column 0
         do Memory.poke(memAddress, -1);
         do Memory.poke(memAddress +32, -32767);
         do Memory.poke(memAddress +64, -32767);
@@ -136,7 +134,6 @@ class Graphics {
     function void drawFood(int location) {
         var int memAddress; 
         let memAddress = 16384+location;
-        // column 0
         do Memory.poke(memAddress, 1632);
         do Memory.poke(memAddress +32, 1440);
         do Memory.poke(memAddress +64, 1056);
@@ -159,7 +156,6 @@ class Graphics {
     function void eraseFood(int location) {
         var int memAddress; 
         let memAddress = 16384+location;
-        // column 0
         do Memory.poke(memAddress, 0);
         do Memory.poke(memAddress +32, 0);
         do Memory.poke(memAddress +64, 0);
