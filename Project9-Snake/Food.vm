@@ -4,7 +4,7 @@ function Food.new 0
     pop pointer 0
     push constant 0
     pop this 0
-    push constant 123
+    push constant 323
     pop this 2
     push this 2
     call Random.new 1
@@ -23,12 +23,6 @@ function Food.getPosition 0
 function Food.spawn 2
     push argument 0
     pop pointer 0
-    push this 2
-    push argument 1
-    call Math.multiply 2
-    push constant 32767
-    call Utils.mod 2
-    pop this 2
     push pointer 0
     call Food.getNewPosition 1
     pop local 0
@@ -61,7 +55,7 @@ function Food.getNewPosition 2
     push argument 0
     pop pointer 0
     push this 1
-    push constant 15
+    push constant 31
     call Random.next 2
     pop local 0
     push this 1

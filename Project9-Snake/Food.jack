@@ -5,7 +5,7 @@ class Food {
 
     constructor Food new () {
         let position = 0;
-        let seed = 123;
+        let seed = 323;
         let random = Random.new(seed);
 
         do spawn(1);
@@ -19,8 +19,6 @@ class Food {
         var int newPosition;
         var boolean isTileOccupied;
         
-        let seed = Utils.mod(seed * nextSeed, 32767);
-        //do random.setSeed(seed);
         let newPosition = getNewPosition();
 
         let isTileOccupied = Graphics.isTileOccupied(newPosition);
@@ -41,7 +39,7 @@ class Food {
         var int columnPos;
         var int rowPos;
 
-        let columnPos = random.next(15);
+        let columnPos = random.next(31);
         let rowPos = random.next(15) * 512;
 
         return rowPos + columnPos;

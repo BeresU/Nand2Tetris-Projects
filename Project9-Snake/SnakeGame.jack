@@ -99,18 +99,20 @@ class SnakeGame {
 
         do player.increaseSize();
         do food.hide();
-        do food.spawn(direction);
+        do food.spawn(direction + player.getSize());
         let score = score + 5;
 
         if (score > Utils.maxValue() - 100){
             let score = Utils.maxValue() - 100;
         }
+
+        do setWaitTime();
     
         return;
     }
 
     method void setWaitTime() {
-        let waitTime = waitTime - 2;
+        let waitTime = waitTime - 3;
 
         if (waitTime < 20) {
             let waitTime = 20;
