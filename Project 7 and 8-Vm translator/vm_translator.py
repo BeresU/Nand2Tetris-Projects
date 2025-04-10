@@ -3,7 +3,7 @@ import line_parser
 from line_parser import ParseResultsType
 
 
-def translate_vm_code_multiple_files(file_data_array):
+def translate_vm_code(file_data_array):
     writer = AssemblyWriter()
 
     if len(file_data_array) > 1:
@@ -12,12 +12,12 @@ def translate_vm_code_multiple_files(file_data_array):
         writer.translate_to_assembly(bootstrap_code)
 
     for data in file_data_array:
-        translate_vm_code(data.data, data.file_name, writer)
+        _translate_vm_code(data.data, data.file_name, writer)
 
     return writer.assembly_arr
 
 
-def translate_vm_code(file_data, file_name, writer):
+def _translate_vm_code(file_data, file_name, writer):
     writer.set_file_name(file_name)
 
     for line in file_data:

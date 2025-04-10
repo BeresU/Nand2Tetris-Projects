@@ -14,7 +14,7 @@ print(f"Args: {full_path}")
 
 files_data = io_module.get_files_data(full_path)
 
-assembly_code = vm_translator.translate_vm_code_multiple_files(files_data)
+assembly_code = vm_translator.translate_vm_code(files_data)
 
 file_name = io_module.get_asm_file_name(args.path)
 
