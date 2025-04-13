@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
+from io_module import JackFileData
+import xml.etree.ElementTree as ET
 
 
 class TokenType(Enum):
@@ -37,7 +39,7 @@ class KeywordType(Enum):
 
 
 @dataclass
-class ParseResults:
+class TokenData:
     token_type: TokenType
     keyword_type: KeywordType  # relevant only if token_type is KEYWORD
     symbol: str  # relevant only if token_type is SYMBOL
@@ -46,7 +48,7 @@ class ParseResults:
     string_val: str  # relevant only if token_type is STRING_CONST
 
 
-def parse_code(line: str) -> ParseResults:
+def tokenize_data(data: str) -> TokenData:
     pass
 
 

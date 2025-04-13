@@ -6,7 +6,7 @@ import shutil
 @dataclass
 class JackFileData:
     file_name: str
-    data: list[str]
+    content: list[str]
 
 
 def create_output_folder(path: str):
