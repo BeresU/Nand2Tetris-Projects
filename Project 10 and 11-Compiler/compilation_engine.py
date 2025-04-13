@@ -1,0 +1,51 @@
+from io_module import JackFileData
+import jack_tokenizer
+
+# main method
+# write to xml (token and final)
+
+# TODO: create class to handle xml writing in a more clean way?
+def compile_class(file_data: JackFileData, out_put_path: str):
+    pass
+
+def compile_class_var_dec():
+    pass
+
+def compile_subroutine():
+    pass
+
+def compile_parameter_list():
+    pass
+
+def compile_subroutine_body():
+    pass
+
+def compie_var_dec():
+    pass
+
+def compile_statements():
+    pass
+
+def compile_if():
+    pass
+
+def compile_let():
+    pass
+
+def compile_while():
+    pass
+
+def compile_do():
+    pass
+
+def compile_return():
+    pass
+
+def compile_expression():
+    pass
+
+def compile_term():
+    pass
+
+def compile_expression_list():
+    pass
