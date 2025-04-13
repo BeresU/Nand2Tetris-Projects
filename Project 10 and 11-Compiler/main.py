@@ -1,6 +1,7 @@
 import argparse
 import os
 from pathlib import Path
+import jack_analyzer
 
 def main():
     parser = argparse.ArgumentParser(description="Process a file path.")
@@ -8,10 +9,12 @@ def main():
     parser.add_argument("-o", "--output", type=str, help="The output file path")
 
     args = parser.parse_args()
-    full_path = os.path.abspath(args.path)
-    output_path = Path(full_path).parent
+    input_path = os.path.abspath(args.path)
+    output_path = Path(input_path).parent if args.output is None else args.output
 
-    print(f"Args: {full_path}")
+    print(f"Args: input path: {input_path}, output path: {output_path}")
+
+    jack_analyzer.analyze(input_path, output_path)
 
 if __name__ == '__main__':
     main()

@@ -8,31 +8,31 @@ import jack_tokenizer
 def compile_class(file_data: JackFileData, out_put_path: str):
     pass
 
-def compile_class_var_dec():
+def _compile_class_var_dec():
     pass
 
-def compile_subroutine():
+def _compile_subroutine():
     pass
 
-def compile_parameter_list():
+def _compile_parameter_list():
     pass
 
-def compile_subroutine_body():
+def _compile_subroutine_body():
     pass
 
-def compie_var_dec():
+def _compie_var_dec():
     pass
 
-def compile_statements():
+def _compile_statements():
     pass
 
-def compile_if():
+def _compile_if():
     pass
 
-def compile_let():
+def _compile_let():
     pass
 
-def compile_while():
+def _compile_while():
     pass
 
 def compile_do():
