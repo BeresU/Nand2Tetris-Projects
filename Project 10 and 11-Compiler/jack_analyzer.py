@@ -1,10 +1,37 @@
-import io_module
+import shutil
+from pathlib import Path
 from compilation_engine import CompilationEngine
 
-def analyze(input_path: str, output_path: str):
-    io_module.create_output_folder(output_path)
-    files_data = io_module.get_files_data(input_path)
 
-    for file_data in files_data:
-        compilation_engine = CompilationEngine(file_data, output_path)
-        compilation_engine.compile()
+def analyze(input_path: str, output_path: str):
+    _create_output_folder(output_path)
+
+    input_path_obj = Path(input_path)
+
+    if input_path_obj.is_file():
+        _process_file(input_path, output_path)
+        return
+
+    _process_multi_files(input_path_obj, output_path)
+
+
+def _create_output_folder(path: str):
+    output_path = Path(path)
+
+    if output_path.exists():
+        shutil.rmtree(path)
+
+    output_path.mkdir(parents=True, exist_ok=False)
+
+
+def _process_multi_files(input_path_obj: Path, output_path: str):
+    jack_files = list(input_path_obj.glob("*.jack"))
+
+    # TODO different thread
+    for file in jack_files:
+        _process_file(file, output_path)
+
+
+def _process_file(file_path: str, output_path: str):
+    compilation_engine = CompilationEngine(file_path, output_path)
+    compilation_engine.compile()

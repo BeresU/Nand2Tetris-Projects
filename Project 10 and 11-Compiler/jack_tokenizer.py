@@ -1,7 +1,5 @@
 from dataclasses import dataclass
 from enum import Enum
-from io_module import JackFileData
-import xml.etree.ElementTree as ET
 
 
 class TokenType(Enum):
