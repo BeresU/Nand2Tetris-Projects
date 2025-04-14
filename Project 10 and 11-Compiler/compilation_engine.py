@@ -4,6 +4,9 @@ from tokens_xml_handler import TokenXmlHandler
 
 
 class CompilationEngine:
+    tokens_xml_handler: TokenXmlHandler
+    output_path: str
+    file_path: str
 
     def __init__(self, file_path: str, output_path: str):
         self.file_path = file_path
@@ -23,7 +26,7 @@ class CompilationEngine:
                 results = jack_tokenizer.tokenize_data(line)
                 self.tokens_xml_handler.write_to_xml(results)
 
-        self.tokens_xml_handler.create_xml(self.output_path)
+        self.tokens_xml_handler.create_xml(input_path_obj.stem, self.output_path)
 
     def _compile_class_var_dec(self):
         pass

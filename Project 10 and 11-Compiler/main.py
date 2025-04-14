@@ -3,6 +3,8 @@ import os
 from pathlib import Path
 import jack_analyzer
 
+import xml_writer
+
 
 def main():
     parser = argparse.ArgumentParser(description="Process a file path.")
