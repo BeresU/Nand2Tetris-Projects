@@ -34,4 +34,4 @@ def _process_multi_files(input_path_obj: Path, output_path: str):
 
 def _process_file(file_path: str, output_path: str):
     compilation_engine = CompilationEngine(file_path, output_path)
-    compilation_engine.compile()
+    compilation_engine.compile_class()
