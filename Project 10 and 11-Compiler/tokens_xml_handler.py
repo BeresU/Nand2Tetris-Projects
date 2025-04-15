@@ -10,11 +10,10 @@ class TokenXmlHandler:
     def __init__(self):
         self.root = ET.Element("tokens")
 
-    def write_to_xml(self, token_results: list[TokenData]):
-        for token_data in token_results:
-            if token_data.token_type == TokenType.NONE: continue
-            item = ET.SubElement(self.root, token_data.token_type.value)
-            item.text = f" {token_data.value} " # add spaces since the compare file has spaces
+    def write_to_xml(self, token_data: TokenData):
+        if token_data.token_type == TokenType.NONE: return
+        item = ET.SubElement(self.root, token_data.token_type.value)
+        item.text = f" {token_data.value} " # add spaces since the compare file has spaces
 
     def create_xml(self, file_name: str, output_path: str):
         tree = ET.ElementTree(self.root)
