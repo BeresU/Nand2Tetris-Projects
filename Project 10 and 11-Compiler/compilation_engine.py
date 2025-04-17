@@ -14,6 +14,21 @@ class CompilationEngine:
     tokenizer: JackTokenizer
     xml_root_element: Element
 
+    CLASS_VAR_DEC = "classVarDec"
+    SUBROUTINE_DEC = "subroutineDec"
+    PARAMETER_LIST = "parameterList"
+    SUBROUTINE_BODY = "subroutineBody"
+    VAR_DEC = "varDec"
+    STATEMENTS = "statements"
+    IF_STATEMENT = "ifStatement"
+    EXPRESSION = "expression"
+    WHILE_STATEMENT = "whileStatement"
+    LET_STATEMENT = "letStatement"
+    DO_STATEMENT = "doStatement"
+    RETURN_STATEMENT = "returnStatement"
+    TERM = "term"
+    EXPRESSION_LIST = "expressionList"
+
     def __init__(self, file_path: str, output_path: str):
         self.file_path = file_path
         self.output_path = output_path
@@ -32,31 +47,32 @@ class CompilationEngine:
         full_path = f"{self.output_path}/{file_name}.xml"
         tree.write(full_path, encoding="utf-8", xml_declaration=False, short_empty_elements=False)
 
-    # TODO: need to handle the term case where let x = foo can be either a variable assignment or an array (foo[]) or a method call (foo.bar)
     def compile_class(self):
         self.xml_root_element = ET.Element(Constants.CLASS)
         self._process(Constants.CLASS, TokenType.KEYWORD, self.xml_root_element)
-        self._process("", TokenType.IDENTIFIER, self.xml_root_element)
+        self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, self.xml_root_element)
         self._process(Constants.LEFT_CURLY_BRACKET, TokenType.SYMBOL, self.xml_root_element)
 
         self._compile_class_var_dec(self.xml_root_element)
-        self._compile_subroutine(self.xml_root_element)
 
-        # TODO: uncomment this when finish
-        # self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, self.xml_root_element)
+        while self.tokenizer.current_token.value in {Constants.FUNCTION, Constants.METHOD, Constants.CONSTRUCTOR}:
+            self._compile_subroutine(self.xml_root_element)
 
-        self._on_finish()  # test
+        self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, self.xml_root_element)
 
-    # TODO: handle has more tokens here?
+        self._on_finish()
+
     def _process(self, token_value: str, token_type: TokenType, xml_element: Element):
         current_token = self.tokenizer.current_token
 
         if current_token.token_type != token_type:
             raise ValueError(
-                f"Got: {current_token.token_type.name} expected: {token_type.name}, token value: {current_token.value}, file: {self.file_path}")
+                f"Got: {current_token.token_type.name} expected: {token_type.name}, "
+                f"token value: {current_token.value}, line count:{self.tokenizer.line_count}, file: {self.file_path}")
 
         if current_token.token_type in {TokenType.KEYWORD, TokenType.SYMBOL} and current_token.value != token_value:
-            raise ValueError(f"Got: {current_token.value}, expected: {token_value}")
+            raise ValueError(
+                f"Got: {current_token.value}, expected: {token_value}, line:{self.tokenizer.line_count},  file: {self.file_path}")
 
         element = ET.SubElement(xml_element, current_token.token_type.value)
         element.text = f" {current_token.value} "  # add spaces since the compare file has spaces
@@ -69,7 +85,7 @@ class CompilationEngine:
 
         if current_token.value not in {Constants.FIELD, Constants.STATIC}: return
 
-        element = ET.SubElement(xml_element, Constants.CLASS_VAR_DEC)
+        element = ET.SubElement(xml_element, CompilationEngine.CLASS_VAR_DEC)
         self._process(current_token.value, TokenType.KEYWORD, element)
 
         while self.tokenizer.current_token.value != Constants.SEMICOLON:
@@ -81,9 +97,7 @@ class CompilationEngine:
 
     def _compile_subroutine(self, xml_element: Element):
         current_token = self.tokenizer.current_token
-        if current_token.value not in {Constants.FUNCTION, Constants.METHOD, Constants.CONSTRUCTOR}: return
-
-        element = ET.SubElement(xml_element, Constants.SUBROUTINE_DEC)
+        element = ET.SubElement(xml_element, CompilationEngine.SUBROUTINE_DEC)
 
         self._process(current_token.value, TokenType.KEYWORD, element)
 
@@ -94,28 +108,30 @@ class CompilationEngine:
         self._compile_parameter_list(element)
         self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, element)
         self._compile_subroutine_body(element)
-        # self._compile_subroutine(xml_element) #TODO: remove comment
 
     def _compile_parameter_list(self, xml_element: Element):
-        element = ET.SubElement(xml_element, Constants.PARAMETER_LIST)
+        element = ET.SubElement(xml_element, CompilationEngine.PARAMETER_LIST)
 
         while self.tokenizer.current_token.value != Constants.RIGHT_BRACKET:
             current_token = self.tokenizer.current_token
             self._process(current_token.value, TokenType.KEYWORD, element)
             self._process(current_token.value, TokenType.IDENTIFIER, element)
+
             if self.tokenizer.current_token.value == Constants.RIGHT_BRACKET: break
             self._process(Constants.COMMA, TokenType.SYMBOL, element)
 
     def _compile_subroutine_body(self, xml_element: Element):
-        element = ET.SubElement(xml_element, Constants.SUBROUTINE_BODY)
+        element = ET.SubElement(xml_element, CompilationEngine.SUBROUTINE_BODY)
         self._process(Constants.LEFT_CURLY_BRACKET, TokenType.SYMBOL, element)
-        self._compie_var_dec(element)
+
+        while self.tokenizer.current_token.value == Constants.VAR:
+            self._compie_var_dec(element)
+
         self._compile_statements(xml_element)
-        # self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, element) # TODO: Remove comment
+        self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, element) # TODO: Remove comment
 
     def _compie_var_dec(self, xml_element: Element):
-        if self.tokenizer.current_token.value != Constants.VAR: return
-        element = ET.SubElement(xml_element, Constants.VAR_DEC)
+        element = ET.SubElement(xml_element, CompilationEngine.VAR_DEC)
         self._process(Constants.VAR, TokenType.KEYWORD, element)
 
         while self.tokenizer.current_token.value != Constants.SEMICOLON:
@@ -124,35 +140,94 @@ class CompilationEngine:
 
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, element)
 
-        self._compie_var_dec(xml_element)
-
     def _compile_statements(self, xml_element: Element):
-        element = ET.SubElement(xml_element, Constants.STATEMENTS)
+        element = ET.SubElement(xml_element, CompilationEngine.STATEMENTS)
 
-        while self.tokenizer.current_token.value is {Constants.LET, Constants.IF, Constants.WHILE, Constants.DO,
-                                                     Constants.RETURN}:
-            pass
+        statement_keywords = {
+            Constants.LET, Constants.IF, Constants.WHILE, Constants.DO, Constants.RETURN
+        }
 
-    def _compile_if(self):
-        pass
+        while self.tokenizer.current_token.value in statement_keywords:
+            token_value = self.tokenizer.current_token.value
 
-    def _compile_let(self):
-        pass
+            if token_value == Constants.IF: self._compile_if(element)
+            if token_value == Constants.LET: self._compile_let(element)
+            if token_value == Constants.WHILE: self._compile_while(element)
+            if token_value == Constants.DO: self._compile_do(element)
+            if token_value == Constants.RETURN: self._compile_return(element)
 
-    def _compile_while(self):
-        pass
+    # TODO: need to finish expressions
+    # TODO: need to check this without expressions
+    def _compile_if(self, xml_element: Element):
+        element = ET.SubElement(xml_element, CompilationEngine.IF_STATEMENT)
+        self._process(Constants.IF, TokenType.KEYWORD, element)
+        self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, element)
 
-    def compile_do(self):
-        pass
+        self._compile_expression(element)  # TODO: finish
 
-    def compile_return(self):
-        pass
+        self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, element)  # TODO: its ok to handle this here?
+        self._process(Constants.LEFT_CURLY_BRACKET, TokenType.SYMBOL, element)
+        self._compile_statements(element)
+        self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, element)
 
-    def compile_expression(self):
-        pass
+        if self.tokenizer.current_token.value != Constants.ELSE: return
+        self._process(Constants.ELSE, TokenType.KEYWORD, element)
+        self._process(Constants.LEFT_CURLY_BRACKET, TokenType.SYMBOL, element)
+        self._compile_statements(element)
+        self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, element)
 
-    def compile_term(self):
-        pass
+    def _compile_let(self, xml_element: Element):
+        element = ET.SubElement(xml_element, CompilationEngine.LET_STATEMENT)
+        self._process(Constants.LET, TokenType.KEYWORD, element)
+        self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, element)
 
-    def compile_expression_list(self):
-        pass
+        if self.tokenizer.current_token.value == Constants.EQUAL:
+            self._process(Constants.EQUAL, TokenType.SYMBOL, element)
+            self._compile_expression(element)
+
+        elif self.tokenizer.current_token.value == Constants.LEFT_SQUARE_BRACKET:
+            self._process(Constants.LEFT_SQUARE_BRACKET, TokenType.SYMBOL, element)
+            self._compile_expression(element)
+            self._process(Constants.RIGHT_SQUARE_BRACKET, TokenType.SYMBOL, element)
+            self._process(Constants.EQUAL, TokenType.SYMBOL, element)
+            self._compile_expression(element)
+
+        self._process(Constants.SEMICOLON, TokenType.SYMBOL, element)  # END
+
+    def _compile_while(self, xml_element: Element):
+        element = ET.SubElement(xml_element, CompilationEngine.WHILE_STATEMENT)
+        self._process(Constants.WHILE, TokenType.KEYWORD, element)
+        self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, element)
+        self._compile_expression(element)
+        self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, element)
+        self._process(Constants.LEFT_CURLY_BRACKET, TokenType.SYMBOL, element)
+        self._compile_statements(element)
+        self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, element)
+
+    def _compile_do(self, xml_element: Element):
+        element = ET.SubElement(xml_element, CompilationEngine.DO_STATEMENT)
+        self._process(Constants.DO, TokenType.KEYWORD, element)
+        self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, element)
+        self._process(Constants.POINT, TokenType.SYMBOL, element)
+        self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, element)
+        self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, element)
+        self._compile_expression_list(element)
+        self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, element)
+        self._process(Constants.SEMICOLON, TokenType.SYMBOL, element)
+
+    def _compile_return(self, xml_element: Element):
+        element = ET.SubElement(xml_element, CompilationEngine.RETURN_STATEMENT)
+        self._process(Constants.RETURN, TokenType.KEYWORD, element)
+        self._process(Constants.SEMICOLON, TokenType.SYMBOL, element)
+
+    # TODO: handle this later...
+    def _compile_expression(self, xml_element: Element):
+        element = ET.SubElement(xml_element, CompilationEngine.EXPRESSION)
+
+    # term is part of an expression
+    def _compile_term(self, xml_element: Element):
+        element = ET.SubElement(xml_element, CompilationEngine.TERM)
+
+    # a collection of expressions
+    def _compile_expression_list(self, xml_element: Element):
+        element = ET.SubElement(xml_element, CompilationEngine.EXPRESSION_LIST)

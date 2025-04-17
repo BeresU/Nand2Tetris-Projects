@@ -25,13 +25,14 @@ class TokenData:
 
 class JackTokenizer:
     _stream: TextIO
-    _line_position = 0
+    _word_position = 0
     _line_data: list[TokenData]
 
+    line_count = 0
     current_token: TokenData
     has_more_tokens: bool
 
-    _KEYWORDS = [
+    _KEYWORDS = {
         Constants.CLASS,
         Constants.CONSTRUCTOR,
         Constants.FUNCTION,
@@ -53,9 +54,9 @@ class JackTokenizer:
         Constants.ELSE,
         Constants.WHILE,
         Constants.RETURN
-    ]
+    }
 
-    _SYMBOLS = [
+    _SYMBOLS = {
         Constants.LEFT_CURLY_BRACKET,
         Constants.RIGHT_CURLY_BRACKET,
         Constants.LEFT_BRACKET,
@@ -75,7 +76,7 @@ class JackTokenizer:
         Constants.GREATER_THAN,
         Constants.EQUAL,
         Constants.TILDA,
-    ]
+    }
 
     def __init__(self, file_path: str):
         input_path_obj = Path(file_path)
@@ -88,16 +89,19 @@ class JackTokenizer:
         self._stream.close()
 
     def advance(self):
-        self._line_position += 1
+        if not self.has_more_tokens: raise ValueError("no more tokens!")
 
-        if self._line_position < len(self._line_data):
-            self.current_token = self._line_data[self._line_position]
+        self._word_position += 1
+
+        if self._word_position < len(self._line_data):
+            self.current_token = self._line_data[self._word_position]
             return
 
         self._line_data = []
 
         while len(self._line_data) == 0:
             line_data = self._stream.readline()
+            self.line_count += 1
 
             if line_data == "":
                 self.has_more_tokens = False
@@ -105,9 +109,8 @@ class JackTokenizer:
 
             self._line_data = self._tokenize_data(line_data)
 
-        self._line_position = 0
+        self._word_position = 0
         self.current_token = self._line_data[0]
-
 
     def _tokenize_data(self, data: str) -> list[TokenData]:
         clean_data = JackTokenizer._clean_string(data)
