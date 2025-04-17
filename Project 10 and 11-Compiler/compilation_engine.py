@@ -109,7 +109,7 @@ class CompilationEngine:
         while self.tokenizer.current_token.value == Constants.VAR:
             self._compie_var_dec(element)
 
-        self._compile_statements(xml_element)
+        self._compile_statements(element)
         self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, element)
 
     def _compie_var_dec(self, xml_element: Element):
@@ -192,6 +192,10 @@ class CompilationEngine:
     def _compile_return(self, xml_element: Element):
         element = ET.SubElement(xml_element, CompilationEngine.RETURN_STATEMENT)
         self._process(Constants.RETURN, TokenType.KEYWORD, element)
+
+        if self.tokenizer.current_token.value != Constants.SEMICOLON:
+            self._compile_expression(element)
+
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, element)
 
     def _compile_expression_list(self, xml_element: Element):
@@ -220,7 +224,7 @@ class CompilationEngine:
         current_token = self.tokenizer.current_token
         self._process(current_token.value, current_token.token_type, element)
 
-        if current_token == Constants.LEFT_BRACKET:
+        if current_token.value == Constants.LEFT_BRACKET:
             self._compile_expression(element)
             self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, element)
         elif current_token.value in {Constants.TILDA, Constants.MINUS}:
@@ -236,22 +240,27 @@ class CompilationEngine:
         self._process(Constants.RIGHT_SQUARE_BRACKET, TokenType.SYMBOL, xml_element)
 
     def _process_subroutine_call(self, xml_element: Element):
-        self._process(Constants.POINT, TokenType.SYMBOL, xml_element)
-        self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, xml_element)
-        self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, xml_element)
-        self._compile_expression_list(xml_element)
-        self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, xml_element)
+        if self.tokenizer.current_token.value == Constants.LEFT_BRACKET:
+            self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, xml_element)
+            self._compile_expression_list(xml_element)
+            self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, xml_element)
+        else:
+            self._process(Constants.POINT, TokenType.SYMBOL, xml_element)
+            self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, xml_element)
+            self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, xml_element)
+            self._compile_expression_list(xml_element)
+            self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, xml_element)
 
     def _process(self, token_value: str, token_type: TokenType, xml_element: Element):
         current_token = self.tokenizer.current_token
 
         if current_token.token_type != token_type:
-            raise ValueError(
+            self.raise_error(
                 f"Got: {current_token.token_type.name} expected: {token_type.name}, "
                 f"token value: {current_token.value}, line:{self.tokenizer.line_count}, file: {self.file_path}")
 
         if current_token.token_type in {TokenType.KEYWORD, TokenType.SYMBOL} and current_token.value != token_value:
-            raise ValueError(
+            self.raise_error(
                 f"Got: {current_token.value}, expected: {token_value}, line:{self.tokenizer.line_count},  file: {self.file_path}")
 
         element = ET.SubElement(xml_element, current_token.token_type.value)
@@ -259,3 +268,7 @@ class CompilationEngine:
 
         self.tokens_xml_handler.write_to_xml(current_token)
         self.tokenizer.advance()
+
+    def raise_error(self, error_message: str):
+        self._on_finish()
+        raise ValueError(error_message)
