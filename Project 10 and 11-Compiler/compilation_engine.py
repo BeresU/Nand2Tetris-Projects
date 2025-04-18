@@ -94,13 +94,15 @@ class CompilationEngine:
     def _compile_parameter_list(self, xml_element: Element):
         element = ET.SubElement(xml_element, CompilationEngine.PARAMETER_LIST)
 
-        while self.tokenizer.current_token.value != Constants.RIGHT_BRACKET:
-            current_token = self.tokenizer.current_token
-            self._process(current_token.value, TokenType.KEYWORD, element)
-            self._process(current_token.value, TokenType.IDENTIFIER, element)
+        if self.tokenizer.current_token.value == Constants.RIGHT_BRACKET: return
 
-            if self.tokenizer.current_token.value == Constants.RIGHT_BRACKET: break
+        self._process(self.tokenizer.current_token.value, TokenType.KEYWORD, element)
+        self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, element)
+
+        while self.tokenizer.current_token.value == Constants.COMMA:
             self._process(Constants.COMMA, TokenType.SYMBOL, element)
+            self._process(self.tokenizer.current_token.value, TokenType.KEYWORD, element)
+            self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, element)
 
     def _compile_subroutine_body(self, xml_element: Element):
         element = ET.SubElement(xml_element, CompilationEngine.SUBROUTINE_BODY)
