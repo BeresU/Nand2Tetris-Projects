@@ -166,7 +166,7 @@ class CompilationEngine:
             self._compile_expression(element)
 
         elif self.tokenizer.current_token.value == Constants.LEFT_SQUARE_BRACKET:
-            self._process_array(element)
+            self._compile_array(element)
             self._process(Constants.EQUAL, TokenType.SYMBOL, element)
             self._compile_expression(element)
 
@@ -186,7 +186,7 @@ class CompilationEngine:
         element = ET.SubElement(xml_element, CompilationEngine.DO_STATEMENT)
         self._process(Constants.DO, TokenType.KEYWORD, element)
         self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, element)
-        self._process_subroutine_call(element)
+        self._compile_subroutine_call(element)
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, element)
 
     def _compile_return(self, xml_element: Element):
@@ -230,16 +230,16 @@ class CompilationEngine:
         elif current_token.value in {Constants.TILDA, Constants.MINUS}:
             self._compile_term(element)
         elif self.tokenizer.current_token.value == Constants.LEFT_SQUARE_BRACKET:
-            self._process_array(element)
+            self._compile_array(element)
         elif self.tokenizer.current_token.value == Constants.POINT:
-            self._process_subroutine_call(element)
+            self._compile_subroutine_call(element)
 
-    def _process_array(self, xml_element: Element):
+    def _compile_array(self, xml_element: Element):
         self._process(Constants.LEFT_SQUARE_BRACKET, TokenType.SYMBOL, xml_element)
         self._compile_expression(xml_element)
         self._process(Constants.RIGHT_SQUARE_BRACKET, TokenType.SYMBOL, xml_element)
 
-    def _process_subroutine_call(self, xml_element: Element):
+    def _compile_subroutine_call(self, xml_element: Element):
         if self.tokenizer.current_token.value == Constants.LEFT_BRACKET:
             self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, xml_element)
             self._compile_expression_list(xml_element)
