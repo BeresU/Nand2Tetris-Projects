@@ -3,7 +3,7 @@ from pathlib import Path
 from compilation_engine import CompilationEngine
 
 
-def analyze(input_path: str, output_path: str):
+def compile_jack_code(input_path: str, output_path: str):
     _create_output_folder(output_path)
 
     input_path_obj = Path(input_path)
@@ -27,7 +27,6 @@ def _create_output_folder(path: str):
 def _process_multi_files(input_path_obj: Path, output_path: str):
     jack_files = list(input_path_obj.glob("*.jack"))
 
-    # TODO different thread
     for file in jack_files:
         _process_file(file, output_path)
 
