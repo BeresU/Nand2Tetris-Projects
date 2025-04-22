@@ -1,0 +1,63 @@
+from dataclasses import dataclass
+from enum import Enum
+from constants import Constants
+
+class SymbolKind(Enum):
+    NONE = "non",
+    STATIC = Constants.STATIC,
+    FIELD = Constants.FIELD,
+    ARG = Constants.ARGUMENT,
+    VAR = Constants.VAR
+
+
+class SymbolTable:
+    @dataclass
+    class _SymbolData:
+        name: str
+        type: str
+        kind: SymbolKind
+        index: int
+
+    _class_table: dict[str, _SymbolData] = dict()
+    _subroutine_table: dict[str, _SymbolData] = dict()
+
+    _symbol_kind_table = {
+        SymbolKind.STATIC: 0,
+        SymbolKind.FIELD: 0,
+        SymbolKind.ARG: 0,
+        SymbolKind.VAR: 0,
+    }
+
+    def reset(self):
+        self._subroutine_table.clear()
+
+        for key in self._symbol_kind_table:
+            self._symbol_kind_table[key] = 0
+
+    # add to table
+    def define(self, name: str, symbol_type: str, kind: SymbolKind):
+        kind_index = self._symbol_kind_table[kind]
+        data = SymbolTable._SymbolData(name, symbol_type, kind, kind_index)
+        self._symbol_kind_table[kind] = kind_index + 1
+        symbol_table = self._class_table if kind in {SymbolKind.STATIC,SymbolKind.FIELD} else self._subroutine_table
+        symbol_table[name] = data
+
+    def var_count(self, kind: SymbolKind) -> int:
+        return self._symbol_kind_table[kind]
+
+    def kind_of(self, name: str) -> SymbolKind:
+        return self._get_data(name).kind
+
+    def type_of(self, name: str) -> str:
+        return self._get_data(name).type
+
+    def index_of(self, name: str) -> int:
+        return self._get_data(name).index
+
+    def _get_data(self, name:str) -> _SymbolData:
+        if name in self._class_table: return self._class_table[name]
+        elif name in self._subroutine_table: return self._subroutine_table[name]
+        raise KeyError(f"key: {name} is not exist in either symbol dictionary")
+
+
+

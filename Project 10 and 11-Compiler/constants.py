@@ -39,3 +39,4 @@ class Constants:
     GREATER_THAN = ">"
     EQUAL = "="
     TILDA = "~"
+    ARGUMENT = "argument"
