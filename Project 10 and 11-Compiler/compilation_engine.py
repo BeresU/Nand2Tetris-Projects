@@ -68,27 +68,36 @@ class CompilationEngine:
         self._on_finish()
 
     def _compile_class_var_dec(self, xml_element: Element):
-        current_token = self.tokenizer.current_token
-
         sub_element = ET.SubElement(xml_element, CompilationEngine.CLASS_VAR_DEC)
-        self._process(current_token.value, TokenType.KEYWORD, sub_element)
 
+        # field\static keyword
+        symbol_kind = getattr(SymbolKind, self.tokenizer.current_token.value.upper())
+        self._process(self.tokenizer.current_token.value, TokenType.KEYWORD, sub_element)
+
+        # variable type (int\string\etc)
+        symbol_type = self.tokenizer.current_token.value
+        self._process(self.tokenizer.current_token.value, self.tokenizer.current_token.token_type, sub_element)
+
+        # in case the variable declared with comma we loop
         while self.tokenizer.current_token.value != Constants.SEMICOLON:
-            current_token = self.tokenizer.current_token
-            self._process(current_token.value, current_token.token_type, sub_element)
+            if self.tokenizer.current_token.value != Constants.COMMA:
+                self.symbol_table.define(self.tokenizer.current_token.value, symbol_type, symbol_kind)
+
+            self._process(self.tokenizer.current_token.value , self.tokenizer.current_token.token_type , sub_element)
 
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
 
     def _compile_subroutine(self, xml_element: Element):
         current_token = self.tokenizer.current_token
         sub_element = ET.SubElement(xml_element, CompilationEngine.SUBROUTINE_DEC)
-
+        self.symbol_table.reset()
+        self.symbol_table.define("this", Path(self.file_path).stem, SymbolKind.FIELD)
         self._process(current_token.value, TokenType.KEYWORD, sub_element)
-
         expected_token_type = TokenType.IDENTIFIER if current_token.value == Constants.CONSTRUCTOR else TokenType.KEYWORD
         self._process(self.tokenizer.current_token.value, expected_token_type, sub_element)
         self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element)
         self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, sub_element)
+
         self._compile_parameter_list(sub_element)
         self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, sub_element)
         self._compile_subroutine_body(sub_element)
@@ -98,12 +107,19 @@ class CompilationEngine:
 
         if self.tokenizer.current_token.value == Constants.RIGHT_BRACKET: return
 
-        self._process(self.tokenizer.current_token.value, TokenType.KEYWORD, sub_element)
+        symbol_type = self.tokenizer.current_token.value
+        self._process(self.tokenizer.current_token.value, self.tokenizer.current_token.token_type, sub_element)
+
+        self.symbol_table.define(self.tokenizer.current_token.value, symbol_type, SymbolKind.ARG)
         self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element)
 
         while self.tokenizer.current_token.value == Constants.COMMA:
             self._process(Constants.COMMA, TokenType.SYMBOL, sub_element)
-            self._process(self.tokenizer.current_token.value, TokenType.KEYWORD, sub_element)
+
+            symbol_type = self.tokenizer.current_token.value
+            self._process(self.tokenizer.current_token.value, self.tokenizer.current_token.token_type, sub_element)
+
+            self.symbol_table.define(self.tokenizer.current_token.value, symbol_type, SymbolKind.ARG)
             self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element)
 
     def _compile_subroutine_body(self, xml_element: Element):
@@ -120,9 +136,12 @@ class CompilationEngine:
         sub_element = ET.SubElement(xml_element, CompilationEngine.VAR_DEC)
         self._process(Constants.VAR, TokenType.KEYWORD, sub_element)
 
+        symbol_type = self.tokenizer.current_token.value
+        self._process(self.tokenizer.current_token.value, self.tokenizer.current_token.token_type, sub_element)
+
         while self.tokenizer.current_token.value != Constants.SEMICOLON:
-            current_token = self.tokenizer.current_token
-            self._process(current_token.value, current_token.token_type, sub_element)
+            self.symbol_table.define(self.tokenizer.current_token.value, symbol_type, SymbolKind.VAR)
+            self._process(self.tokenizer.current_token.value, self.tokenizer.current_token.token_type, sub_element)
 
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
 
