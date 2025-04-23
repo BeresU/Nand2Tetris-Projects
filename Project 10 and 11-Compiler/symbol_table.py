@@ -5,9 +5,9 @@ from constants import Constants
 class SymbolKind(Enum):
     NONE = "non",
     STATIC = Constants.STATIC,
-    FIELD = Constants.FIELD,
+    FIELD = Constants.FIELD, # TODO: change to this?
     ARG = Constants.ARGUMENT,
-    VAR = Constants.VAR
+    VAR = Constants.VAR     # TODO: change to local?
 
 
 class SymbolTable:
@@ -35,6 +35,9 @@ class SymbolTable:
             self._symbol_kind_table[key] = 0
 
     # add to table
+    # TODO: The compiler creates a method-level symbol table, and adds to it the entry <this className argument 0>;
+    # For each parameter and local variable found in the method declaration,
+    # the compiler adds the variable to the symbol table as argument i or as local i
     def define(self, name: str, symbol_type: str, kind: SymbolKind):
         kind_index = self._symbol_kind_table[kind]
         data = SymbolTable._SymbolData(name, symbol_type, kind, kind_index)

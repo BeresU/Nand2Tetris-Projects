@@ -5,6 +5,8 @@ from jack_tokenizer import JackTokenizer
 import xml.etree.ElementTree as ET
 from constants import Constants
 from jack_tokenizer import TokenType
+from symbol_table import SymbolTable
+from symbol_table import SymbolKind
 
 
 class CompilationEngine:
@@ -13,6 +15,7 @@ class CompilationEngine:
     file_path: str
     tokenizer: JackTokenizer
     xml_root_element: Element
+    symbol_table: SymbolTable
 
     CLASS_VAR_DEC = "classVarDec"
     SUBROUTINE_DEC = "subroutineDec"
@@ -34,6 +37,7 @@ class CompilationEngine:
         self.output_path = output_path
         self.tokens_xml_handler = TokenXmlHandler()
         self.tokenizer = JackTokenizer(file_path)
+        self.symbol_table = SymbolTable()
 
     def _on_finish(self):
         self.tokenizer.dispose()
@@ -53,7 +57,8 @@ class CompilationEngine:
         self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, self.xml_root_element)
         self._process(Constants.LEFT_CURLY_BRACKET, TokenType.SYMBOL, self.xml_root_element)
 
-        self._compile_class_var_dec(self.xml_root_element)
+        while self.tokenizer.current_token.value in {Constants.FIELD, Constants.STATIC}:
+            self._compile_class_var_dec(self.xml_root_element)
 
         while self.tokenizer.current_token.value in {Constants.FUNCTION, Constants.METHOD, Constants.CONSTRUCTOR}:
             self._compile_subroutine(self.xml_root_element)
@@ -65,8 +70,6 @@ class CompilationEngine:
     def _compile_class_var_dec(self, xml_element: Element):
         current_token = self.tokenizer.current_token
 
-        if current_token.value not in {Constants.FIELD, Constants.STATIC}: return
-
         sub_element = ET.SubElement(xml_element, CompilationEngine.CLASS_VAR_DEC)
         self._process(current_token.value, TokenType.KEYWORD, sub_element)
 
@@ -75,7 +78,6 @@ class CompilationEngine:
             self._process(current_token.value, current_token.token_type, sub_element)
 
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
-        self._compile_class_var_dec(xml_element)
 
     def _compile_subroutine(self, xml_element: Element):
         current_token = self.tokenizer.current_token
@@ -195,6 +197,7 @@ class CompilationEngine:
         sub_element = ET.SubElement(xml_element, CompilationEngine.RETURN_STATEMENT)
         self._process(Constants.RETURN, TokenType.KEYWORD, sub_element)
 
+        # TODO; if the return has no value we need to push dummy value
         if self.tokenizer.current_token.value != Constants.SEMICOLON:
             self._compile_expression(sub_element)
 
@@ -218,8 +221,10 @@ class CompilationEngine:
                   Constants.OR, Constants.LESS_THAN, Constants.GREATER_THAN, Constants.EQUAL}
 
         while self.tokenizer.current_token.value in op_set:
+            # TODO: create a process method that handle syntax analyzing and vm writing for specific tasks? like op for example
             self._process(self.tokenizer.current_token.value, TokenType.SYMBOL, sub_element)
             self._compile_term(sub_element)
+            # TODO: write vm code for op here
 
     def _compile_term(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, CompilationEngine.TERM)
