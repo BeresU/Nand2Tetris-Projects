@@ -2,12 +2,13 @@ from dataclasses import dataclass
 from enum import Enum
 from constants import Constants
 
+
 class SymbolKind(Enum):
-    NONE = "non",
-    STATIC = Constants.STATIC,
-    FIELD = Constants.FIELD, # TODO: change to this?
-    ARG = Constants.ARGUMENT,
-    VAR = Constants.VAR     # TODO: change to local?
+    NONE = "none"
+    STATIC = Constants.STATIC
+    FIELD = Constants.FIELD  # TODO: change to this?
+    ARG = Constants.ARGUMENT
+    VAR = Constants.VAR  # TODO: change to local?
 
 
 class SymbolTable:
@@ -34,15 +35,11 @@ class SymbolTable:
         for key in self._symbol_kind_table:
             self._symbol_kind_table[key] = 0
 
-    # add to table
-    # TODO: The compiler creates a method-level symbol table, and adds to it the entry <this className argument 0>;
-    # For each parameter and local variable found in the method declaration,
-    # the compiler adds the variable to the symbol table as argument i or as local i
     def define(self, name: str, symbol_type: str, kind: SymbolKind):
         kind_index = self._symbol_kind_table[kind]
         data = SymbolTable._SymbolData(name, symbol_type, kind, kind_index)
         self._symbol_kind_table[kind] = kind_index + 1
-        symbol_table = self._class_table if kind in {SymbolKind.STATIC,SymbolKind.FIELD} else self._subroutine_table
+        symbol_table = self._class_table if kind in {SymbolKind.STATIC, SymbolKind.FIELD} else self._subroutine_table
         symbol_table[name] = data
 
     def var_count(self, kind: SymbolKind) -> int:
@@ -57,10 +54,9 @@ class SymbolTable:
     def index_of(self, name: str) -> int:
         return self._get_data(name).index
 
-    def _get_data(self, name:str) -> _SymbolData:
-        if name in self._class_table: return self._class_table[name]
-        elif name in self._subroutine_table: return self._subroutine_table[name]
-        raise KeyError(f"key: {name} is not exist in either symbol dictionary")
-
-
-
+    def _get_data(self, name: str) -> _SymbolData:
+        if name in self._class_table:
+            return self._class_table[name]
+        elif name in self._subroutine_table:
+            return self._subroutine_table[name]
+        return SymbolTable._SymbolData(name, "", SymbolKind.NONE, -1)
