@@ -1,7 +1,7 @@
 from pathlib import Path
 from xml.etree.ElementTree import Element
 from tokens_xml_handler import TokenXmlHandler
-from jack_tokenizer import JackTokenizer
+from jack_tokenizer import JackTokenizer, TokenData
 import xml.etree.ElementTree as ET
 from constants import Constants
 from jack_tokenizer import TokenType
@@ -16,6 +16,10 @@ class CompilationEngine:
     tokenizer: JackTokenizer
     xml_root_element: Element
     symbol_table: SymbolTable
+
+    _CLASS = "class"
+    _SUBROUTINE = "subroutine"
+    _EXPRESSION_USE = "expression use"
 
     def __init__(self, file_path: str, output_path: str):
         self.file_path = file_path
@@ -39,7 +43,9 @@ class CompilationEngine:
     def compile_class(self):
         self.xml_root_element = ET.Element(Constants.CLASS)
         self._process(Constants.CLASS, TokenType.KEYWORD, self.xml_root_element)
-        self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, self.xml_root_element)
+
+        attributes = self._get_identifier_attributes("class name", CompilationEngine._CLASS)
+        self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, self.xml_root_element, attributes)
         self._process(Constants.LEFT_CURLY_BRACKET, TokenType.SYMBOL, self.xml_root_element)
 
         while self.tokenizer.current_token.value in {Constants.FIELD, Constants.STATIC}:
@@ -65,9 +71,15 @@ class CompilationEngine:
 
         # in case the variable declared with comma we loop
         while self.tokenizer.current_token.value != Constants.SEMICOLON:
+            attributes = None
+
             if self.tokenizer.current_token.value != Constants.COMMA:
                 self.symbol_table.define(self.tokenizer.current_token.value, symbol_type, symbol_kind)
-            self._process(self.tokenizer.current_token.value, self.tokenizer.current_token.token_type, sub_element)
+                usage = f"{symbol_kind.value} declaration"
+                attributes = self._get_identifier_attributes(usage)
+
+            self._process(self.tokenizer.current_token.value, self.tokenizer.current_token.token_type, sub_element,
+                          attributes)
 
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
 
@@ -75,11 +87,16 @@ class CompilationEngine:
         current_token = self.tokenizer.current_token
         sub_element = ET.SubElement(xml_element, "subroutineDec")
         self.symbol_table.reset()
-        self.symbol_table.define("this", Path(self.file_path).stem, SymbolKind.FIELD)
+        self.symbol_table.define("this", Path(self.file_path).stem, SymbolKind.ARG)
         self._process(current_token.value, TokenType.KEYWORD, sub_element)
+
         expected_token_type = TokenType.IDENTIFIER if current_token.value == Constants.CONSTRUCTOR else TokenType.KEYWORD
+
         self._process(self.tokenizer.current_token.value, expected_token_type, sub_element)
-        self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element)
+
+        attributes = self._get_identifier_attributes("subroutine declaration", CompilationEngine._SUBROUTINE)
+
+        self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element, attributes)
         self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, sub_element)
 
         self._compile_parameter_list(sub_element)
@@ -91,20 +108,18 @@ class CompilationEngine:
 
         if self.tokenizer.current_token.value == Constants.RIGHT_BRACKET: return
 
-        symbol_type = self.tokenizer.current_token.value
-        self._process(self.tokenizer.current_token.value, self.tokenizer.current_token.token_type, sub_element)
-
-        self.symbol_table.define(self.tokenizer.current_token.value, symbol_type, SymbolKind.ARG)
-        self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element)
+        self._compile_parameter(sub_element)
 
         while self.tokenizer.current_token.value == Constants.COMMA:
             self._process(Constants.COMMA, TokenType.SYMBOL, sub_element)
+            self._compile_parameter(sub_element)
 
-            symbol_type = self.tokenizer.current_token.value
-            self._process(self.tokenizer.current_token.value, self.tokenizer.current_token.token_type, sub_element)
-
-            self.symbol_table.define(self.tokenizer.current_token.value, symbol_type, SymbolKind.ARG)
-            self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element)
+    def _compile_parameter(self, xml_element: Element):
+        symbol_type = self.tokenizer.current_token.value
+        self._process(self.tokenizer.current_token.value, self.tokenizer.current_token.token_type, xml_element)
+        self.symbol_table.define(self.tokenizer.current_token.value, symbol_type, SymbolKind.ARG)
+        attributes = self._get_identifier_attributes("parameter list")
+        self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, xml_element, attributes)
 
     def _compile_subroutine_body(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "subroutineBody")
@@ -124,9 +139,12 @@ class CompilationEngine:
         self._process(self.tokenizer.current_token.value, self.tokenizer.current_token.token_type, sub_element)
 
         while self.tokenizer.current_token.value != Constants.SEMICOLON:
+            attributes = None
             if self.tokenizer.current_token.value != Constants.COMMA:
                 self.symbol_table.define(self.tokenizer.current_token.value, symbol_type, SymbolKind.VAR)
-            self._process(self.tokenizer.current_token.value, self.tokenizer.current_token.token_type, sub_element)
+                attributes = self._get_identifier_attributes("subroutine variable declaration")
+            self._process(self.tokenizer.current_token.value, self.tokenizer.current_token.token_type, sub_element,
+                          attributes)
 
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
 
@@ -167,7 +185,9 @@ class CompilationEngine:
     def _compile_let(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "letStatement")
         self._process(Constants.LET, TokenType.KEYWORD, sub_element)
-        self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element)
+
+        attributes = self._get_identifier_attributes("let")
+        self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element, attributes)
 
         if self.tokenizer.current_token.value == Constants.EQUAL:
             self._process(Constants.EQUAL, TokenType.SYMBOL, sub_element)
@@ -193,9 +213,25 @@ class CompilationEngine:
     def _compile_do(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "doStatement")
         self._process(Constants.DO, TokenType.KEYWORD, sub_element)
-        self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element)
+
+        current_token = self.tokenizer.current_token
+        self._process(current_token.value, TokenType.IDENTIFIER, sub_element)
+        self._add_attribute_to_last_element(sub_element, current_token)
         self._compile_subroutine_call(sub_element)
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
+
+    def _add_attribute_to_last_element(self,xml_element:Element, token_data: TokenData):
+        if self.tokenizer.current_token.value == Constants.POINT:
+            identifier_category = CompilationEngine._CLASS
+        elif self.symbol_table.kind_of(token_data.value) == SymbolKind.NONE:
+            identifier_category = CompilationEngine._SUBROUTINE
+        else:
+            identifier_category = ""
+
+        attributes = self._get_identifier_attributes("do", identifier_category, name=token_data.value)
+
+        element_child = xml_element.find(token_data.token_type.value)
+        element_child.attrib.update(attributes)
 
     def _compile_return(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "returnStatement")
@@ -233,7 +269,15 @@ class CompilationEngine:
     def _compile_term(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "term")
         current_token = self.tokenizer.current_token
-        self._process(current_token.value, current_token.token_type, sub_element)
+        attributes = None
+
+        if current_token.token_type == TokenType.IDENTIFIER:
+            category_type = CompilationEngine._CLASS if self.symbol_table.kind_of(
+                current_token.value) == SymbolKind.NONE else ""
+
+            attributes = self._get_identifier_attributes(CompilationEngine._EXPRESSION_USE, category_type)
+
+        self._process(current_token.value, current_token.token_type, sub_element, attributes)
 
         if current_token.value == Constants.LEFT_BRACKET:
             self._compile_expression(sub_element)
@@ -257,12 +301,15 @@ class CompilationEngine:
             self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, xml_element)
         else:
             self._process(Constants.POINT, TokenType.SYMBOL, xml_element)
-            self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, xml_element)
+            attributes = self._get_identifier_attributes(CompilationEngine._EXPRESSION_USE,
+                                                         CompilationEngine._SUBROUTINE)
+
+            self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, xml_element, attributes)
             self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, xml_element)
             self._compile_expression_list(xml_element)
             self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, xml_element)
 
-    def _process(self, token_value: str, token_type: TokenType, xml_element: Element):
+    def _process(self, token_value: str, token_type: TokenType, xml_element: Element, attributes: dict = None):
         current_token = self.tokenizer.current_token
 
         if current_token.token_type != token_type:
@@ -274,7 +321,9 @@ class CompilationEngine:
             self._raise_error(
                 f"Got: {current_token.value}, expected: {token_value}, line:{self.tokenizer.line_count},  file: {self.file_path}")
 
-        sub_element = ET.SubElement(xml_element, current_token.token_type.value)
+        sub_element = ET.SubElement(xml_element, current_token.token_type.value,
+                                    attrib={} if attributes is None else attributes)
+
         sub_element.text = f" {current_token.value} "  # add spaces since the compare file has spaces
 
         self.tokens_xml_handler.write_to_xml(current_token)
@@ -284,5 +333,21 @@ class CompilationEngine:
         self._on_finish()
         raise ValueError(error_message)
 
-    def _get_identifier_data(self, usage: str) -> str:
-        pass
+    def _get_identifier_attributes(self, usage: str, category="", name="") -> dict[str, str]:
+        name = self.tokenizer.current_token.value if name == "" else name
+
+        if category == "":
+            category = self.symbol_table.kind_of(name).value
+            if category == Constants.VAR:
+                category = "local"
+
+        attributes = {"category": category}
+
+        symbol_index = self.symbol_table.index_of(name)
+
+        if symbol_index != -1:
+            attributes["index"] = f"{symbol_index}"
+
+        attributes["usage"] = usage
+
+        return attributes
