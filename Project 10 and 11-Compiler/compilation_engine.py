@@ -17,21 +17,6 @@ class CompilationEngine:
     xml_root_element: Element
     symbol_table: SymbolTable
 
-    CLASS_VAR_DEC = "classVarDec"
-    SUBROUTINE_DEC = "subroutineDec"
-    PARAMETER_LIST = "parameterList"
-    SUBROUTINE_BODY = "subroutineBody"
-    VAR_DEC = "varDec"
-    STATEMENTS = "statements"
-    IF_STATEMENT = "ifStatement"
-    EXPRESSION = "expression"
-    WHILE_STATEMENT = "whileStatement"
-    LET_STATEMENT = "letStatement"
-    DO_STATEMENT = "doStatement"
-    RETURN_STATEMENT = "returnStatement"
-    TERM = "term"
-    EXPRESSION_LIST = "expressionList"
-
     def __init__(self, file_path: str, output_path: str):
         self.file_path = file_path
         self.output_path = output_path
@@ -68,7 +53,7 @@ class CompilationEngine:
         self._on_finish()
 
     def _compile_class_var_dec(self, xml_element: Element):
-        sub_element = ET.SubElement(xml_element, CompilationEngine.CLASS_VAR_DEC)
+        sub_element = ET.SubElement(xml_element, "classVarDec")
 
         # field\static keyword
         symbol_kind = getattr(SymbolKind, self.tokenizer.current_token.value.upper())
@@ -82,14 +67,13 @@ class CompilationEngine:
         while self.tokenizer.current_token.value != Constants.SEMICOLON:
             if self.tokenizer.current_token.value != Constants.COMMA:
                 self.symbol_table.define(self.tokenizer.current_token.value, symbol_type, symbol_kind)
-
             self._process(self.tokenizer.current_token.value , self.tokenizer.current_token.token_type , sub_element)
 
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
 
     def _compile_subroutine(self, xml_element: Element):
         current_token = self.tokenizer.current_token
-        sub_element = ET.SubElement(xml_element, CompilationEngine.SUBROUTINE_DEC)
+        sub_element = ET.SubElement(xml_element, "subroutineDec")
         self.symbol_table.reset()
         self.symbol_table.define("this", Path(self.file_path).stem, SymbolKind.FIELD)
         self._process(current_token.value, TokenType.KEYWORD, sub_element)
@@ -103,7 +87,7 @@ class CompilationEngine:
         self._compile_subroutine_body(sub_element)
 
     def _compile_parameter_list(self, xml_element: Element):
-        sub_element = ET.SubElement(xml_element, CompilationEngine.PARAMETER_LIST)
+        sub_element = ET.SubElement(xml_element, "parameterList")
 
         if self.tokenizer.current_token.value == Constants.RIGHT_BRACKET: return
 
@@ -123,7 +107,7 @@ class CompilationEngine:
             self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element)
 
     def _compile_subroutine_body(self, xml_element: Element):
-        sub_element = ET.SubElement(xml_element, CompilationEngine.SUBROUTINE_BODY)
+        sub_element = ET.SubElement(xml_element, "subroutineBody")
         self._process(Constants.LEFT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
 
         while self.tokenizer.current_token.value == Constants.VAR:
@@ -133,20 +117,21 @@ class CompilationEngine:
         self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
 
     def _compie_var_dec(self, xml_element: Element):
-        sub_element = ET.SubElement(xml_element, CompilationEngine.VAR_DEC)
+        sub_element = ET.SubElement(xml_element, "varDec")
         self._process(Constants.VAR, TokenType.KEYWORD, sub_element)
 
         symbol_type = self.tokenizer.current_token.value
         self._process(self.tokenizer.current_token.value, self.tokenizer.current_token.token_type, sub_element)
 
         while self.tokenizer.current_token.value != Constants.SEMICOLON:
-            self.symbol_table.define(self.tokenizer.current_token.value, symbol_type, SymbolKind.VAR)
+            if self.tokenizer.current_token.value != Constants.COMMA:
+                self.symbol_table.define(self.tokenizer.current_token.value, symbol_type, SymbolKind.VAR)
             self._process(self.tokenizer.current_token.value, self.tokenizer.current_token.token_type, sub_element)
 
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
 
     def _compile_statements(self, xml_element: Element):
-        sub_element = ET.SubElement(xml_element, CompilationEngine.STATEMENTS)
+        sub_element = ET.SubElement(xml_element, "statements")
 
         statement_keywords = {
             Constants.LET, Constants.IF, Constants.WHILE, Constants.DO, Constants.RETURN
@@ -162,7 +147,7 @@ class CompilationEngine:
             if token_value == Constants.RETURN: self._compile_return(sub_element)
 
     def _compile_if(self, xml_element: Element):
-        sub_element = ET.SubElement(xml_element, CompilationEngine.IF_STATEMENT)
+        sub_element = ET.SubElement(xml_element, "ifStatement")
         self._process(Constants.IF, TokenType.KEYWORD, sub_element)
         self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, sub_element)
 
@@ -180,7 +165,7 @@ class CompilationEngine:
         self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
 
     def _compile_let(self, xml_element: Element):
-        sub_element = ET.SubElement(xml_element, CompilationEngine.LET_STATEMENT)
+        sub_element = ET.SubElement(xml_element, "letStatement")
         self._process(Constants.LET, TokenType.KEYWORD, sub_element)
         self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element)
 
@@ -196,7 +181,7 @@ class CompilationEngine:
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)  # END
 
     def _compile_while(self, xml_element: Element):
-        sub_element = ET.SubElement(xml_element, CompilationEngine.WHILE_STATEMENT)
+        sub_element = ET.SubElement(xml_element, "whileStatement")
         self._process(Constants.WHILE, TokenType.KEYWORD, sub_element)
         self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, sub_element)
         self._compile_expression(sub_element)
@@ -206,14 +191,14 @@ class CompilationEngine:
         self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
 
     def _compile_do(self, xml_element: Element):
-        sub_element = ET.SubElement(xml_element, CompilationEngine.DO_STATEMENT)
+        sub_element = ET.SubElement(xml_element, "doStatement")
         self._process(Constants.DO, TokenType.KEYWORD, sub_element)
         self._process(self.tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element)
         self._compile_subroutine_call(sub_element)
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
 
     def _compile_return(self, xml_element: Element):
-        sub_element = ET.SubElement(xml_element, CompilationEngine.RETURN_STATEMENT)
+        sub_element = ET.SubElement(xml_element, "returnStatement")
         self._process(Constants.RETURN, TokenType.KEYWORD, sub_element)
 
         # TODO; if the return has no value we need to push dummy value
@@ -223,7 +208,7 @@ class CompilationEngine:
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
 
     def _compile_expression_list(self, xml_element: Element):
-        sub_element = ET.SubElement(xml_element, CompilationEngine.EXPRESSION_LIST)
+        sub_element = ET.SubElement(xml_element, "expressionList")
         if self.tokenizer.current_token.value == Constants.RIGHT_BRACKET: return
 
         self._compile_expression(sub_element)
@@ -233,7 +218,7 @@ class CompilationEngine:
             self._compile_expression(sub_element)
 
     def _compile_expression(self, xml_element: Element):
-        sub_element = ET.SubElement(xml_element, CompilationEngine.EXPRESSION)
+        sub_element = ET.SubElement(xml_element, "expression")
         self._compile_term(sub_element)
 
         op_set = {Constants.PLUS, Constants.MINUS, Constants.ASTERISK, Constants.FORWARD_SLASH, Constants.AND,
@@ -246,7 +231,7 @@ class CompilationEngine:
             # TODO: write vm code for op here
 
     def _compile_term(self, xml_element: Element):
-        sub_element = ET.SubElement(xml_element, CompilationEngine.TERM)
+        sub_element = ET.SubElement(xml_element, "term")
         current_token = self.tokenizer.current_token
         self._process(current_token.value, current_token.token_type, sub_element)
 
