@@ -56,7 +56,7 @@ class CompilationEngine:
         sub_element = ET.SubElement(xml_element, "classVarDec")
 
         # field\static keyword
-        symbol_kind = getattr(SymbolKind, self.tokenizer.current_token.value.upper())
+        symbol_kind = SymbolKind[self.tokenizer.current_token.value.upper()]
         self._process(self.tokenizer.current_token.value, TokenType.KEYWORD, sub_element)
 
         # variable type (int\string\etc)
@@ -67,7 +67,7 @@ class CompilationEngine:
         while self.tokenizer.current_token.value != Constants.SEMICOLON:
             if self.tokenizer.current_token.value != Constants.COMMA:
                 self.symbol_table.define(self.tokenizer.current_token.value, symbol_type, symbol_kind)
-            self._process(self.tokenizer.current_token.value , self.tokenizer.current_token.token_type , sub_element)
+            self._process(self.tokenizer.current_token.value, self.tokenizer.current_token.token_type, sub_element)
 
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
 
@@ -266,12 +266,12 @@ class CompilationEngine:
         current_token = self.tokenizer.current_token
 
         if current_token.token_type != token_type:
-            self.raise_error(
+            self._raise_error(
                 f"Got: {current_token.token_type.name} expected: {token_type.name}, "
                 f"token value: {current_token.value}, line:{self.tokenizer.line_count}, file: {self.file_path}")
 
         if current_token.token_type in {TokenType.KEYWORD, TokenType.SYMBOL} and current_token.value != token_value:
-            self.raise_error(
+            self._raise_error(
                 f"Got: {current_token.value}, expected: {token_value}, line:{self.tokenizer.line_count},  file: {self.file_path}")
 
         sub_element = ET.SubElement(xml_element, current_token.token_type.value)
@@ -280,6 +280,9 @@ class CompilationEngine:
         self.tokens_xml_handler.write_to_xml(current_token)
         self.tokenizer.advance()
 
-    def raise_error(self, error_message: str):
+    def _raise_error(self, error_message: str):
         self._on_finish()
         raise ValueError(error_message)
+
+    def _get_identifier_data(self, usage: str) -> str:
+        pass
