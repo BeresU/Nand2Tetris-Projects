@@ -221,11 +221,24 @@ class CompilationEngine:
         sub_element = ET.SubElement(xml_element, "whileStatement")
         self._process(Constants.WHILE, TokenType.KEYWORD, sub_element)
         self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, sub_element)
+        loop_label = f"loop_{self.get_unique_label()}"
+        end_loop_label = f"end_loop_{self.get_unique_label()}"
+
+        # loop condition expression
+        self._vm_writer.write_label(loop_label)
         self._compile_expression(sub_element)
+        self._vm_writer.write_arithmetic(ArithmeticCommandType.NOT)
+        self._vm_writer.write_if(end_loop_label)
+
+        # loop statements
         self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, sub_element)
         self._process(Constants.LEFT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
         self._compile_statements(sub_element)
+        self._vm_writer.write_goto(loop_label)
         self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
+
+        self._vm_writer.write_label(end_loop_label)
+
 
     def _compile_do(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "doStatement")
