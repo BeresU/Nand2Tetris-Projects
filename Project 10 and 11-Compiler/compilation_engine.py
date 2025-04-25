@@ -135,7 +135,12 @@ class CompilationEngine:
             self._compie_var_dec(sub_element)
 
         local_var_count = self._symbol_table.var_count(SymbolKind.VAR)
-        self._vm_writer.write_function(subroutine_name, local_var_count)
+        self._vm_writer.write_function(f"{self._file_name}.{subroutine_name}", local_var_count)
+
+        if subroutine_name == "new":
+            field_count = self._symbol_table.var_count(SymbolKind.FIELD)
+            if field_count > 0:
+                self._vm_writer.write_call(Constants.OS_MEM_ALLOC, field_count)
 
         self._compile_statements(sub_element)
         self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
@@ -194,7 +199,6 @@ class CompilationEngine:
             label = self._get_unique_label()
             self._vm_writer.write_goto(label)
             self._vm_writer.write_label(else_label)
-
             self._process(Constants.ELSE, TokenType.KEYWORD, sub_element)
             self._process(Constants.LEFT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
             self._compile_statements(sub_element)
@@ -207,29 +211,31 @@ class CompilationEngine:
         self._process(Constants.LET, TokenType.KEYWORD, sub_element)
 
         var_name = self._tokenizer.current_token.value
-        field_data = self._get_vm_field_data(var_name)
-
         self._process(self._tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element, "let")
 
-        is_array = self._tokenizer.current_token.value == Constants.LEFT_SQUARE_BRACKET
-
-        if is_array:
-            self._compile_array(sub_element, var_name)
-
-        self._process(Constants.EQUAL, TokenType.SYMBOL, sub_element)
-        self._compile_expression(sub_element)
-
-        # pop expression value to array[index]
-        if is_array:
-            self._vm_writer.write_pop(SegmentType.TEMP, 0)
-            self._vm_writer.write_pop(SegmentType.POINTER, 1)
-            self._vm_writer.write_push(SegmentType.TEMP, 0)
-            self._vm_writer.write_pop(SegmentType.THAT, 0)
-
+        if self._tokenizer.current_token.value == Constants.LEFT_SQUARE_BRACKET:
+            self.handle_let_array(sub_element, var_name)
         else:
-            self._vm_writer.write_pop(field_data[0], field_data[1])
+            self.handle_let_field(sub_element, var_name)
 
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
+
+    def handle_let_array(self, xml_element: Element, var_name: str):
+        self._compile_array(xml_element, var_name)
+        self._process(Constants.EQUAL, TokenType.SYMBOL, xml_element)
+        self._compile_expression(xml_element)
+
+        # pop expression value to array[index]
+        self._vm_writer.write_pop(SegmentType.TEMP, 0)  # TODO: need to see if need that...
+        self._vm_writer.write_pop(SegmentType.POINTER, 1)
+        self._vm_writer.write_push(SegmentType.TEMP, 0)
+        self._vm_writer.write_pop(SegmentType.THAT, 0)
+
+    def handle_let_field(self, xml_element: Element, var_name: str):
+        self._process(Constants.EQUAL, TokenType.SYMBOL, xml_element)
+        self._compile_expression(xml_element)
+        field_data = self._get_vm_field_data(var_name)
+        self._vm_writer.write_pop(field_data[0], field_data[1])
 
     def _compile_while(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "whileStatement")
@@ -284,6 +290,7 @@ class CompilationEngine:
             self._process(Constants.COMMA, TokenType.SYMBOL, sub_element)
             self._compile_expression(sub_element)
 
+    # TODO: need to handle array creations (use OS class)
     def _compile_expression(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "expression")
         self._compile_term(sub_element)
@@ -408,7 +415,6 @@ class CompilationEngine:
         segment_kind = self._symbol_table.kind_of(field_name)
         segment_type = CompilationEngine._symbol_kind_to_segment_type(segment_kind)
         return segment_type, array_field_index
-
 
     @staticmethod
     def _symbol_kind_to_segment_type(symbol_type: SymbolKind) -> SegmentType:
