@@ -181,7 +181,7 @@ class CompilationEngine:
 
         self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, sub_element)
 
-        label = self.get_unique_label()
+        label = self._get_unique_label()
         self._vm_writer.write_arithmetic(ArithmeticCommandType.NOT)  # flip the expression output
         self._vm_writer.write_if(label)
 
@@ -191,7 +191,7 @@ class CompilationEngine:
 
         if self._tokenizer.current_token.value == Constants.ELSE:
             else_label = label
-            label =  self.get_unique_label()
+            label = self._get_unique_label()
             self._vm_writer.write_goto(label)
             self._vm_writer.write_label(else_label)
 
@@ -207,26 +207,36 @@ class CompilationEngine:
         self._process(Constants.LET, TokenType.KEYWORD, sub_element)
 
         var_name = self._tokenizer.current_token.value
-        var_index = self._symbol_table.index_of(var_name)
-        var_kind = self._symbol_table.kind_of(var_name)
-        var_segment = CompilationEngine._symbol_kind_to_segment_type(var_kind)
+        field_data = self._get_vm_field_data(var_name)
 
         self._process(self._tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element, "let")
 
-        if self._tokenizer.current_token.value == Constants.LEFT_SQUARE_BRACKET:
-            self._compile_array(sub_element)
+        is_array = self._tokenizer.current_token.value == Constants.LEFT_SQUARE_BRACKET
+
+        if is_array:
+            self._compile_array(sub_element, var_name)
 
         self._process(Constants.EQUAL, TokenType.SYMBOL, sub_element)
         self._compile_expression(sub_element)
-        self._vm_writer.write_pop(var_segment, var_index)
+
+        # pop expression value to array[index]
+        if is_array:
+            self._vm_writer.write_pop(SegmentType.TEMP, 0)
+            self._vm_writer.write_pop(SegmentType.POINTER, 1)
+            self._vm_writer.write_push(SegmentType.TEMP, 0)
+            self._vm_writer.write_pop(SegmentType.THAT, 0)
+
+        else:
+            self._vm_writer.write_pop(field_data[0], field_data[1])
+
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
 
     def _compile_while(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "whileStatement")
         self._process(Constants.WHILE, TokenType.KEYWORD, sub_element)
         self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, sub_element)
-        loop_label = f"loop_{self.get_unique_label()}"
-        end_loop_label = f"end_loop_{self.get_unique_label()}"
+        loop_label = f"loop_{self._get_unique_label()}"
+        end_loop_label = f"end_loop_{self._get_unique_label()}"
 
         # loop condition expression
         self._vm_writer.write_label(loop_label)
@@ -242,7 +252,6 @@ class CompilationEngine:
         self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
 
         self._vm_writer.write_label(end_loop_label)
-
 
     def _compile_do(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "doStatement")
@@ -283,10 +292,8 @@ class CompilationEngine:
                   Constants.OR, Constants.LESS_THAN, Constants.GREATER_THAN, Constants.EQUAL}
 
         while self._tokenizer.current_token.value in op_set:
-            # TODO: create a process method that handle syntax analyzing and vm writing for specific tasks? like op for example
             self._process(self._tokenizer.current_token.value, TokenType.SYMBOL, sub_element)
             self._compile_term(sub_element)
-            # TODO: write vm code for op here
 
     def _compile_term(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "term")
@@ -300,13 +307,23 @@ class CompilationEngine:
         elif current_token.value in {Constants.TILDA, Constants.MINUS}:
             self._compile_term(sub_element)
         elif self._tokenizer.current_token.value == Constants.LEFT_SQUARE_BRACKET:
-            self._compile_array(sub_element)
+            self._compile_array(sub_element, current_token.value)
         elif self._tokenizer.current_token.value == Constants.POINT:
             self._compile_subroutine_call(sub_element)
 
-    def _compile_array(self, xml_element: Element):
+    # push vm code that select index value: push: arr[i]
+
+    # TODO: I really hope i'll work...
+    # TODO: Need to check if its work for the other use case...
+    def _compile_array(self, xml_element: Element, array_field_name: str):
         self._process(Constants.LEFT_SQUARE_BRACKET, TokenType.SYMBOL, xml_element)
-        self._compile_expression(xml_element)
+
+        array_data = self._get_vm_field_data(array_field_name)
+
+        self._vm_writer.write_push(array_data[0], array_data[1])  # push array base address
+        self._compile_expression(xml_element)  # push index value
+        self._vm_writer.write_arithmetic(ArithmeticCommandType.ADD)  # add addresses
+
         self._process(Constants.RIGHT_SQUARE_BRACKET, TokenType.SYMBOL, xml_element)
 
     def _compile_subroutine_call(self, xml_element: Element):
@@ -381,11 +398,18 @@ class CompilationEngine:
 
         return attributes
 
-    def get_unique_label(self) -> str:
+    def _get_unique_label(self) -> str:
         index = self._running_index
         self._running_index += 1
         return f"{self._file_name}_{index}"
 
+    def _get_vm_field_data(self, field_name) -> tuple[SegmentType, int]:
+        array_field_index = self._symbol_table.index_of(field_name)
+        segment_kind = self._symbol_table.kind_of(field_name)
+        segment_type = CompilationEngine._symbol_kind_to_segment_type(segment_kind)
+        return segment_type, array_field_index
+
+
     @staticmethod
-    def _symbol_kind_to_segment_type(symbol_type:SymbolKind)-> SegmentType:
+    def _symbol_kind_to_segment_type(symbol_type: SymbolKind) -> SegmentType:
         return SegmentType(symbol_type.value)
