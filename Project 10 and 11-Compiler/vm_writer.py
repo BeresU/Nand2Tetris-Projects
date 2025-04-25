@@ -1,11 +1,12 @@
 from enum import Enum
 from typing import TextIO
+from pathlib import Path
 
 from constants import Constants
 
 
 class SegmentType(Enum):
-    NONE = "none",
+    NONE = "none"
     CONSTANT = "constant"
     ARGUMENT = Constants.ARGUMENT
     LOCAL = "local"
@@ -17,7 +18,7 @@ class SegmentType(Enum):
 
 
 class ArithmeticCommandType(Enum):
-    NONE = "none",
+    NONE = "none"
     ADD = "add"
     SUB = "sub"
     NEG = "neg"
@@ -33,7 +34,7 @@ class VmWriter:
     _stream: TextIO
 
     def __init__(self, file_path: str):
-        self._stream = open(f"{file_path}.vm", "w", encoding="utf-8")
+        self._stream = open(f"{file_path}", "w", encoding="utf-8")
 
     def dispose(self):
         self._stream.close()

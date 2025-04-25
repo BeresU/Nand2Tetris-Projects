@@ -7,15 +7,18 @@ from constants import Constants
 from jack_tokenizer import TokenType
 from symbol_table import SymbolTable
 from symbol_table import SymbolKind
+from vm_writer import VmWriter
 
 
 class CompilationEngine:
     _tokens_xml_handler: TokenXmlHandler
     _output_path: str
     _file_path: str
+    _file_name:str
     _tokenizer: JackTokenizer
     _xml_root_element: Element
     _symbol_table: SymbolTable
+    _vm_writer:VmWriter
 
     _CLASS = "class"
     _SUBROUTINE = "subroutine"
@@ -27,13 +30,17 @@ class CompilationEngine:
         self._tokens_xml_handler = TokenXmlHandler()
         self._tokenizer = JackTokenizer(file_path)
         self._symbol_table = SymbolTable()
+        input_path_obj = Path(self._file_path)
+        self._file_name = input_path_obj.stem
+        full_vm_path = f"{self._output_path}/{self._file_name}.vm"
+        self._vm_writer = VmWriter(full_vm_path)
+
 
     def _on_finish(self):
         self._tokenizer.dispose()
-        input_path_obj = Path(self._file_path)
-        file_name = input_path_obj.stem
-        self._tokens_xml_handler.create_xml(file_name, self._output_path)
-        self._create_xml_file(file_name)
+        self._tokens_xml_handler.create_xml(self._file_name, self._output_path)
+        self._create_xml_file(self._file_name)
+        self._vm_writer.dispose()
 
     def _create_xml_file(self, file_name: str):
         tree = ET.ElementTree(self._xml_root_element)
