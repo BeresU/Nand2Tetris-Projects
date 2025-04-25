@@ -6,9 +6,9 @@ from constants import Constants
 class SymbolKind(Enum):
     NONE = "none"
     STATIC = Constants.STATIC
-    FIELD = Constants.FIELD  # TODO: change to this?
+    FIELD = Constants.THIS
     ARG = Constants.ARGUMENT
-    VAR = Constants.VAR  # TODO: change to local?
+    VAR = "local"
 
 
 class SymbolTable:

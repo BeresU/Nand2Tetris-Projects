@@ -26,7 +26,7 @@ class CompilationEngine:
     _CLASS = "class"
     _SUBROUTINE = "subroutine"
     _EXPRESSION_USE = "expression use"
-    _SET_IDENTIFIER = False
+    _SET_ATTRIBUTES = False
 
     def __init__(self, file_path: str, output_path: str):
         self._file_path = file_path
@@ -205,6 +205,12 @@ class CompilationEngine:
     def _compile_let(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "letStatement")
         self._process(Constants.LET, TokenType.KEYWORD, sub_element)
+
+        var_name = self._tokenizer.current_token.value
+        var_index = self._symbol_table.index_of(var_name)
+        var_kind = self._symbol_table.kind_of(var_name)
+        var_segment = CompilationEngine._symbol_kind_to_segment_type(var_kind)
+
         self._process(self._tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element, "let")
 
         if self._tokenizer.current_token.value == Constants.LEFT_SQUARE_BRACKET:
@@ -212,8 +218,8 @@ class CompilationEngine:
 
         self._process(Constants.EQUAL, TokenType.SYMBOL, sub_element)
         self._compile_expression(sub_element)
-
-        self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)  # END
+        self._vm_writer.write_pop(var_segment, var_index)
+        self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
 
     def _compile_while(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "whileStatement")
@@ -334,7 +340,7 @@ class CompilationEngine:
         self._tokens_xml_handler.write_to_xml(current_token)
         self._tokenizer.advance()
 
-        if usage is not None and CompilationEngine._SET_IDENTIFIER:
+        if usage is not None and CompilationEngine._SET_ATTRIBUTES:
             self._add_attribute_to_identifier(sub_element, current_token, usage)
 
     def _raise_error(self, error_message: str):
@@ -379,3 +385,7 @@ class CompilationEngine:
         index = self._running_index
         self._running_index += 1
         return f"{self._file_name}_{index}"
+
+    @staticmethod
+    def _symbol_kind_to_segment_type(symbol_type:SymbolKind)-> SegmentType:
+        return SegmentType(symbol_type.value)
