@@ -1,6 +1,5 @@
 from enum import Enum
 from typing import TextIO
-from pathlib import Path
 
 from constants import Constants
 
@@ -40,31 +39,31 @@ class VmWriter:
         self._stream.close()
 
     def write_push(self, segment: SegmentType, index: int):
-        pass
+        self._write(f"\tpush {segment.value} {index}")
 
     def write_pop(self, segment: SegmentType, index: int):
-        pass
+        self._write(f"\tpop {segment.value} {index}")
 
     def write_arithmetic(self, arithmetic_command: ArithmeticCommandType):
-        pass
+        self._write(f"\t{arithmetic_command.value}")
 
     def write_label(self, label: str):
-        pass
+        self._write(f"label {label}")
 
     def write_goto(self, label: str):
-        pass
+        self._write(f"\tgoto {label}")
 
     def write_if(self, label: str):
-        pass
+        self._write(f"\tif-goto {label}")
 
     def write_call(self, name: str, n_args: int):
-        pass
+        self._write(f"\tcall {name} {n_args}")
 
-    def write_function(self, name: str, n_args: int):
-        pass
+    def write_function(self, name: str, n_vars: int):
+        self._write(f"\nfunction {name} {n_vars}")
 
     def write_return(self):
-        pass
+        self._write("\treturn")
 
     def _write(self, text: str):
         self._stream.write(text)

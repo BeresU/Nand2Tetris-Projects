@@ -8,7 +8,8 @@ from jack_tokenizer import TokenType
 from symbol_table import SymbolTable
 from symbol_table import SymbolKind
 from vm_writer import VmWriter
-
+from vm_writer import SegmentType
+from vm_writer import ArithmeticCommandType
 
 class CompilationEngine:
     _tokens_xml_handler: TokenXmlHandler
