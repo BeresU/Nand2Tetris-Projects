@@ -11,15 +11,16 @@ from vm_writer import VmWriter
 from vm_writer import SegmentType
 from vm_writer import ArithmeticCommandType
 
+
 class CompilationEngine:
     _tokens_xml_handler: TokenXmlHandler
     _output_path: str
     _file_path: str
-    _file_name:str
+    _file_name: str
     _tokenizer: JackTokenizer
     _xml_root_element: Element
     _symbol_table: SymbolTable
-    _vm_writer:VmWriter
+    _vm_writer: VmWriter
 
     _CLASS = "class"
     _SUBROUTINE = "subroutine"
@@ -35,7 +36,6 @@ class CompilationEngine:
         self._file_name = input_path_obj.stem
         full_vm_path = f"{self._output_path}/{self._file_name}.vm"
         self._vm_writer = VmWriter(full_vm_path)
-
 
     def _on_finish(self):
         self._tokenizer.dispose()
@@ -223,11 +223,13 @@ class CompilationEngine:
         sub_element = ET.SubElement(xml_element, "returnStatement")
         self._process(Constants.RETURN, TokenType.KEYWORD, sub_element)
 
-        # TODO; if the return has no value we need to push dummy value
         if self._tokenizer.current_token.value != Constants.SEMICOLON:
             self._compile_expression(sub_element)
+        else:
+            self._vm_writer.write_push(SegmentType.CONSTANT, 0)
 
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
+        self._vm_writer.write_return()
 
     def _compile_expression_list(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "expressionList")
