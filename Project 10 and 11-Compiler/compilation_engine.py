@@ -93,19 +93,20 @@ class CompilationEngine:
         current_token = self._tokenizer.current_token
         sub_element = ET.SubElement(xml_element, "subroutineDec")
         self._symbol_table.reset()
-        self._symbol_table.define("this", Path(self._file_path).stem, SymbolKind.ARG)
+        self._symbol_table.define("this", self._file_name, SymbolKind.ARG)
         self._process(current_token.value, TokenType.KEYWORD, sub_element)
 
         expected_token_type = TokenType.IDENTIFIER if current_token.value == Constants.CONSTRUCTOR else TokenType.KEYWORD
 
         self._process(self._tokenizer.current_token.value, expected_token_type, sub_element)
 
+        subroutine_name = self._tokenizer.current_token.value
         self._process(self._tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element, "subroutine declaration")
         self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, sub_element)
 
         self._compile_parameter_list(sub_element)
         self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, sub_element)
-        self._compile_subroutine_body(sub_element)
+        self._compile_subroutine_body(subroutine_name, sub_element)
 
     def _compile_parameter_list(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "parameterList")
@@ -124,12 +125,15 @@ class CompilationEngine:
         self._symbol_table.define(self._tokenizer.current_token.value, symbol_type, SymbolKind.ARG)
         self._process(self._tokenizer.current_token.value, TokenType.IDENTIFIER, xml_element, "parameter list")
 
-    def _compile_subroutine_body(self, xml_element: Element):
+    def _compile_subroutine_body(self, subroutine_name:str, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "subroutineBody")
         self._process(Constants.LEFT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
 
         while self._tokenizer.current_token.value == Constants.VAR:
             self._compie_var_dec(sub_element)
+
+        local_var_count = self._symbol_table.var_count(SymbolKind.VAR)
+        self._vm_writer.write_function(subroutine_name, local_var_count)
 
         self._compile_statements(sub_element)
         self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)

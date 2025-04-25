@@ -66,4 +66,4 @@ class VmWriter:
         self._write("\treturn")
 
     def _write(self, text: str):
-        self._stream.write(text)
+        self._stream.write(f"{text}\n")
