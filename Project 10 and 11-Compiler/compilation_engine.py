@@ -21,6 +21,7 @@ class CompilationEngine:
     _xml_root_element: Element
     _symbol_table: SymbolTable
     _vm_writer: VmWriter
+    _running_index = 0
 
     _CLASS = "class"
     _SUBROUTINE = "subroutine"
@@ -125,7 +126,7 @@ class CompilationEngine:
         self._symbol_table.define(self._tokenizer.current_token.value, symbol_type, SymbolKind.ARG)
         self._process(self._tokenizer.current_token.value, TokenType.IDENTIFIER, xml_element, "parameter list")
 
-    def _compile_subroutine_body(self, subroutine_name:str, xml_element: Element):
+    def _compile_subroutine_body(self, subroutine_name: str, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "subroutineBody")
         self._process(Constants.LEFT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
 
@@ -175,18 +176,30 @@ class CompilationEngine:
         self._process(Constants.IF, TokenType.KEYWORD, sub_element)
         self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, sub_element)
 
-        self._compile_expression(sub_element)
+        self._compile_expression(sub_element)  # expression
 
         self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, sub_element)
+
+        label = self.get_unique_label()
+        self._vm_writer.write_arithmetic(ArithmeticCommandType.NOT)  # flip the expression output
+        self._vm_writer.write_if(label)
+
         self._process(Constants.LEFT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
         self._compile_statements(sub_element)
         self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
 
-        if self._tokenizer.current_token.value != Constants.ELSE: return
-        self._process(Constants.ELSE, TokenType.KEYWORD, sub_element)
-        self._process(Constants.LEFT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
-        self._compile_statements(sub_element)
-        self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
+        if self._tokenizer.current_token.value == Constants.ELSE:
+            else_label = label
+            label =  self.get_unique_label()
+            self._vm_writer.write_goto(label)
+            self._vm_writer.write_label(else_label)
+
+            self._process(Constants.ELSE, TokenType.KEYWORD, sub_element)
+            self._process(Constants.LEFT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
+            self._compile_statements(sub_element)
+            self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
+
+        self._vm_writer.write_label(label)  # continue
 
     def _compile_let(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "letStatement")
@@ -350,3 +363,8 @@ class CompilationEngine:
         attributes["usage"] = usage
 
         return attributes
+
+    def get_unique_label(self) -> str:
+        index = self._running_index
+        self._running_index += 1
+        return f"{self._file_name}_{index}"
