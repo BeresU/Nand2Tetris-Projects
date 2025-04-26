@@ -262,11 +262,11 @@ class CompilationEngine:
     def _compile_do(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "doStatement")
         self._process(Constants.DO, TokenType.KEYWORD, sub_element)
-
-        current_token = self._tokenizer.current_token
-        self._process(current_token.value, TokenType.IDENTIFIER, sub_element, "do")
-        self._compile_subroutine_call(sub_element)
+        subroutine_name = self._tokenizer.current_token.value
+        self._process(subroutine_name, TokenType.IDENTIFIER, sub_element, "do")
+        self._compile_subroutine_call(subroutine_name, sub_element)
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
+        self._vm_writer.write_pop(SegmentType.TEMP, 0)  # dispose last variable in the stack
 
     def _compile_return(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "returnStatement")
@@ -280,17 +280,20 @@ class CompilationEngine:
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
         self._vm_writer.write_return()
 
-    def _compile_expression_list(self, xml_element: Element):
+    def _compile_expression_list(self, xml_element: Element) -> int:
         sub_element = ET.SubElement(xml_element, "expressionList")
-        if self._tokenizer.current_token.value == Constants.RIGHT_BRACKET: return
+        if self._tokenizer.current_token.value == Constants.RIGHT_BRACKET: return 0
 
         self._compile_expression(sub_element)
+        var_count = 1
 
         while self._tokenizer.current_token.value == Constants.COMMA:
             self._process(Constants.COMMA, TokenType.SYMBOL, sub_element)
             self._compile_expression(sub_element)
+            var_count += 1
 
-    # TODO: need to handle array creations (use OS class)
+        return var_count
+
     def _compile_expression(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "expression")
         self._compile_term(sub_element)
@@ -316,7 +319,7 @@ class CompilationEngine:
         elif self._tokenizer.current_token.value == Constants.LEFT_SQUARE_BRACKET:
             self._compile_array(sub_element, current_token.value)
         elif self._tokenizer.current_token.value == Constants.POINT:
-            self._compile_subroutine_call(sub_element)
+            self._compile_subroutine_call(current_token.value, sub_element)
 
     # push vm code that select index value: push: arr[i]
 
@@ -333,18 +336,21 @@ class CompilationEngine:
 
         self._process(Constants.RIGHT_SQUARE_BRACKET, TokenType.SYMBOL, xml_element)
 
-    def _compile_subroutine_call(self, xml_element: Element):
+    def _compile_subroutine_call(self, subroutine_name: str, xml_element: Element):
         if self._tokenizer.current_token.value == Constants.LEFT_BRACKET:
+            subroutine_name = f"{self._file_name}.{subroutine_name}"
             self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, xml_element)
-            self._compile_expression_list(xml_element)
+            var_count = self._compile_expression_list(xml_element)
             self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, xml_element)
         else:
             self._process(Constants.POINT, TokenType.SYMBOL, xml_element)
             self._process(self._tokenizer.current_token.value, TokenType.IDENTIFIER, xml_element,
                           CompilationEngine._EXPRESSION_USE)
             self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, xml_element)
-            self._compile_expression_list(xml_element)
+            var_count = self._compile_expression_list(xml_element)
             self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, xml_element)
+
+        self._vm_writer.write_call(subroutine_name, var_count)
 
     def _process(self, token_value: str, token_type: TokenType, xml_element: Element, usage: str = None):
         current_token = self._tokenizer.current_token
