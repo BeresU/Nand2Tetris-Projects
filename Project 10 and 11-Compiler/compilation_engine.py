@@ -23,6 +23,15 @@ class CompilationEngine:
     _vm_writer: VmWriter
     _running_index = 0
 
+    _op_command_dict = {Constants.PLUS: ArithmeticCommandType.ADD,
+                        Constants.MINUS: ArithmeticCommandType.SUB,
+                        Constants.AND: ArithmeticCommandType.AND,
+                        Constants.OR: ArithmeticCommandType.OR,
+                        Constants.LESS_THAN: ArithmeticCommandType.LT,
+                        Constants.GREATER_THAN: ArithmeticCommandType.GT,
+                        Constants.EQUAL: ArithmeticCommandType.EQ,
+                        Constants.TILDA: ArithmeticCommandType.NOT}
+
     _CLASS = "class"
     _SUBROUTINE = "subroutine"
     _EXPRESSION_USE = "expression use"
@@ -234,7 +243,7 @@ class CompilationEngine:
     def handle_let_field(self, xml_element: Element, var_name: str):
         self._process(Constants.EQUAL, TokenType.SYMBOL, xml_element)
         self._compile_expression(xml_element)
-        field_data = self._get_vm_field_data(var_name)
+        field_data = self._get_vm_var_data(var_name)
         self._vm_writer.write_pop(field_data[0], field_data[1])
 
     def _compile_while(self, xml_element: Element):
@@ -262,9 +271,9 @@ class CompilationEngine:
     def _compile_do(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "doStatement")
         self._process(Constants.DO, TokenType.KEYWORD, sub_element)
-        subroutine_name = self._tokenizer.current_token.value
-        self._process(subroutine_name, TokenType.IDENTIFIER, sub_element, "do")
-        self._compile_subroutine_call(subroutine_name, sub_element)
+        identifier_name = self._tokenizer.current_token.value
+        self._process(identifier_name, TokenType.IDENTIFIER, sub_element, "do")
+        self._compile_subroutine_call(identifier_name, sub_element)
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
         self._vm_writer.write_pop(SegmentType.TEMP, 0)  # dispose last variable in the stack
 
@@ -302,8 +311,10 @@ class CompilationEngine:
                   Constants.OR, Constants.LESS_THAN, Constants.GREATER_THAN, Constants.EQUAL}
 
         while self._tokenizer.current_token.value in op_set:
+            op_symbol = self._tokenizer.current_token.value
             self._process(self._tokenizer.current_token.value, TokenType.SYMBOL, sub_element)
             self._compile_term(sub_element)
+            self._write_op(op_symbol)
 
     def _compile_term(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "term")
@@ -316,19 +327,25 @@ class CompilationEngine:
             self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, sub_element)
         elif current_token.value in {Constants.TILDA, Constants.MINUS}:
             self._compile_term(sub_element)
+            self._write_op(current_token.value)
         elif self._tokenizer.current_token.value == Constants.LEFT_SQUARE_BRACKET:
-            self._compile_array(sub_element, current_token.value)
+            self._compile_array(sub_element, current_token.value)  # TODO: finish arrays
         elif self._tokenizer.current_token.value == Constants.POINT:
             self._compile_subroutine_call(current_token.value, sub_element)
+        else:
+            self._push_argument(current_token.value)
+
+    # TODO:
+    def _push_argument(self, value):
+        pass
 
     # push vm code that select index value: push: arr[i]
-
     # TODO: I really hope i'll work...
     # TODO: Need to check if its work for the other use case...
     def _compile_array(self, xml_element: Element, array_field_name: str):
         self._process(Constants.LEFT_SQUARE_BRACKET, TokenType.SYMBOL, xml_element)
 
-        array_data = self._get_vm_field_data(array_field_name)
+        array_data = self._get_vm_var_data(array_field_name)
 
         self._vm_writer.write_push(array_data[0], array_data[1])  # push array base address
         self._compile_expression(xml_element)  # push index value
@@ -336,21 +353,44 @@ class CompilationEngine:
 
         self._process(Constants.RIGHT_SQUARE_BRACKET, TokenType.SYMBOL, xml_element)
 
-    def _compile_subroutine_call(self, subroutine_name: str, xml_element: Element):
+    def _compile_subroutine_call(self, identifier_name: str, xml_element: Element):
         if self._tokenizer.current_token.value == Constants.LEFT_BRACKET:
-            subroutine_name = f"{self._file_name}.{subroutine_name}"
+            identifier_name = f"{self._file_name}.{identifier_name}"  # This is an inner class call
             self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, xml_element)
             var_count = self._compile_expression_list(xml_element)
             self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, xml_element)
         else:
             self._process(Constants.POINT, TokenType.SYMBOL, xml_element)
+
+            subroutine_name = self._tokenizer.current_token.value
+
             self._process(self._tokenizer.current_token.value, TokenType.IDENTIFIER, xml_element,
                           CompilationEngine._EXPRESSION_USE)
+
             self._process(Constants.LEFT_BRACKET, TokenType.SYMBOL, xml_element)
+
+            var_data = self._get_vm_var_data(identifier_name)
             var_count = self._compile_expression_list(xml_element)
+
+            # In case it's not a static call: SomeStaticClass.SomeMethod()
+            if var_data[0] != SegmentType.NONE:
+                self._vm_writer.write_push(var_data[0], var_data[1])
+                var_count += 1  # +1 for address of the callee
+
             self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, xml_element)
 
-        self._vm_writer.write_call(subroutine_name, var_count)
+            identifier_name = f"{identifier_name}.{subroutine_name}"
+
+        self._vm_writer.write_call(identifier_name, var_count)
+
+    def _write_op(self, op_symbol: str):
+        if op_symbol == Constants.ASTERISK:
+            self._vm_writer.write_function(Constants.OS_MULT, 2)
+        if op_symbol == Constants.FORWARD_SLASH:
+            self._vm_writer.write_function(Constants.OS_DIV, 2)
+        else:
+            op_command = self._op_command_dict[op_symbol]
+            self._vm_writer.write_arithmetic(op_command)
 
     def _process(self, token_value: str, token_type: TokenType, xml_element: Element, usage: str = None):
         current_token = self._tokenizer.current_token
@@ -416,7 +456,7 @@ class CompilationEngine:
         self._running_index += 1
         return f"{self._file_name}_{index}"
 
-    def _get_vm_field_data(self, field_name) -> tuple[SegmentType, int]:
+    def _get_vm_var_data(self, field_name) -> tuple[SegmentType, int]:
         array_field_index = self._symbol_table.index_of(field_name)
         segment_kind = self._symbol_table.kind_of(field_name)
         segment_type = CompilationEngine._symbol_kind_to_segment_type(segment_kind)
