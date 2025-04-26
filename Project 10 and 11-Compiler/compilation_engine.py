@@ -111,6 +111,7 @@ class CompilationEngine:
         self._process(current_token.value, TokenType.KEYWORD, sub_element)
 
         expected_token_type = TokenType.IDENTIFIER if current_token.value == Constants.CONSTRUCTOR else TokenType.KEYWORD
+        subroutine_type = current_token.value
 
         self._process(self._tokenizer.current_token.value, expected_token_type, sub_element)
 
@@ -120,7 +121,7 @@ class CompilationEngine:
 
         self._compile_parameter_list(sub_element)
         self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, sub_element)
-        self._compile_subroutine_body(subroutine_name, sub_element)
+        self._compile_subroutine_body(subroutine_name, subroutine_type, sub_element)
 
     def _compile_parameter_list(self, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "parameterList")
@@ -139,7 +140,7 @@ class CompilationEngine:
         self._symbol_table.define(self._tokenizer.current_token.value, symbol_type, SymbolKind.ARG)
         self._process(self._tokenizer.current_token.value, TokenType.IDENTIFIER, xml_element, "parameter list")
 
-    def _compile_subroutine_body(self, subroutine_name: str, xml_element: Element):
+    def _compile_subroutine_body(self, subroutine_name: str, subroutine_type: str, xml_element: Element):
         sub_element = ET.SubElement(xml_element, "subroutineBody")
         self._process(Constants.LEFT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
 
@@ -149,11 +150,13 @@ class CompilationEngine:
         local_var_count = self._symbol_table.var_count(SymbolKind.VAR)
         self._vm_writer.write_function(f"{self._file_name}.{subroutine_name}", local_var_count)
 
-        if subroutine_name == "new":
+        if subroutine_type == Constants.CONSTRUCTOR:
             field_count = self._symbol_table.var_count(SymbolKind.FIELD)
-            if field_count > 0:
-                self._vm_writer.write_call(Constants.OS_MEM_ALLOC, field_count)
-                self._vm_writer.write_pop(SegmentType.POINTER, 0)  # Set allocated memory address
+            self._vm_writer.write_call(Constants.OS_MEM_ALLOC, field_count)
+            self._vm_writer.write_pop(SegmentType.POINTER, 0)  # Set allocated memory address
+        elif subroutine_type == Constants.METHOD:
+            self._vm_writer.write_push(SegmentType.ARGUMENT, 0)
+            self._vm_writer.write_pop(SegmentType.POINTER, 0)
 
         self._compile_statements(sub_element)
         self._process(Constants.RIGHT_CURLY_BRACKET, TokenType.SYMBOL, sub_element)
