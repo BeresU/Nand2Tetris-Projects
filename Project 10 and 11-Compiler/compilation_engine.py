@@ -236,8 +236,8 @@ class CompilationEngine:
 
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
 
-    def handle_let_array(self, xml_element: Element, var_name: str):
-        self._compile_array(xml_element, var_name)
+    def handle_let_array(self, xml_element: Element, array_field_name: str):
+        self._compile_array(xml_element, array_field_name)
         self._process(Constants.EQUAL, TokenType.SYMBOL, xml_element)
         self._compile_expression(xml_element)
 
@@ -336,7 +336,9 @@ class CompilationEngine:
             self._compile_term(sub_element)
             self._write_op(current_token.value)
         elif self._tokenizer.current_token.value == Constants.LEFT_SQUARE_BRACKET:
-            self._compile_array(sub_element, current_token.value)  # TODO: finish arrays
+            self._compile_array(sub_element, current_token.value)
+            self._vm_writer.write_pop(SegmentType.POINTER, 1)
+            self._vm_writer.write_push(SegmentType.THAT, 0)
         elif self._tokenizer.current_token.value == Constants.POINT:
             self._compile_subroutine_call(current_token.value, sub_element)
         else:
@@ -365,15 +367,13 @@ class CompilationEngine:
     # push vm code that select index value: push: arr[i]
     # TODO: I really hope i'll work...
     # TODO: Need to check if its work for the other use case...
+    # TODO: Rename method?
     def _compile_array(self, xml_element: Element, array_field_name: str):
         self._process(Constants.LEFT_SQUARE_BRACKET, TokenType.SYMBOL, xml_element)
-
         array_data = self._get_vm_var_data(array_field_name)
-
         self._vm_writer.write_push(array_data[0], array_data[1])  # push array base address
         self._compile_expression(xml_element)  # push index value
         self._vm_writer.write_arithmetic(ArithmeticCommandType.ADD)  # add addresses
-
         self._process(Constants.RIGHT_SQUARE_BRACKET, TokenType.SYMBOL, xml_element)
 
     def _compile_subroutine_call(self, identifier_name: str, xml_element: Element):
