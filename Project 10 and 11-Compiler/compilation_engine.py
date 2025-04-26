@@ -243,7 +243,7 @@ class CompilationEngine:
 
         # pop expression value to array[index]
         self._vm_writer.write_pop(SegmentType.TEMP, 0)  # TODO: need to see if need that...
-        self._vm_writer.write_pop(SegmentType.POINTER, 1)
+        self._vm_writer.write_pop(SegmentType.POINTER, 1)  # last value before temp is the array address...
         self._vm_writer.write_push(SegmentType.TEMP, 0)
         self._vm_writer.write_pop(SegmentType.THAT, 0)
 
@@ -280,7 +280,7 @@ class CompilationEngine:
         self._process(Constants.DO, TokenType.KEYWORD, sub_element)
         identifier_name = self._tokenizer.current_token.value
         self._process(identifier_name, TokenType.IDENTIFIER, sub_element, "do")
-        self._compile_subroutine_call(identifier_name)
+        self._compile_subroutine_call(identifier_name, sub_element)
         self._process(Constants.SEMICOLON, TokenType.SYMBOL, sub_element)
         self._vm_writer.write_pop(SegmentType.TEMP, 0)  # dispose last variable in the stack
 
@@ -338,7 +338,7 @@ class CompilationEngine:
         elif self._tokenizer.current_token.value == Constants.LEFT_SQUARE_BRACKET:
             self._compile_array(sub_element, current_token.value)  # TODO: finish arrays
         elif self._tokenizer.current_token.value == Constants.POINT:
-            self._compile_subroutine_call(current_token.value)
+            self._compile_subroutine_call(current_token.value, sub_element)
         else:
             self._push_var(current_token)
 
@@ -347,7 +347,7 @@ class CompilationEngine:
             self._vm_writer.write_push(SegmentType.CONSTANT, int(token_data.value))
         if token_data.value in {Constants.NULL, Constants.FALSE}:
             self._vm_writer.write_push(SegmentType.CONSTANT, 0)
-        if token_data.value in {Constants.NULL, Constants.TRUE}:
+        if token_data.value == Constants.TRUE:
             self._vm_writer.write_push(SegmentType.CONSTANT, 1)
             self._vm_writer.write_arithmetic(ArithmeticCommandType.NEG)
         if token_data.value == Constants.THIS:
