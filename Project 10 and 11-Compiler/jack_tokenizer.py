@@ -119,9 +119,15 @@ class JackTokenizer:
 
     @staticmethod
     def _clean_string(code: str) -> str:
+
+        # Check if the entire line ends with */
+        if re.search(r"\*/$", code):
+            return ''
+
+        # Remove comments from line
         pattern = r"""
             /\*\*.*?\*/        # block comments like /** ... */
-            |^\s*\*.*$         # lines that start with '*'
+            |^\s*\*.*          # lines that start with '*'
             |//.*              # single-line // comments
             |/\*\*.*           # dangling /** without */
         """
