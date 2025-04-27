@@ -97,13 +97,14 @@ class CompilationEngine:
         sub_element = ET.SubElement(xml_element, "subroutineDec")
         self._symbol_table.reset()
 
-        if current_token.value != Constants.FUNCTION:
+        subroutine_type = current_token.value
+
+        if subroutine_type == Constants.METHOD:
             self._symbol_table.define("this", self._file_name, SymbolKind.ARG)
 
         self._process(current_token.value, TokenType.KEYWORD, sub_element)
 
         expected_token_type = TokenType.IDENTIFIER if current_token.value == Constants.CONSTRUCTOR else TokenType.KEYWORD
-        subroutine_type = current_token.value
 
         self._process(self._tokenizer.current_token.value, expected_token_type, sub_element)
 
