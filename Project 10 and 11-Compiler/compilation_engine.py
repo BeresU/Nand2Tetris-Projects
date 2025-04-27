@@ -411,9 +411,9 @@ class CompilationEngine:
 
     def _write_op(self, op_symbol: str):
         if op_symbol == Constants.ASTERISK:
-            self._vm_writer.write_function(Constants.OS_MULT, 2)
+            self._vm_writer.write_call(Constants.OS_MULT, 2)
         elif op_symbol == Constants.FORWARD_SLASH:
-            self._vm_writer.write_function(Constants.OS_DIV, 2)
+            self._vm_writer.write_call(Constants.OS_DIV, 2)
         else:
             op_command = self._op_command_dict[op_symbol]
             self._vm_writer.write_arithmetic(op_command)
