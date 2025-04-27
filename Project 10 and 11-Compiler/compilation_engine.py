@@ -28,6 +28,7 @@ class CompilationEngine:
     _SET_ATTRIBUTES = True
 
     def __init__(self, file_path: str, output_path: str):
+        self._xml_root_element = ET.Element(Constants.CLASS)
         self._file_path = file_path
         self._output_path = output_path
         self._tokens_xml_handler = TokenXmlHandler()
@@ -52,7 +53,6 @@ class CompilationEngine:
         tree.write(full_path, encoding="utf-8", xml_declaration=False, short_empty_elements=False)
 
     def compile_class(self):
-        self._xml_root_element = ET.Element(Constants.CLASS)
         self._process(Constants.CLASS, TokenType.KEYWORD, self._xml_root_element)
 
         self._process(self._tokenizer.current_token.value, TokenType.IDENTIFIER, self._xml_root_element, "class name")
