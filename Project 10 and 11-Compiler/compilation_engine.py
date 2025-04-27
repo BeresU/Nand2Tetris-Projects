@@ -152,7 +152,8 @@ class CompilationEngine:
 
         if subroutine_type == Constants.CONSTRUCTOR:
             field_count = self._symbol_table.var_count(SymbolKind.FIELD)
-            self._vm_writer.write_call(Constants.OS_MEM_ALLOC, field_count)
+            self._vm_writer.write_push(SegmentType.CONSTANT, field_count)
+            self._vm_writer.write_call(Constants.OS_MEM_ALLOC, 1)
             self._vm_writer.write_pop(SegmentType.POINTER, 0)  # Set allocated memory address
         elif subroutine_type == Constants.METHOD:
             self._vm_writer.write_push(SegmentType.ARGUMENT, 0)
@@ -403,12 +404,15 @@ class CompilationEngine:
             if var_data[0] != SegmentType.NONE:
                 self._vm_writer.write_push(var_data[0], var_data[1])
                 var_count += 1  # +1 for address of the callee
+                method_prefix = self._symbol_table.type_of(identifier_name)
+            else:
+                method_prefix = identifier_name
 
             var_count += self._compile_expression_list(xml_element)
 
             self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, xml_element)
 
-            identifier_name = f"{identifier_name}.{subroutine_name}"
+            identifier_name = f"{method_prefix}.{subroutine_name}"
 
         self._vm_writer.write_call(identifier_name, var_count)
 
