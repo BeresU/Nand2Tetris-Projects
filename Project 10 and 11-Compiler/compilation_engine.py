@@ -103,10 +103,7 @@ class CompilationEngine:
             self._symbol_table.define("this", self._file_name, SymbolKind.ARG)
 
         self._process(current_token.value, TokenType.KEYWORD, sub_element)
-
-        expected_token_type = TokenType.IDENTIFIER if current_token.value == Constants.CONSTRUCTOR else TokenType.KEYWORD
-
-        self._process(self._tokenizer.current_token.value, expected_token_type, sub_element)
+        self._process(self._tokenizer.current_token.value, self._tokenizer.current_token.token_type, sub_element)
 
         subroutine_name = self._tokenizer.current_token.value
         self._process(self._tokenizer.current_token.value, TokenType.IDENTIFIER, sub_element, "subroutine declaration")
