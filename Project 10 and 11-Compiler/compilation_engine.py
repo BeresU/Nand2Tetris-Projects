@@ -334,7 +334,10 @@ class CompilationEngine:
             self._process(Constants.RIGHT_BRACKET, TokenType.SYMBOL, sub_element)
         elif current_token.value in {Constants.TILDA, Constants.MINUS}:
             self._compile_term(sub_element)
-            self._write_op(current_token.value)
+            if current_token.value == Constants.MINUS:
+                self._vm_writer.write_arithmetic(ArithmeticCommandType.NEG)
+            else:
+                self._write_op(current_token.value)
         elif self._tokenizer.current_token.value == Constants.LEFT_SQUARE_BRACKET:
             self._compile_array(sub_element, current_token.value)
             self._vm_writer.write_pop(SegmentType.POINTER, 1)
