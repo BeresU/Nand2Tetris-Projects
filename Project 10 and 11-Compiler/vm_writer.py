@@ -30,8 +30,6 @@ class ArithmeticCommandType(Enum):
 
 
 class VmWriter:
-    _stream: TextIO
-
     def __init__(self, file_path: str):
         self._stream = open(f"{file_path}", "w", encoding="utf-8")
 

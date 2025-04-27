@@ -19,20 +19,20 @@ class SymbolTable:
         kind: SymbolKind
         index: int
 
-    _class_table: dict[str, _SymbolData] = dict()
-    _subroutine_table: dict[str, _SymbolData] = dict()
-
-    _symbol_kind_table = {
-        SymbolKind.STATIC: 0,
-        SymbolKind.FIELD: 0,
-        SymbolKind.ARG: 0,
-        SymbolKind.VAR: 0,
-    }
+    def __init__(self):
+        self._class_table: dict[str, SymbolTable._SymbolData] = dict()
+        self._subroutine_table: dict[str, SymbolTable._SymbolData] = dict()
+        self._symbol_kind_table = {
+            SymbolKind.STATIC: 0,
+            SymbolKind.FIELD: 0,
+            SymbolKind.ARG: 0,
+            SymbolKind.VAR: 0,
+        }
 
     def reset(self):
         self._subroutine_table.clear()
 
-        for key in self._symbol_kind_table:
+        for key in (k for k in self._symbol_kind_table if k in {SymbolKind.ARG, SymbolKind.VAR}):
             self._symbol_kind_table[key] = 0
 
     def define(self, name: str, symbol_type: str, kind: SymbolKind):

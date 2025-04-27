@@ -24,14 +24,6 @@ class TokenData:
 
 
 class JackTokenizer:
-    _stream: TextIO
-    _word_position = 0
-    _line_data: list[TokenData]
-
-    line_count = 0
-    current_token: TokenData
-    has_more_tokens: bool
-
     _KEYWORDS = {
         Constants.CLASS,
         Constants.CONSTRUCTOR,
@@ -79,10 +71,13 @@ class JackTokenizer:
     }
 
     def __init__(self, file_path: str):
+        self.current_token = None
+        self._word_position = 0
+        self.line_count = 0
         input_path_obj = Path(file_path)
         self.has_more_tokens = True
-        self._stream = input_path_obj.open('r')
-        self._line_data = []
+        self._stream:TextIO = input_path_obj.open('r')
+        self._line_data: list[TokenData] = []
         self.advance()
 
     def dispose(self):

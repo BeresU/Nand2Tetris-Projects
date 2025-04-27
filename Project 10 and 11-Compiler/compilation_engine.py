@@ -13,17 +13,7 @@ from vm_writer import ArithmeticCommandType
 
 
 class CompilationEngine:
-    _tokens_xml_handler: TokenXmlHandler
-    _output_path: str
-    _file_path: str
-    _file_name: str
-    _tokenizer: JackTokenizer
-    _xml_root_element: Element
-    _symbol_table: SymbolTable
-    _vm_writer: VmWriter
-    _running_index = 0
-
-    _op_command_dict = {Constants.PLUS: ArithmeticCommandType.ADD,
+    _OP_COMMEND_DICT = {Constants.PLUS: ArithmeticCommandType.ADD,
                         Constants.MINUS: ArithmeticCommandType.SUB,
                         Constants.AND: ArithmeticCommandType.AND,
                         Constants.OR: ArithmeticCommandType.OR,
@@ -35,7 +25,7 @@ class CompilationEngine:
     _CLASS = "class"
     _SUBROUTINE = "subroutine"
     _EXPRESSION_USE = "expression use"
-    _SET_ATTRIBUTES = False
+    _SET_ATTRIBUTES = True
 
     def __init__(self, file_path: str, output_path: str):
         self._file_path = file_path
@@ -43,6 +33,8 @@ class CompilationEngine:
         self._tokens_xml_handler = TokenXmlHandler()
         self._tokenizer = JackTokenizer(file_path)
         self._symbol_table = SymbolTable()
+        self._running_index = 0
+
         input_path_obj = Path(self._file_path)
         self._file_name = input_path_obj.stem
         full_vm_path = f"{self._output_path}/{self._file_name}.vm"
@@ -422,7 +414,7 @@ class CompilationEngine:
         elif op_symbol == Constants.FORWARD_SLASH:
             self._vm_writer.write_call(Constants.OS_DIV, 2)
         else:
-            op_command = self._op_command_dict[op_symbol]
+            op_command = CompilationEngine._OP_COMMEND_DICT[op_symbol]
             self._vm_writer.write_arithmetic(op_command)
 
     def _process(self, token_value: str, token_type: TokenType, xml_element: Element, usage: str = None):

@@ -5,10 +5,8 @@ import xml.etree.ElementTree as ET
 
 
 class TokenXmlHandler:
-    root: Element
-
     def __init__(self):
-        self.root = ET.Element("tokens")
+        self.root:Element = ET.Element("tokens")
 
     def write_to_xml(self, token_data: TokenData):
         if token_data.token_type == TokenType.NONE: return
