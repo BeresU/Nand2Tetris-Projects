@@ -233,7 +233,7 @@ class CompilationEngine:
         self._compile_expression(xml_element)
 
         # pop expression value to array[index]
-        self._vm_writer.write_pop(SegmentType.TEMP, 0)  # TODO: need to see if need that...
+        self._vm_writer.write_pop(SegmentType.TEMP, 0)
         self._vm_writer.write_pop(SegmentType.POINTER, 1)  # last value before temp is the array address...
         self._vm_writer.write_push(SegmentType.TEMP, 0)
         self._vm_writer.write_pop(SegmentType.THAT, 0)
@@ -355,13 +355,10 @@ class CompilationEngine:
                 self._vm_writer.write_push(SegmentType.CONSTANT, ord(c))
                 self._vm_writer.write_call(Constants.OS_STRING_APPEND, 2)
         else:
-            var_data = self._get_vm_var_data(token_data.value)  # TODO: should handle this here?
+            var_data = self._get_vm_var_data(token_data.value)
             self._vm_writer.write_push(var_data[0], var_data[1])
 
-    # push vm code that select index value: push: arr[i]
-    # TODO: I really hope i'll work...
-    # TODO: Need to check if its work for the other use case...
-    # TODO: Rename method?
+    # push vm code that select index value: push: arr[i]?
     def _compile_array(self, xml_element: Element, array_field_name: str):
         self._process(Constants.LEFT_SQUARE_BRACKET, TokenType.SYMBOL, xml_element)
         array_data = self._get_vm_var_data(array_field_name)
@@ -456,7 +453,6 @@ class CompilationEngine:
         attributes = self._get_identifier_attributes(token_data.value, usage, identifier_category)
         xml_element.attrib.update(attributes)
 
-    # TODO: remove this after finish with code writer
     def _get_identifier_attributes(self, name: str, usage: str, category: str = "") -> dict[str, str]:
         if category == "":
             category = self._symbol_table.kind_of(name).value
