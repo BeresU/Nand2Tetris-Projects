@@ -347,14 +347,14 @@ class CompilationEngine:
     def _push_var(self, token_data: TokenData):
         if token_data.token_type == TokenType.INT_CONST:
             self._vm_writer.write_push(SegmentType.CONSTANT, int(token_data.value))
-        if token_data.value in {Constants.NULL, Constants.FALSE}:
+        elif token_data.value in {Constants.NULL, Constants.FALSE}:
             self._vm_writer.write_push(SegmentType.CONSTANT, 0)
-        if token_data.value == Constants.TRUE:
+        elif token_data.value == Constants.TRUE:
             self._vm_writer.write_push(SegmentType.CONSTANT, 1)
             self._vm_writer.write_arithmetic(ArithmeticCommandType.NEG)
-        if token_data.value == Constants.THIS:
+        elif token_data.value == Constants.THIS:
             self._vm_writer.write_push(SegmentType.POINTER, 0)
-        if token_data.token_type == TokenType.STRING_CONST:
+        elif token_data.token_type == TokenType.STRING_CONST:
             self._vm_writer.write_push(SegmentType.CONSTANT, len(token_data.value))
             self._vm_writer.write_call(Constants.OS_STRING_NEW, 1)
             for c in token_data.value:
