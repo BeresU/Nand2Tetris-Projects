@@ -89,7 +89,45 @@ class Math {
 
     /** Returns the integer part of the square root of x. */
     function int sqrt(int x) {
-        return 0;
+        var int results;
+        var int j;
+        var int twoPowJ;
+        var int loopExpression;
+
+        let results = 0;
+        let j = n/2 - 1;
+
+        while (~(j < 0)){
+            let twoPowJ = Math.pow(2 , j);
+            let loopExpression = (results + twoPowJ) * (results + twoPowJ);
+
+            if (~(loopExpression > x) & loopExpression > 0) {
+                let results = results + twoPowJ;
+            }
+
+            let j = j - 1;
+        }
+
+        return results;
+    }
+
+    function int pow(int x, int y){
+        var int i;
+        var int results;
+
+        let results = x;
+        let i = 0;
+
+        if (y = 0) {
+            return 1;
+        }
+
+        while(i < (y-1)){
+            let results = results * x;
+            let i = i + 1;
+        }
+        
+        return results;
     }
 
     /** Returns the greater value. */
