@@ -75,11 +75,12 @@ class Math {
         
         let q = Math.divide(absX, y + y);
 
-        if (setSign){
-            let q = -q;
-        }
+        if ((absX - (q + q * y)) < y) {
+            
+            if (setSign){
+                return -(q + q);
+            }
 
-        if ((absX - (q + q * y)) < y){
             return q + q;
         }
 

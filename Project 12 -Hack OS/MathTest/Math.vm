@@ -127,33 +127,35 @@ label Math_6
     add
     call Math.divide 2
     pop local 0
-    push local 2
-    not
-    if-goto Math_9
-    push local 0
-    neg
-    pop local 0
-    goto Math_8
-label Math_9
-label Math_8
     push local 1
     push local 0
-    sub
     push local 0
     add
     push argument 1
     call Math.multiply 2
+    sub
     push argument 1
     lt
+    not
+    if-goto Math_9
+    push local 2
     not
     if-goto Math_11
     push local 0
     push local 0
     add
+    neg
     return
     goto Math_10
 label Math_11
 label Math_10
+    push local 0
+    push local 0
+    add
+    return
+    goto Math_8
+label Math_9
+label Math_8
     push local 0
     push local 0
     add
