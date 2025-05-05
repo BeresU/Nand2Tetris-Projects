@@ -64,21 +64,21 @@ class Math {
      *  Thus, x/y and Math.divide(x,y) return the same value. */
     function int divide(int x, int y) {
         var int q;
-        var int absX;
         var boolean setSign;
 
-        let setSign = x < 0;
+        let setSign = x < 0 | y < 0;
 
-        let absX = Math.abs(x);
+        let x = Math.abs(x);
+        let y = Math.abs(y);
 
-        if (y > absX | y < 0) {return 0;}
+        if (y > x | y < 0) {return 0;}
         
-        let q = Math.divide(absX, y + y);
+        let q = Math.divide(x, y + y);
 
-        if ((absX - (q + q * y)) < y) {
+        if ((x - (q + q * y)) < y) {
             
             if (setSign){
-                return -(q + q);
+                let q = -q;
             }
 
             return q + q;
