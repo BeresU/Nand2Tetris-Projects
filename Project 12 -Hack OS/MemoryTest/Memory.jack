@@ -65,7 +65,8 @@ class Memory {
 
                 do Memory.poke(targetAddress, 0);
                 do Memory.poke(targetAddress + 1, size);
-                return targetAddress;
+
+                return targetAddress + 2;
             }
 
             let parentAddress = currentAddress;
@@ -79,15 +80,16 @@ class Memory {
     /** De-allocates the given object (cast as an array) by making
      *  it available for future allocations. */
     function void deAlloc(Array o) {
-        var int targetAddress; 
+        var int nextAddress, currentAddress; 
 
-        let targetAddress = freeList;
+        let nextAddress = freeList;
 
-        while(~(targetAddress = 0)){
-            let targetAddress = Memory.peek(targetAddress);
+        while(~(nextAddress = 0)){
+            let currentAddress = nextAddress;
+            let nextAddress = Memory.peek(currentAddress);
         }
 
-        do Memory.poke(targetAddress, o - 2);
+        do Memory.poke(currentAddress, o-2);
         return;
     }    
 }
