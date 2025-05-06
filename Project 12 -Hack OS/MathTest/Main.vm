@@ -212,7 +212,7 @@ function Main.main 1
     push constant 20
     push local 0
     add
-    push constant 9
+    push constant 2500
     call Math.sqrt 1
     pop temp 0
     pop pointer 1
@@ -221,7 +221,7 @@ function Main.main 1
     push constant 21
     push local 0
     add
-    push constant 25
+    push constant 10000
     call Math.sqrt 1
     pop temp 0
     pop pointer 1
@@ -230,7 +230,7 @@ function Main.main 1
     push constant 22
     push local 0
     add
-    push constant 4
+    push constant 32767
     call Math.sqrt 1
     pop temp 0
     pop pointer 1

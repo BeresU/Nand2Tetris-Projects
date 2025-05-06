@@ -1,4 +1,24 @@
-function Math.init 1
+function Math.init 2
+    push constant 10000
+    pop static 2
+    push constant 0
+    push static 2
+    add
+    push constant 123
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push static 2
+    pop local 1
+    push constant 1
+    push static 2
+    add
+    push local 1
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
     push constant 16
     pop static 0
     push static 0
@@ -183,9 +203,11 @@ label Math_12
     not
     not
     if-goto Math_13
-    push constant 2
     push local 1
-    call Math.pow 2
+    push static 1
+    add
+    pop pointer 1
+    push that 0
     pop local 2
     push local 0
     push local 2
@@ -220,52 +242,17 @@ label Math_14
 label Math_13
     push local 0
     return
-function Math.pow 2
-    push argument 0
-    pop local 1
-    push constant 0
-    pop local 0
-    push argument 1
-    push constant 0
-    eq
-    not
-    if-goto Math_17
-    push constant 1
-    return
-    goto Math_16
-label Math_17
-label Math_16
-label Math_18
-    push local 0
-    push argument 1
-    push constant 1
-    sub
-    lt
-    not
-    if-goto Math_19
-    push local 1
-    push argument 0
-    call Math.multiply 2
-    pop local 1
-    push local 0
-    push constant 1
-    add
-    pop local 0
-    goto Math_18
-label Math_19
-    push local 1
-    return
 function Math.max 0
     push argument 0
     push argument 1
     gt
     not
-    if-goto Math_21
+    if-goto Math_17
     push argument 0
     return
-    goto Math_20
-label Math_21
-label Math_20
+    goto Math_16
+label Math_17
+label Math_16
     push argument 1
     return
 function Math.min 0
@@ -273,12 +260,12 @@ function Math.min 0
     push argument 1
     lt
     not
-    if-goto Math_23
+    if-goto Math_19
     push argument 0
     return
-    goto Math_22
-label Math_23
-label Math_22
+    goto Math_18
+label Math_19
+label Math_18
     push argument 1
     return
 function Math.abs 0
@@ -286,12 +273,12 @@ function Math.abs 0
     push constant 0
     lt
     not
-    if-goto Math_25
+    if-goto Math_21
     push argument 0
     neg
     pop argument 0
-    goto Math_24
-label Math_25
-label Math_24
+    goto Math_20
+label Math_21
+label Math_20
     push argument 0
     return
