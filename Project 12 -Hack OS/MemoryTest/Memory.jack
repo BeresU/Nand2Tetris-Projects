@@ -7,17 +7,20 @@
  * memory (RAM), and allocation and recycling of memory blocks. The Hack RAM
  * consists of 32,768 words, each holding a 16-bit binary number.
  */ 
+
+
+ // TODO: Rename fields
 class Memory {
     static Array ram;
-    static int freeList;
+    static int freeListHeadIndex;
 
     /** Initializes the class. */
     function void init() {
         let ram = 0;
-        let freeList = 2048;
+        let freeListHeadIndex = 2048;
 
-        do Memory.poke(freeList, 0);
-        do Memory.poke(freeList + 1, 14334);
+        do Memory.poke(freeListHeadIndex, 0);
+        do Memory.poke(freeListHeadIndex + 1, 14334);
         
         return;
     }
@@ -38,7 +41,7 @@ class Memory {
     function Array alloc(int size) {
         var int currentAddress, targetAddress, parentAddress, blockSize, deltaSize;
 
-        let currentAddress = freeList;
+        let currentAddress = freeListHeadIndex;
 
         while (~(currentAddress = 0)) {
             let blockSize = Memory.peek(currentAddress + 1);
@@ -50,7 +53,7 @@ class Memory {
                     let targetAddress = currentAddress;
 
                     if (parentAddress = 0){
-                        let freeList = Memory.peek(currentAddress);
+                        let freeListHeadIndex = Memory.peek(currentAddress);
                     }
                     else{
                         do Memory.poke(parentAddress, Memory.peek(currentAddress));
@@ -82,14 +85,14 @@ class Memory {
     function void deAlloc(Array o) {
         var int nextAddress, currentAddress; 
 
-        let nextAddress = freeList;
+        let nextAddress = freeListHeadIndex;
 
         while(~(nextAddress = 0)){
             let currentAddress = nextAddress;
             let nextAddress = Memory.peek(currentAddress);
         }
 
-        do Memory.poke(currentAddress, o-2);
+        do Memory.poke(currentAddress, o - 2);
         return;
     }    
 }
