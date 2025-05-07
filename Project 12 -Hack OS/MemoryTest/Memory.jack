@@ -9,7 +9,6 @@
  */ 
 
 
- // TODO: Rename fields
 class Memory {
     static Array ram;
     static int freeListHeadIndex, freeListTailIndex;
