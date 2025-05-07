@@ -55,10 +55,10 @@ class Screen {
         let pixelNumber = powersOfTwo[bitPlace];
 
         if (currentColor == 0){
-            value = value & ~(pixelNumber);
+            let value = value & ~(pixelNumber);
         }
         else{
-            value = value | pixelNumber;
+            let value = value | pixelNumber;
         }
         
         do Memory.poke(address, value);
