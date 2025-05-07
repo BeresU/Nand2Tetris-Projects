@@ -12,12 +12,13 @@
  // TODO: Rename fields
 class Memory {
     static Array ram;
-    static int freeListHeadIndex;
+    static int freeListHeadIndex, freeListTailIndex;
 
     /** Initializes the class. */
     function void init() {
         let ram = 0;
         let freeListHeadIndex = 2048;
+        let freeListTailIndex = freeListHeadIndex;
 
         do Memory.poke(freeListHeadIndex, 0);
         do Memory.poke(freeListHeadIndex + 1, 14334);
@@ -69,6 +70,10 @@ class Memory {
                 do Memory.poke(targetAddress, 0);
                 do Memory.poke(targetAddress + 1, size);
 
+                if (targetAddress = freeListTailIndex) {
+                    let freeListTailIndex = parentAddress;
+                }
+
                 return targetAddress + 2;
             }
 
@@ -83,16 +88,10 @@ class Memory {
     /** De-allocates the given object (cast as an array) by making
      *  it available for future allocations. */
     function void deAlloc(Array o) {
-        var int nextAddress, currentAddress; 
-
-        let nextAddress = freeListHeadIndex;
-
-        while(~(nextAddress = 0)){
-            let currentAddress = nextAddress;
-            let nextAddress = Memory.peek(currentAddress);
-        }
-
-        do Memory.poke(currentAddress, o - 2);
+        var int freeBlockAddr;
+        let freeBlockAddr = o - 2;
+        do Memory.poke(freeListTailIndex, freeBlockAddr);
+        let freeListTailIndex = freeBlockAddr;
         return;
     }    
 }

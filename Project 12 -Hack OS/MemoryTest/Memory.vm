@@ -4,6 +4,8 @@ function Memory.init 0
     push constant 2048
     pop static 1
     push static 1
+    pop static 2
+    push static 1
     push constant 0
     call Memory.poke 2
     pop temp 0
@@ -132,27 +134,18 @@ label Memory_1
     push constant 0
     return
 function Memory.deAlloc 2
-    push static 1
-    pop local 0
-label Memory_8
-    push local 0
-    push constant 0
-    eq
-    not
-    not
-    if-goto Memory_9
-    push local 0
-    pop local 1
-    push local 1
-    call Memory.peek 1
-    pop local 0
-    goto Memory_8
-label Memory_9
-    push local 1
     push argument 0
     push constant 2
     sub
+    pop local 0
+    push static 2
+    call Memory.peek 1
+    pop local 1
+    push local 1
+    push local 0
     call Memory.poke 2
     pop temp 0
+    push local 0
+    pop static 2
     push constant 0
     return
