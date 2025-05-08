@@ -307,7 +307,36 @@ label Screen_16
 label Screen_17
     push constant 0
     return
-function Screen.drawRectangle 0
+function Screen.drawRectangle 2
+    push argument 3
+    push argument 1
+    sub
+    pop local 0
+    push constant 0
+    pop local 1
+label Screen_18
+    push local 1
+    push local 0
+    gt
+    not
+    not
+    if-goto Screen_19
+    push argument 0
+    push argument 1
+    push local 1
+    add
+    push argument 2
+    push argument 1
+    push local 1
+    add
+    call Screen.drawStraightLine 4
+    pop temp 0
+    push local 1
+    push constant 1
+    add
+    pop local 1
+    goto Screen_18
+label Screen_19
     push constant 0
     return
 function Screen.drawCircle 0

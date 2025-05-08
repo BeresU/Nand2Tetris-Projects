@@ -141,6 +141,16 @@ class Screen {
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      *  and bottom right corner is (x2,y2), using the current color. */
     function void drawRectangle(int x1, int y1, int x2, int y2) {
+        var int d, steps;
+
+        let d = y2 - y1;
+        let steps = 0;
+
+        while (~(steps > d)){
+            do Screen.drawStraightLine(x1, y1 + steps, x2, y1 + steps);
+            let steps = steps + 1;
+        }
+    
         return;
     }
 
