@@ -79,15 +79,19 @@ class Screen {
 
     /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
     function void drawLine(int x1, int y1, int x2, int y2) {
-        var int a, b, dx, dy, diff;
+        var int a, b, dx, dy, diff, xModifier, yModifier;
         let a = 0;
         let b = 0;
-        let dx = x2 - x1;
-        let dy = y1 - y2;   // TODO: probably need to change this
+        let dx = Math.abs(x2 - x1);
+        let dy = Math.abs(y2 - y1);   
         let diff = 0;
 
-        while (~(a > dx) & ~(b < dy)) {
-            do drawPixel(x1 + a, y1 - b);
+        // TODO: see if y1 > y2 will assign -1 
+        let yModifier = if (y1 > y2) {-1;} else {0;}
+        let xModifier = if (x1 > x2) {-1;} else {0;}
+
+        while (~(a > dx) & ~(b > dy)) {
+            do drawPixel(x1 + (Screen.xor(a, xModifier) - xModifier), y1 + (Screen.xor(b, yModifier) - yModifier));
 
             if (diff < 0) {  
                 let a = a + 1;
@@ -119,5 +123,9 @@ class Screen {
 
     function int mod (int a, int b) {
         return  a - (b * (a / b));
+    }
+
+    function int xor(int a, int b) {
+        return ((a & ~b) | (b & ~a));
     }
 }
