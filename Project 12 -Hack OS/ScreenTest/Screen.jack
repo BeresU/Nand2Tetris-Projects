@@ -93,10 +93,8 @@ class Screen {
         let dx = Math.abs(x2 - x1);
         let dy = Math.abs(y2 - y1);   
         let diff = 0;
-
-        // TODO: see if y1 > y2 will assign -1 
-        if (y1 > y2) {let yPosition = -1;} else {let yPosition = 0;}
-        if (x1 > x2) {let xPosition = -1;} else {let xPosition = 0;}
+        let yPosition = y1 > y2;
+        let xPosition = x1 > x2;
 
         while (~(a > dx) & ~(b > dy)) {
             do Screen.drawPixel(x1 + (Screen.xor(a, xPosition) - xPosition), y1 + (Screen.xor(b, yPosition) - yPosition));
@@ -128,8 +126,8 @@ class Screen {
             let yModifier = 0;
         }
 
-        if (x1 > x2) {let xPosition = -1;} else {let xPosition = 0;}
-        if (y1 > y2) {let yPosition = -1;} else {let yPosition = 0;}
+        let xPosition = x1 > x2;
+        let yPosition = y1 > y2;
 
 
         while (~(steps > d)){
