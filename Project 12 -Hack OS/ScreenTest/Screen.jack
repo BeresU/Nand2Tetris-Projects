@@ -15,6 +15,7 @@ class Screen {
     /** Initializes the Screen. */
     function void init() {
         var int i;
+        let powersOfTwo = Array.new(16);
         let currentColor = 1;
         let screenBaseAddress = 16384;
 
@@ -57,9 +58,10 @@ class Screen {
     /** Draws the (x,y) pixel, using the current color. */
     function void drawPixel(int x, int y) {
         var int address, value, bitPlace, pixelNumber;
+        var int debug;
 
-        let address = 32 * y + (x / 16);
-        let value = Memory.peek(screenBaseAddress + address);
+        let address = screenBaseAddress + (32 * y + (x / 16));
+        let value = Memory.peek(address);
         let bitPlace = Screen.mod(x, 16);
         let pixelNumber = powersOfTwo[bitPlace];
 
@@ -80,6 +82,16 @@ class Screen {
     /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
     function void drawLine(int x1, int y1, int x2, int y2) {
         var int a, b, dx, dy, diff, xModifier, yModifier;
+
+        if (x1 = x2) {    
+            do Screen.drawYStraightLine(y1, y2, x1);
+            return;         
+        }
+        if (y1 = y2) {
+            do Screen.drawXStraightLine(x1, x2, y1);
+            return;         
+        }
+
         let a = 0;
         let b = 0;
         let dx = Math.abs(x2 - x1);
@@ -106,9 +118,34 @@ class Screen {
         return;
     }
 
-    function void drawStraightLine(int x1, int y1, int x2, int y2) {
+    // TODO: can merge this with & -1 or & 0 on the number we don't want to increase 
+    function void drawXStraightLine(int x1, int x2, int y){
+        var int steps, d, xModifier;
+
+        let d = Math.abs(x2 - x1);
+        if (x1 > x2) {let xModifier = -1;} else {let xModifier = 0;}
+        
+        while (~(steps > d)){
+            do Screen.drawPixel(x1 + (Screen.xor(steps, xModifier) - xModifier) , y);
+            let steps = steps + 1;
+        }
+
         return;
     }
+
+    function void drawYStraightLine(int y1, int y2, int x){
+        var int steps, d, yModifier;
+        let d = Math.abs(y2 - y1);
+        if (y1 > y2) {let yModifier = -1;} else {let yModifier = 0;}
+
+        while (~(steps > d)){
+            do Screen.drawPixel(x,  y1 + (Screen.xor(steps, yModifier) - yModifier));
+            let steps = steps + 1;
+        }
+
+        return;
+    }
+
 
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      *  and bottom right corner is (x2,y2), using the current color. */
