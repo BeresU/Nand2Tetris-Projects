@@ -81,14 +81,10 @@ class Screen {
 
     /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
     function void drawLine(int x1, int y1, int x2, int y2) {
-        var int a, b, dx, dy, diff, xModifier, yModifier;
+        var int a, b, dx, dy, diff, xPosition, yPosition;
 
-        if (x1 = x2) {    
-            do Screen.drawYStraightLine(y1, y2, x1);
-            return;         
-        }
-        if (y1 = y2) {
-            do Screen.drawXStraightLine(x1, x2, y1);
+        if (x1 = x2 | y1 = y2) {    
+            do Screen.drawStraightLine(x1, y1, x2, y2);
             return;         
         }
 
@@ -99,11 +95,11 @@ class Screen {
         let diff = 0;
 
         // TODO: see if y1 > y2 will assign -1 
-        if (y1 > y2) {let yModifier = -1;} else {let yModifier = 0;}
-        if (x1 > x2) {let xModifier = -1;} else {let xModifier = 0;}
+        if (y1 > y2) {let yPosition = -1;} else {let yPosition = 0;}
+        if (x1 > x2) {let xPosition = -1;} else {let xPosition = 0;}
 
         while (~(a > dx) & ~(b > dy)) {
-            do Screen.drawPixel(x1 + (Screen.xor(a, xModifier) - xModifier), y1 + (Screen.xor(b, yModifier) - yModifier));
+            do Screen.drawPixel(x1 + (Screen.xor(a, xPosition) - xPosition), y1 + (Screen.xor(b, yPosition) - yPosition));
 
             if (diff < 0) {  
                 let a = a + 1;
@@ -118,34 +114,31 @@ class Screen {
         return;
     }
 
-    // TODO: can merge this with & -1 or & 0 on the number we don't want to increase 
-    function void drawXStraightLine(int x1, int x2, int y){
-        var int steps, d, xModifier;
+    function void drawStraightLine(int x1, int y1, int x2, int y2) {
+        var int steps, d, yPosition, xPosition, yModifier, xModifier;
 
-        let d = Math.abs(x2 - x1);
-        if (x1 > x2) {let xModifier = -1;} else {let xModifier = 0;}
-        
+        if (x1 = x2) {
+            let d = Math.abs(y2 - y1);
+            let xModifier = 0;
+            let yModifier = -1;
+        } 
+        else {
+            let d = Math.abs(x2 - x1);
+            let xModifier = -1;
+            let yModifier = 0;
+        }
+
+        if (x1 > x2) {let xPosition = -1;} else {let xPosition = 0;}
+        if (y1 > y2) {let yPosition = -1;} else {let yPosition = 0;}
+
+
         while (~(steps > d)){
-            do Screen.drawPixel(x1 + (Screen.xor(steps, xModifier) - xModifier) , y);
+            do Screen.drawPixel(x1 + ((Screen.xor(steps, xPosition) - xPosition) & xModifier), y1 + ((Screen.xor(steps, yPosition) - yPosition) & yModifier));
             let steps = steps + 1;
         }
 
         return;
     }
-
-    function void drawYStraightLine(int y1, int y2, int x){
-        var int steps, d, yModifier;
-        let d = Math.abs(y2 - y1);
-        if (y1 > y2) {let yModifier = -1;} else {let yModifier = 0;}
-
-        while (~(steps > d)){
-            do Screen.drawPixel(x,  y1 + (Screen.xor(steps, yModifier) - yModifier));
-            let steps = steps + 1;
-        }
-
-        return;
-    }
-
 
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      *  and bottom right corner is (x2,y2), using the current color. */
