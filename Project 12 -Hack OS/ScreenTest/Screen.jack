@@ -36,7 +36,7 @@ class Screen {
         let i = 0;
 
         while (i < 8192){
-            Memory.poke(screenBaseAddress + i, 0);
+            do Memory.poke(screenBaseAddress + i, 0);
         }
 
         return;
@@ -63,7 +63,7 @@ class Screen {
         let bitPlace = Screen.mod(x, 16);
         let pixelNumber = powersOfTwo[bitPlace];
 
-        if (currentColor == 0){
+        if (currentColor = 0){
             let value = value & ~(pixelNumber);
         }
         else{
@@ -87,26 +87,26 @@ class Screen {
         let diff = 0;
 
         // TODO: see if y1 > y2 will assign -1 
-        let yModifier = if (y1 > y2) {-1;} else {0;}
-        let xModifier = if (x1 > x2) {-1;} else {0;}
+        if (y1 > y2) {let yModifier = -1;} else {let yModifier = 0;}
+        if (x1 > x2) {let xModifier = -1;} else {let xModifier = 0;}
 
         while (~(a > dx) & ~(b > dy)) {
-            do drawPixel(x1 + (Screen.xor(a, xModifier) - xModifier), y1 + (Screen.xor(b, yModifier) - yModifier));
+            do Screen.drawPixel(x1 + (Screen.xor(a, xModifier) - xModifier), y1 + (Screen.xor(b, yModifier) - yModifier));
 
             if (diff < 0) {  
                 let a = a + 1;
-                let dif = dif + dy;
+                let diff = diff + dy;
             }
             else {
                 let b = b + 1;
-                let dif = dif - dx;
+                let diff = diff - dx;
             }
         }
 
         return;
     }
 
-    function void drawStraightLine(int x1, int y1, int x2, int y2, int dx, int dy) {
+    function void drawStraightLine(int x1, int y1, int x2, int y2) {
         return;
     }
 
