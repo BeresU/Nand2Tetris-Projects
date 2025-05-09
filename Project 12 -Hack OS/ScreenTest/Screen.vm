@@ -315,61 +315,138 @@ label Screen_18
 label Screen_19
     push constant 0
     return
-function Screen.drawRectangle1 10
-    push constant 0
-    pop local 9
+function Screen.drawRectangle 2
     push argument 3
     push argument 1
     sub
     pop local 0
-    push argument 2
-    push argument 0
-    sub
+    push constant 0
     pop local 1
-    push constant 0
-    pop local 2
-    push static 0
-    neg
-    pop local 5
-    push constant 0
-    pop local 3
-    push constant 9000
-    pop local 8
 label Screen_20
-    push local 2
+    push local 1
     push local 0
     gt
     not
     not
     if-goto Screen_21
+    push argument 0
+    push argument 2
+    push argument 1
+    push local 1
+    add
+    call Screen.drawHorizontalLine2 3
+    pop temp 0
+    push local 1
+    push constant 1
+    add
+    pop local 1
+    goto Screen_20
+label Screen_21
+    push constant 1
+    neg
+    pop static 3
     push constant 0
-    pop local 3
+    return
+function Screen.drawHorizontalLine2 9
+    push constant 0
+    pop local 8
+    push argument 1
+    push argument 0
+    sub
+    pop local 0
+    push static 0
+    neg
+    pop local 6
+    push constant 0
+    pop local 1
     push argument 0
     push constant 16
     call Screen.mod 2
-    pop local 6
-    push local 6
+    pop local 3
+    push argument 1
+    push constant 16
+    call Screen.mod 2
+    push argument 1
+    push constant 16
+    call Screen.mod 2
+    push local 3
+    sub
+    add
+    pop local 4
+    push constant 9000
+    pop local 7
+    push constant 0
+    push local 7
+    add
+    push argument 0
+    push constant 16
+    call Screen.mod 2
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 1
+    push local 7
+    add
+    push local 4
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 2
+    push local 7
+    add
+    push local 0
+    push constant 16
+    call Screen.mod 2
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 3
+    push local 7
+    add
+    push argument 1
+    push constant 16
+    call Screen.mod 2
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 4
+    push local 7
+    add
+    push argument 1
+    push constant 10
+    sub
+    push constant 16
+    call Screen.mod 2
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push local 3
     push constant 0
     gt
     not
     if-goto Screen_23
+    push constant 16
+    pop local 1
     push static 1
     push constant 32
-    push argument 1
-    push local 2
-    add
+    push argument 2
     call Math.multiply 2
     push argument 0
     push constant 16
     call Math.divide 2
     add
     add
-    pop local 4
-    push local 4
+    pop local 5
+    push local 5
     call Memory.peek 1
-    pop local 7
+    pop local 2
 label Screen_24
-    push local 6
+    push local 3
     push constant 16
     lt
     not
@@ -379,211 +456,169 @@ label Screen_24
     eq
     not
     if-goto Screen_27
-    push local 7
-    push local 6
+    push local 2
+    push local 3
     push static 2
     add
     pop pointer 1
     push that 0
     or
-    pop local 7
+    pop local 2
     goto Screen_26
 label Screen_27
-    push local 7
-    push local 6
+    push local 2
+    push local 3
     push static 2
     add
     pop pointer 1
     push that 0
     not
     and
-    pop local 7
+    pop local 2
 label Screen_26
-    push local 6
+    push local 3
     push constant 1
     add
-    pop local 6
+    pop local 3
     goto Screen_24
 label Screen_25
-    push local 4
-    push local 7
+    push local 5
+    push local 2
     call Memory.poke 2
     pop temp 0
-    push constant 16
-    pop local 3
     goto Screen_22
 label Screen_23
 label Screen_22
 label Screen_28
-    push local 3
     push local 1
-    push constant 16
+    push local 0
+    push local 4
     sub
-    lt
+    gt
+    not
     not
     if-goto Screen_29
     push static 1
     push constant 32
-    push argument 1
-    push local 2
-    add
+    push argument 2
     call Math.multiply 2
     push argument 0
-    push local 3
+    push local 1
     add
     push constant 16
     call Math.divide 2
     add
     add
-    pop local 4
-    push local 4
+    pop local 5
+    push constant 10
+    push local 7
+    add
     push local 5
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push local 5
+    push local 6
     call Memory.poke 2
     pop temp 0
-    push local 3
+    push local 1
     push constant 16
     add
-    pop local 3
+    pop local 1
     goto Screen_28
 label Screen_29
-    push local 9
-    push constant 0
-    eq
-    not
-    if-goto Screen_31
-    push constant 4
-    push local 8
-    add
-    push local 3
-    pop temp 0
-    pop pointer 1
-    push temp 0
-    pop that 0
-    push constant 5
-    push local 8
-    add
-    push local 1
-    pop temp 0
-    pop pointer 1
-    push temp 0
-    pop that 0
-    goto Screen_30
-label Screen_31
-label Screen_30
-    push argument 0
-    push local 1
-    add
+    push argument 1
     push constant 16
     call Screen.mod 2
-    pop local 6
-    push local 6
+    pop local 3
+    push local 3
     push constant 0
     gt
     not
-    if-goto Screen_33
+    if-goto Screen_31
     push static 1
     push constant 32
-    push argument 1
-    push local 2
-    add
+    push argument 2
     call Math.multiply 2
-    push argument 0
-    push local 1
-    add
+    push argument 1
     push constant 16
     call Math.divide 2
     add
     add
-    pop local 4
-    push local 4
-    call Memory.peek 1
-    pop local 7
-    push local 9
-    push constant 0
-    eq
-    not
-    if-goto Screen_35
-    push constant 6
-    push local 8
+    pop local 5
+    push constant 11
+    push local 7
     add
-    push local 6
+    push local 5
     pop temp 0
     pop pointer 1
     push temp 0
     pop that 0
-    push constant 1
-    neg
-    pop local 9
-    goto Screen_34
-label Screen_35
-label Screen_34
-label Screen_36
-    push local 6
+    push local 5
+    call Memory.peek 1
+    pop local 2
+label Screen_32
+    push local 3
     push constant 0
     lt
     not
     not
-    if-goto Screen_37
+    if-goto Screen_33
     push static 0
     push constant 1
     eq
     not
-    if-goto Screen_39
-    push local 7
-    push local 6
+    if-goto Screen_35
+    push local 2
+    push local 3
     push static 2
     add
     pop pointer 1
     push that 0
     or
-    pop local 7
-    goto Screen_38
-label Screen_39
-    push local 7
-    push local 6
+    pop local 2
+    goto Screen_34
+label Screen_35
+    push local 2
+    push local 3
     push static 2
     add
     pop pointer 1
     push that 0
     not
     and
-    pop local 7
-label Screen_38
-    push local 6
+    pop local 2
+label Screen_34
+    push local 3
     push constant 1
     sub
-    pop local 6
-    goto Screen_36
-label Screen_37
-    push local 4
-    push local 7
-    call Memory.poke 2
-    pop temp 0
+    pop local 3
     goto Screen_32
 label Screen_33
-label Screen_32
+    push local 5
     push local 2
-    push constant 1
-    add
-    pop local 2
-    goto Screen_20
-label Screen_21
+    call Memory.poke 2
+    pop temp 0
+    goto Screen_30
+label Screen_31
+label Screen_30
     push constant 0
     return
-function Screen.drawRectangle 2
+function Screen.drawRectangle1 2
     push argument 3
     push argument 1
     sub
     pop local 0
     push constant 0
     pop local 1
-label Screen_40
+label Screen_36
     push local 1
     push local 0
     gt
     not
     not
-    if-goto Screen_41
+    if-goto Screen_37
     push argument 0
     push argument 2
     push argument 1
@@ -595,8 +630,8 @@ label Screen_40
     push constant 1
     add
     pop local 1
-    goto Screen_40
-label Screen_41
+    goto Screen_36
+label Screen_37
     push constant 0
     return
 function Screen.drawCircle 3
@@ -607,12 +642,12 @@ function Screen.drawCircle 3
     push argument 2
     call Math.multiply 2
     pop local 2
-label Screen_42
+label Screen_38
     push local 0
     push argument 2
     lt
     not
-    if-goto Screen_43
+    if-goto Screen_39
     push local 2
     push local 0
     push local 0
@@ -635,8 +670,8 @@ label Screen_42
     push constant 1
     add
     pop local 0
-    goto Screen_42
-label Screen_43
+    goto Screen_38
+label Screen_39
     push constant 0
     return
 function Screen.mod 0

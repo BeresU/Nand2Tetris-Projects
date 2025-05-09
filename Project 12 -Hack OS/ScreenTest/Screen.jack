@@ -11,6 +11,7 @@
 class Screen {
     static int currentColor, screenBaseAddress;
     static Array powersOfTwo; 
+    static boolean r;
 
     /** Initializes the Screen. */
     function void init() {
@@ -143,89 +144,97 @@ class Screen {
 
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      *  and bottom right corner is (x2,y2), using the current color. */
-    function void drawRectangle1(int x1, int y1, int x2, int y2) {
-        var int dy, dx, ySteps,xSteps, address, color, mod, value, debug;
-        var boolean dolog;
-        let dolog = false;
+    function void drawRectangle(int x1, int y1, int x2, int y2) {
+        var int dy, ySteps;
 
         let dy = y2 - y1;
-        let dx = x2 - x1;
         let ySteps = 0;
-        let color = -currentColor;
-
-        let xSteps = 0;
-
-        let debug = 9000;
 
         while (~(ySteps > dy)){
-            let xSteps = 0;
-            let mod = Screen.mod(x1, 16);
-
-            if (mod > 0){
-                let address = screenBaseAddress + (32 * (y1 + ySteps) + (x1 / 16));
-                let value = Memory.peek(address);
-                while (mod < 16){
-                    if (currentColor = 1){
-                        let value = value | powersOfTwo[mod];
-                    }
-                    else{
-                        let value = value & ~(powersOfTwo[mod]);
-                    }
-                    let mod = mod + 1;
-                }
-                
-                do Memory.poke(address, value);
-
-                let xSteps = 16;
-            }
-
-            while (xSteps < (dx-16)){
-                let address = screenBaseAddress + (32 * (y1 + ySteps) + ((x1 + xSteps) / 16));
-                do Memory.poke(address, color);
-
-                let xSteps = xSteps + 16;
-            }
- 
-            if (dolog = false){
-                let debug[4] = xSteps;
-                let debug[5] = dx;
-                //let dolog = true;
-            }
-
-            let mod = Screen.mod(x1 + dx, 16);
-
-            if (mod > 0){
-                let address = screenBaseAddress + (32 * (y1 + ySteps) + ((x1 + dx) / 16));
-                let value = Memory.peek(address);
-
-                if (dolog = false){
-                    let debug[6] = mod;
-                    let dolog = true;
-                }
-                while (~(mod < 0)){             
-                    if (currentColor = 1){
-                        let value = value | powersOfTwo[mod];
-                    }
-                    else{
-                        let value = value & ~(powersOfTwo[mod]);
-                    }
-                    
-                    let mod = mod - 1;
-                }
-
-                do Memory.poke(address, value); 
-
-            }
+            do Screen.drawHorizontalLine2(x1, x2, y1 + ySteps);
 
             let ySteps = ySteps + 1;
         }
+
+        let r = true;
     
+        return;
+    }
+
+    function void drawHorizontalLine2(int x1, int x2, int y){
+        var int dx, steps, value, mod,offset, address, color, debug;
+
+        var boolean dolog;
+
+        let dolog = false;
+        let dx = x2 - x1;
+        let color = -currentColor;
+        let steps = 0;
+        let mod = Screen.mod(x1, 16);
+        let offset = Screen.mod(x2, 16) + (Screen.mod(x2, 16) - mod) ;
+        let debug = 9000;
+        
+        // house dx = 130
+        let debug[0] = Screen.mod(x1, 16);  
+        let debug[1] = offset;
+        let debug[2] = Screen.mod(dx, 16);
+        let debug[3] = Screen.mod(x2, 16);
+        let debug[4] = Screen.mod(x2 - 10, 16);
+
+        if (mod > 0) {
+            let steps = 16; // TODO: need to change this (or maybe its ok?)
+            let address = screenBaseAddress + (32 * y + (x1 / 16));
+            let value = Memory.peek(address);
+            while (mod < 16){
+                if (currentColor = 1){
+                    let value = value | powersOfTwo[mod];
+                }
+                else{
+                    let value = value & ~(powersOfTwo[mod]);
+                }
+                let mod = mod + 1;
+            }
+            
+            do Memory.poke(address, value);
+        }
+        // HOUSE: mod start: 8, mod end: 10 = 10 + (10 - 8)
+        // DOOR: mod start: 14, mod end: 6 = 6 + (6 - 14)
+        // NOTE: dor offset: -10
+        // house offset: -11
+        while (~(steps > (dx - offset))){
+            
+            let address = screenBaseAddress + (32 * y + ((x1 + steps) / 16));
+            let debug[10] = address;
+            do Memory.poke(address, color);
+
+            let steps = steps + 16;
+        }
+
+        let mod = Screen.mod(x2, 16);
+        if (mod > 0){
+            let address = screenBaseAddress + (32 * y + (x2 / 16));
+            let debug[11] = address;
+            let value = Memory.peek(address);
+
+            while (~(mod < 0)){             
+                if (currentColor = 1){
+                    let value = value | powersOfTwo[mod];
+                }
+                else{
+                    let value = value & ~(powersOfTwo[mod]);
+                }
+                
+                let mod = mod - 1;
+            }
+
+            do Memory.poke(address, value); 
+        }
         return;
     }
 
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      *  and bottom right corner is (x2,y2), using the current color. */
-    function void drawRectangle(int x1, int y1, int x2, int y2) {
+    function void drawRectangle1(int x1, int y1, int x2, int y2) {
         var int d, steps;
 
         let d = y2 - y1;
