@@ -115,31 +115,6 @@ class Screen {
         return;
     }
 
-    function void drawStraightLine(int x1, int y1, int x2, int y2) {
-        var int steps, d, yPosition, xPosition, yModifier, xModifier;
-
-        if (x1 = x2) {
-            let d = Math.abs(y2 - y1);
-            let xModifier = 0;
-            let yModifier = -1;
-        } 
-        else {
-            let d = Math.abs(x2 - x1);
-            let xModifier = -1;
-            let yModifier = 0;
-        }
-
-        let xPosition = x1 > x2;
-        let yPosition = y1 > y2;
-
-        while (~(steps > d)){
-            do Screen.drawPixel(x1 + ((Screen.xor(steps, xPosition) - xPosition) & xModifier), y1 + ((Screen.xor(steps, yPosition) - yPosition) & yModifier));
-            let steps = steps + 1;
-        }
-
-        return;
-    }
-
     function void drawHorizontalLine(int x1, int x2, int y){
         var int d, position, steps;
         let d = Math.abs(x2 - x1);
@@ -266,6 +241,17 @@ class Screen {
 
     /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
     function void drawCircle(int x, int y, int r) {
+        var int dy, dx, rSquared;
+
+        let dy = -r;
+        let rSquared = r * r;
+
+        while (dy < r){
+            let dx = Math.sqrt((rSquared - (dy * dy)));
+            do Screen.drawHorizontalLine(x - dx, x + dx, y + dy);
+            let dy = dy + 1;
+        }
+
         return;
     }
 
