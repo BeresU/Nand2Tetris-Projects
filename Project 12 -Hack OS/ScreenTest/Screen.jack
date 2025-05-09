@@ -80,11 +80,16 @@ class Screen {
     /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
     function void drawLine(int x1, int y1, int x2, int y2) {
         var int a, b, dx, dy, diff, xPosition, yPosition;
+        
+        if (x1 = x2) {
+            do Screen.drawVerticalLine(y1, y2, x1);
+            return;
+        } 
 
-        if (x1 = x2 | y1 = y2) {    
-            do Screen.drawStraightLine(x1, y1, x2, y2);
-            return;         
-        }
+        if (y1 = y2) {
+            do Screen.drawHorizontalLine(x1, x2, y1);
+            return;
+        } 
 
         let a = 0;
         let b = 0;
@@ -127,7 +132,6 @@ class Screen {
         let xPosition = x1 > x2;
         let yPosition = y1 > y2;
 
-
         while (~(steps > d)){
             do Screen.drawPixel(x1 + ((Screen.xor(steps, xPosition) - xPosition) & xModifier), y1 + ((Screen.xor(steps, yPosition) - yPosition) & yModifier));
             let steps = steps + 1;
@@ -136,9 +140,35 @@ class Screen {
         return;
     }
 
+    function void drawHorizontalLine(int x1, int x2, int y){
+        var int d, position, steps;
+        let d = Math.abs(x2 - x1);
+        let position = x1 > x2;
+
+        while (~(steps > d)){
+            do Screen.drawPixel(x1 + (Screen.xor(steps, position) - position), y);
+            let steps = steps + 1;
+        }
+
+        return;
+    }
+
+    function void drawVerticalLine(int y1, int y2, int x){
+        var int d, position, steps;
+        let d = Math.abs(y2 - y1);
+        let position = y1 > y2;
+
+        while (~(steps > d)){
+            do Screen.drawPixel(x, y1 + (Screen.xor(steps, position) - position));
+            let steps = steps + 1;
+        }
+
+        return;
+    }
+
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      *  and bottom right corner is (x2,y2), using the current color. */
-    function void drawRectangle(int x1, int y1, int x2, int y2) {
+    function void drawRectangle1(int x1, int y1, int x2, int y2) {
         var int dy, dx, ySteps,xSteps, address, color, mod, value, debug;
         var boolean dolog;
         let dolog = false;
@@ -174,16 +204,17 @@ class Screen {
                 let xSteps = 16;
             }
 
-            while (xSteps < (dx - 16)){
+            while (xSteps < (dx-16)){
                 let address = screenBaseAddress + (32 * (y1 + ySteps) + ((x1 + xSteps) / 16));
                 do Memory.poke(address, color);
 
                 let xSteps = xSteps + 16;
             }
-
-            if (dolog){
+ 
+            if (dolog = false){
                 let debug[4] = xSteps;
                 let debug[5] = dx;
+                //let dolog = true;
             }
 
             let mod = Screen.mod(x1 + dx, 16);
@@ -191,6 +222,11 @@ class Screen {
             if (mod > 0){
                 let address = screenBaseAddress + (32 * (y1 + ySteps) + ((x1 + dx) / 16));
                 let value = Memory.peek(address);
+
+                if (dolog = false){
+                    let debug[6] = mod;
+                    let dolog = true;
+                }
                 while (~(mod < 0)){             
                     if (currentColor = 1){
                         let value = value | powersOfTwo[mod];
@@ -202,16 +238,7 @@ class Screen {
                     let mod = mod - 1;
                 }
 
-                do Memory.poke(address, value);  
-
-                if (dolog = false){
-                    let address = screenBaseAddress + (32 * (y1 + ySteps) + ((x1 + (dx - 16)) / 16));
-                    let value = Memory.peek(address);
-                    do Memory.poke(address, 0);
-
-                    let debug[0] = value;
-                    let dolog = true;
-                }
+                do Memory.poke(address, value); 
 
             }
 
@@ -223,14 +250,14 @@ class Screen {
 
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      *  and bottom right corner is (x2,y2), using the current color. */
-    function void drawRectangle2(int x1, int y1, int x2, int y2) {
+    function void drawRectangle(int x1, int y1, int x2, int y2) {
         var int d, steps;
 
         let d = y2 - y1;
         let steps = 0;
 
         while (~(steps > d)){
-            do Screen.drawStraightLine(x1, y1 + steps, x2, y1 + steps);
+            do Screen.drawHorizontalLine(x1, x2, y1 + steps);
             let steps = steps + 1;
         }
     
