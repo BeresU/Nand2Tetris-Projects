@@ -20,15 +20,14 @@ function Main.main 0
     push constant 219
     call Screen.drawRectangle 4
     pop temp 0
-    push constant 292
-    push constant 120
-    push constant 332
-    push constant 150
-    call Screen.drawRectangle 4
-    pop temp 0
     push constant 1
     neg
     call Screen.setColor 1
+    pop temp 0
+    push constant 360
+    push constant 170
+    push constant 3
+    call Screen.drawCircle 3
     pop temp 0
     push constant 280
     push constant 90
@@ -41,6 +40,11 @@ function Main.main 0
     push constant 410
     push constant 90
     call Screen.drawLine 4
+    pop temp 0
+    push constant 140
+    push constant 60
+    push constant 30
+    call Screen.drawCircle 3
     pop temp 0
     push constant 140
     push constant 26
