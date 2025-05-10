@@ -102,8 +102,7 @@ function Screen.drawPixel 5
     call Memory.peek 1
     pop local 1
     push argument 0
-    push constant 16
-    call Screen.mod 2
+    call Screen.mod16 1
     pop local 2
     push local 2
     push static 2
@@ -327,8 +326,7 @@ label Screen_22
     neg
     pop local 6
     push argument 0
-    push constant 16
-    call Screen.mod 2
+    call Screen.mod16 1
     pop local 3
     push constant 16
     push local 3
@@ -436,8 +434,7 @@ label Screen_30
     goto Screen_30
 label Screen_31
     push argument 1
-    push constant 16
-    call Screen.mod 2
+    call Screen.mod16 1
     pop local 3
     push static 1
     push local 5
@@ -570,14 +567,10 @@ label Screen_38
 label Screen_39
     push constant 0
     return
-function Screen.mod 0
+function Screen.mod16 0
     push argument 0
-    push argument 1
-    push argument 0
-    push argument 1
-    call Math.divide 2
-    call Math.multiply 2
-    sub
+    push constant 15
+    and
     return
 function Screen.xor 0
     push argument 0
