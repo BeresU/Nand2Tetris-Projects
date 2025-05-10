@@ -245,7 +245,7 @@ label Screen_14
 label Screen_13
     push constant 0
     return
-function Screen.drawHorizontalLine 3
+function Screen.drawVerticalLine 3
     push argument 1
     push argument 0
     sub
@@ -262,6 +262,7 @@ label Screen_16
     not
     not
     if-goto Screen_17
+    push argument 2
     push argument 0
     push local 2
     push local 1
@@ -269,7 +270,6 @@ label Screen_16
     push local 1
     sub
     add
-    push argument 2
     call Screen.drawPixel 2
     pop temp 0
     push local 2
@@ -280,41 +280,6 @@ label Screen_16
 label Screen_17
     push constant 0
     return
-function Screen.drawVerticalLine 3
-    push argument 1
-    push argument 0
-    sub
-    call Math.abs 1
-    pop local 0
-    push argument 0
-    push argument 1
-    gt
-    pop local 1
-label Screen_18
-    push local 2
-    push local 0
-    gt
-    not
-    not
-    if-goto Screen_19
-    push argument 2
-    push argument 0
-    push local 2
-    push local 1
-    call Screen.xor 2
-    push local 1
-    sub
-    add
-    call Screen.drawPixel 2
-    pop temp 0
-    push local 2
-    push constant 1
-    add
-    pop local 2
-    goto Screen_18
-label Screen_19
-    push constant 0
-    return
 function Screen.drawRectangle 2
     push argument 3
     push argument 1
@@ -322,32 +287,46 @@ function Screen.drawRectangle 2
     pop local 0
     push constant 0
     pop local 1
-label Screen_20
+label Screen_18
     push local 1
     push local 0
     gt
     not
     not
-    if-goto Screen_21
+    if-goto Screen_19
     push argument 0
     push argument 2
     push argument 1
     push local 1
     add
-    call Screen.drawHorizontalLine2 3
+    call Screen.drawHorizontalLine 3
     pop temp 0
     push local 1
     push constant 1
     add
     pop local 1
-    goto Screen_20
-label Screen_21
+    goto Screen_18
+label Screen_19
     push constant 1
     neg
     pop static 3
     push constant 0
     return
-function Screen.drawHorizontalLine2 8
+function Screen.drawHorizontalLine 9
+    push argument 0
+    push argument 1
+    gt
+    not
+    if-goto Screen_21
+    push argument 1
+    pop local 8
+    push argument 0
+    pop argument 1
+    push local 8
+    pop argument 0
+    goto Screen_20
+label Screen_21
+label Screen_20
     push argument 1
     push argument 0
     sub

@@ -116,19 +116,6 @@ class Screen {
         return;
     }
 
-    function void drawHorizontalLine(int x1, int x2, int y){
-        var int d, position, steps;
-        let d = Math.abs(x2 - x1);
-        let position = x1 > x2;
-
-        while (~(steps > d)){
-            do Screen.drawPixel(x1 + (Screen.xor(steps, position) - position), y);
-            let steps = steps + 1;
-        }
-
-        return;
-    }
-
     function void drawVerticalLine(int y1, int y2, int x){
         var int d, position, steps;
         let d = Math.abs(y2 - y1);
@@ -151,7 +138,7 @@ class Screen {
         let ySteps = 0;
 
         while (~(ySteps > dy)){
-            do Screen.drawHorizontalLine2(x1, x2, y1 + ySteps);
+            do Screen.drawHorizontalLine(x1, x2, y1 + ySteps);
 
             let ySteps = ySteps + 1;
         }
@@ -161,8 +148,15 @@ class Screen {
         return;
     }
 
-    function void drawHorizontalLine2(int x1, int x2, int y){
-        var int dx, steps, value, mod, address, rowAddress, color, pixels;
+    function void drawHorizontalLine(int x1, int x2, int y){
+        var int dx, steps, value, mod, address, rowAddress, color, pixels, temp;
+
+        if (x1 > x2) {
+            let temp = x2;
+            let x2 = x1;
+            let x1 = temp;
+        }
+
         let dx = x2 - x1;
         let rowAddress = 32 * y;
         let color = -currentColor;
@@ -216,7 +210,7 @@ class Screen {
         }
             
         do Memory.poke(address, value); 
-        
+
         return;
     }
 
