@@ -159,10 +159,7 @@ class Screen {
         let maxPixels = Math.min(16, dx + mod + 1);
         let pixels = 0;
 
-        while (mod < maxPixels){
-            let pixels = pixels + powersOfTwo[mod];
-            let mod = mod + 1;
-        }
+        let pixels = ~(powersOfTwo[mod] - 1) & (powersOfTwo[maxPixels] - 1);
 
         let value = Memory.peek(address);
 
@@ -190,12 +187,7 @@ class Screen {
         let address = screenBaseAddress + (rowAddress + (x2 / 16));
         let value = Memory.peek(address);
 
-        let pixels = 0;
-
-        while (~(mod < 0)){ 
-            let pixels = pixels + powersOfTwo[mod];            
-            let mod = mod - 1;
-        }
+        let pixels =  powersOfTwo[mod] | (powersOfTwo[mod] - 1);
 
         if (currentColor = 1){
             let value = value | pixels;
