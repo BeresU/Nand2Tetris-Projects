@@ -62,7 +62,7 @@ class Screen {
 
         let address = screenBaseAddress + (32 * y + (x / 16));
         let value = Memory.peek(address);
-        let bitPlace = Screen.mod16(x);
+        let bitPlace = x & 15;
         let pixelPlace = powersOfTwo[bitPlace];
 
         if (currentColor = 0) {
@@ -153,7 +153,7 @@ class Screen {
         let color = -currentColor;
 
         // Handle first pixel batch
-        let mod = Screen.mod16(x1);
+        let mod = x1 & 15;
         let steps = 16 - mod; 
         let address = screenBaseAddress + (rowAddress + (x1 / 16));
         let maxPixels = Math.min(16, dx + mod + 1);
@@ -186,7 +186,7 @@ class Screen {
         }
 
         // Handle last pixel batch 
-        let mod = Screen.mod16(x2);
+        let mod = x2 & 15;
         let address = screenBaseAddress + (rowAddress + (x2 / 16));
         let value = Memory.peek(address);
 
@@ -243,11 +243,6 @@ class Screen {
         }
 
         return;
-    }
-
-
-    function int mod16 (int a) {
-        return  a & 15;
     }
 
     function int xor(int a, int b) {
