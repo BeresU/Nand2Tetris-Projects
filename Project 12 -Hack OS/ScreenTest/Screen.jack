@@ -117,12 +117,17 @@ class Screen {
     }
 
     function void drawVerticalLine(int y1, int y2, int x){
-        var int d, position, steps;
+        var int d, temp, steps;
         let d = Math.abs(y2 - y1);
-        let position = y1 > y2;
+
+        if (y1 > y2) {
+            let temp = y2;
+            let y2 = y1;
+            let y1 = temp;
+        }
 
         while (~(steps > d)){
-            do Screen.drawPixel(x, y1 + (Screen.xor(steps, position) - position));
+            do Screen.drawPixel(x, y1 + steps);
             let steps = steps + 1;
         }
 
