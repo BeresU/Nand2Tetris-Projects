@@ -58,19 +58,19 @@ class Screen {
 
     /** Draws the (x,y) pixel, using the current color. */
     function void drawPixel(int x, int y) {
-        var int address, value, bitPlace, pixelNumber;
+        var int address, value, bitPlace, pixelPlace;
         var int debug;
 
         let address = screenBaseAddress + (32 * y + (x / 16));
         let value = Memory.peek(address);
         let bitPlace = Screen.mod(x, 16);
-        let pixelNumber = powersOfTwo[bitPlace];
+        let pixelPlace = powersOfTwo[bitPlace];
 
-        if (currentColor = 0){
-            let value = value & ~(pixelNumber);
+        if (currentColor = 0) {
+            let value = value & ~(pixelPlace);
         }
         else{
-            let value = value | pixelNumber;
+            let value = value | pixelPlace;
         }
         
         do Memory.poke(address, value);
@@ -162,73 +162,61 @@ class Screen {
     }
 
     function void drawHorizontalLine2(int x1, int x2, int y){
-        var int dx, steps, value, mod,offset, address, color, debug;
-
-        var boolean dolog;
-
-        let dolog = false;
+        var int dx, steps, value, mod, address, rowAddress, color, pixels;
         let dx = x2 - x1;
+        let rowAddress = 32 * y;
         let color = -currentColor;
         let steps = 0;
         let mod = Screen.mod(x1, 16);
-        let offset = Screen.mod(x2, 16) + (Screen.mod(x2, 16) - mod) ;
-        let debug = 9000;
-        
-        // house dx = 130
-        let debug[0] = Screen.mod(x1, 16);  
-        let debug[1] = offset;
-        let debug[2] = Screen.mod(dx, 16);
-        let debug[3] = Screen.mod(x2, 16);
-        let debug[4] = Screen.mod(x2 - 10, 16);
 
-        if (mod > 0) {
-            let steps = 16; // TODO: need to change this (or maybe its ok?)
-            let address = screenBaseAddress + (32 * y + (x1 / 16));
-            let value = Memory.peek(address);
-            while (mod < 16){
-                if (currentColor = 1){
-                    let value = value | powersOfTwo[mod];
-                }
-                else{
-                    let value = value & ~(powersOfTwo[mod]);
-                }
-                let mod = mod + 1;
-            }
-            
-            do Memory.poke(address, value);
+        let steps = 16 - mod; 
+        let address = screenBaseAddress + (rowAddress + (x1 / 16));
+        let value = Memory.peek(address);
+        let pixels = 0;
+
+        while (mod < 16){
+            let pixels = pixels + powersOfTwo[mod];
+            let mod = mod + 1;
         }
-        // HOUSE: mod start: 8, mod end: 10 = 10 + (10 - 8)
-        // DOOR: mod start: 14, mod end: 6 = 6 + (6 - 14)
-        // NOTE: dor offset: -10
-        // house offset: -11
-        while (~(steps > (dx - offset))){
+
+        if (currentColor = 1){
+            let value = value | pixels;
+        }
+        else{
+            let value = value & ~(pixels);
+        }
+    
+        do Memory.poke(address, value);
+
+        while (~(steps > (dx - 16))){
             
-            let address = screenBaseAddress + (32 * y + ((x1 + steps) / 16));
-            let debug[10] = address;
+            let address = screenBaseAddress + (rowAddress + ((x1 + steps) / 16));
             do Memory.poke(address, color);
 
             let steps = steps + 16;
         }
 
         let mod = Screen.mod(x2, 16);
-        if (mod > 0){
-            let address = screenBaseAddress + (32 * y + (x2 / 16));
-            let debug[11] = address;
-            let value = Memory.peek(address);
 
-            while (~(mod < 0)){             
-                if (currentColor = 1){
-                    let value = value | powersOfTwo[mod];
-                }
-                else{
-                    let value = value & ~(powersOfTwo[mod]);
-                }
-                
-                let mod = mod - 1;
-            }
+        let address = screenBaseAddress + (rowAddress + (x2 / 16));
+        let value = Memory.peek(address);
 
-            do Memory.poke(address, value); 
+        let pixels = 0;
+
+        while (~(mod < 0)){ 
+            let pixels = pixels + powersOfTwo[mod];            
+            let mod = mod - 1;
         }
+
+        if (currentColor = 1){
+            let value = value | pixels;
+        }
+        else{
+            let value = value & ~(pixels);
+        }
+            
+        do Memory.poke(address, value); 
+        
         return;
     }
 
