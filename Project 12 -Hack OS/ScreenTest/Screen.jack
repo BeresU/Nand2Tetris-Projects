@@ -11,7 +11,7 @@
 class Screen {
     static int currentColor, screenBaseAddress;
     static Array powersOfTwo; 
-    static boolean r;
+    static boolean debug;
 
     /** Initializes the Screen. */
     function void init() {
@@ -147,15 +147,23 @@ class Screen {
 
             let ySteps = ySteps + 1;
         }
-
-        let r = true;
-    
+        
         return;
     }
 
     function void drawHorizontalLine(int x1, int x2, int y){
-        var int dx, steps, value, mod, address, rowAddress, color, pixels, temp;
+        var int dx, steps, value, mod, address, rowAddress, color, pixels, temp, maxPixels;
 
+        //358
+        // 362
+        var int log;
+
+        if (x1 = x2) {
+            do Screen.drawPixel(x1, y);
+            return;
+        }
+    
+        let log = 8000;
         if (x1 > x2) {
             let temp = x2;
             let x2 = x1;
@@ -168,16 +176,38 @@ class Screen {
         let steps = 0;
         let mod = Screen.mod(x1, 16);
 
+        if (x1 = 358){
+            let log[7] = mod;
+        }
+
         let steps = 16 - mod; 
         let address = screenBaseAddress + (rowAddress + (x1 / 16));
         let value = Memory.peek(address);
         let pixels = 0;
+        let maxPixels = dx + mod +  1;
+        
+        let maxPixels = Math.min(16, maxPixels);
 
-        while (mod < 16){
+        if (x1 = 358){
+            let log[5] = mod;
+        }
+
+        while (mod < maxPixels){
             let pixels = pixels + powersOfTwo[mod];
             let mod = mod + 1;
         }
+        
+        if (x1 = 358){
+            let log[0] = maxPixels;
+            let log[1] = x1;
+            let log[2] = x2;
+            let log[3] = address;
+            let log[4] = pixels;
+            let log[6] = steps;
+            let log[11] = dx;
+        }
 
+ 
         if (currentColor = 1){
             let value = value | pixels;
         }
@@ -187,8 +217,11 @@ class Screen {
     
         do Memory.poke(address, value);
 
+        if (maxPixels < 16) {return;}
+
         while (~(steps > (dx - 16))){
-            
+            let debug = true;
+
             let address = screenBaseAddress + (rowAddress + ((x1 + steps) / 16));
             do Memory.poke(address, color);
 
@@ -201,6 +234,13 @@ class Screen {
         let value = Memory.peek(address);
 
         let pixels = 0;
+
+        let maxPixels = 0;
+
+        // if (x1 = 358){
+        //     let maxPixels = 10;
+        //     let log[10] = mod;
+        // }
 
         while (~(mod < 0)){ 
             let pixels = pixels + powersOfTwo[mod];            
@@ -219,37 +259,46 @@ class Screen {
         return;
     }
 
-    /** Draws a filled rectangle whose top left corner is (x1, y1)
-     *  and bottom right corner is (x2,y2), using the current color. */
-    function void drawRectangle1(int x1, int y1, int x2, int y2) {
-        var int d, steps;
-
-        let d = y2 - y1;
-        let steps = 0;
-
-        while (~(steps > d)){
-            do Screen.drawHorizontalLine(x1, x2, y1 + steps);
-            let steps = steps + 1;
-        }
-    
-        return;
-    }
-
     /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
     function void drawCircle(int x, int y, int r) {
-        var int dy, dx, rSquared;
+        var int dy, dx, rSquared, log;
+        var boolean d;
+        
+        let log = 9000;
+        let r = Math.min(r, 181);
 
         let dy = -r;
         let rSquared = r * r;
 
-        while (dy < r){
+        while (~(dy > r)){
+
             let dx = Math.sqrt((rSquared - (dy * dy)));
+
+            if (d = false & (~((x-dx) = (x+dx)))){
+                let log[0] = x - dx;
+                let log[1] = x + dx;
+                let log[2] = y + dy;
+            }
             do Screen.drawHorizontalLine(x - dx, x + dx, y + dy);
             let dy = dy + 1;
         }
 
         return;
     }
+
+    function void drawHorizontalLine2(int x1, int x2, int y){
+        var int d, position, steps;
+        let d = Math.abs(x2 - x1);
+        let position = x1 > x2;
+
+        while (~(steps > d)){
+            do Screen.drawPixel(x1 + (Screen.xor(steps, position) - position), y);
+            let steps = steps + 1;
+        }
+
+        return;
+    }
+
 
     function int mod (int a, int b) {
         return  a - (b * (a / b));
