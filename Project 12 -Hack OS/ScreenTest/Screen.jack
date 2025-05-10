@@ -133,6 +133,7 @@ class Screen {
         return;
     }
 
+    // Optimized method that draws the pixels in 16-bit batches 
     function void drawHorizontalLine(int x1, int x2, int y){
         var int dx, steps, value, mod, address, rowAddress, color, pixels, temp, maxPixels;
 
@@ -150,21 +151,20 @@ class Screen {
         let dx = x2 - x1;
         let rowAddress = 32 * y;
         let color = -currentColor;
-        let steps = 0;
-        let mod = Screen.mod(x1, 16);
 
+        // Handle first pixel batch
+        let mod = Screen.mod(x1, 16);
         let steps = 16 - mod; 
         let address = screenBaseAddress + (rowAddress + (x1 / 16));
-        let value = Memory.peek(address);
+        let maxPixels = Math.min(16, dx + mod + 1);
         let pixels = 0;
-        let maxPixels = dx + mod + 1;
-        
-        let maxPixels = Math.min(16, maxPixels);
 
         while (mod < maxPixels){
             let pixels = pixels + powersOfTwo[mod];
             let mod = mod + 1;
         }
+
+        let value = Memory.peek(address);
 
         if (currentColor = 1){
             let value = value | pixels;
@@ -177,6 +177,7 @@ class Screen {
 
         if (maxPixels < 16) {return;}
 
+        // 16-bit batches drawing 
         while (~(steps > (dx - 16))){
             let address = screenBaseAddress + (rowAddress + ((x1 + steps) / 16));
             do Memory.poke(address, color);
@@ -184,8 +185,8 @@ class Screen {
             let steps = steps + 16;
         }
 
+        // Handle last pixel batch 
         let mod = Screen.mod(x2, 16);
-
         let address = screenBaseAddress + (rowAddress + (x2 / 16));
         let value = Memory.peek(address);
 
@@ -207,7 +208,7 @@ class Screen {
 
         return;
     }
-    
+
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      *  and bottom right corner is (x2,y2), using the current color. */
     function void drawRectangle(int x1, int y1, int x2, int y2) {

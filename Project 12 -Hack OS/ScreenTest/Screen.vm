@@ -326,8 +326,6 @@ label Screen_22
     push static 0
     neg
     pop local 6
-    push constant 0
-    pop local 1
     push argument 0
     push constant 16
     call Screen.mod 2
@@ -344,21 +342,16 @@ label Screen_22
     add
     add
     pop local 4
-    push local 4
-    call Memory.peek 1
-    pop local 2
-    push constant 0
-    pop local 7
+    push constant 16
     push local 0
     push local 3
     add
     push constant 1
     add
-    pop local 9
-    push constant 16
-    push local 9
     call Math.min 2
     pop local 9
+    push constant 0
+    pop local 7
 label Screen_24
     push local 3
     push local 9
@@ -379,6 +372,9 @@ label Screen_24
     pop local 3
     goto Screen_24
 label Screen_25
+    push local 4
+    call Memory.peek 1
+    pop local 2
     push static 0
     push constant 1
     eq
