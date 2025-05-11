@@ -265,7 +265,7 @@ class Output {
     function void transformCursor(int x, int y){
         let cursorX = cursorX + (x * charWidth);
         let cursorY = cursorY + (y * lineHeight);
-        do OutputclampCursor();
+        do Output.clampCursor();
         return;
     }
 
