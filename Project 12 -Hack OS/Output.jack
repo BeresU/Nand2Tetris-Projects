@@ -16,15 +16,28 @@
 class Output {
 
     // Character map for displaying characters
-    static int screenBaseAddress, cursorX, cursorY;
-    static Array charMaps; 
+    static int screenBaseAddress, cursorX, cursorY, lineHeight, charWidth;
+    static Array charMaps, powerOfTens; 
 
     /** Initializes the screen, and locates the cursor at the screen's top-left. */
     function void init() {
+        var int i;
         do Output.initMap();
         let screenBaseAddress = 16384;
         let cursorX = 0;
         let cursorY = 0;
+        let lineHeight = 352;
+        let charWidth = 8;
+
+        let powerOfTens = Array.new(5);
+        let powerOfTens[0] = 1;
+
+        let i = 1;
+
+        while(i < 5){
+            let powerOfTens[i] = powerOfTens[i - 1] * 10;
+            let i = i + 1;
+        }
         return;
     }
 
@@ -180,12 +193,10 @@ class Output {
 
     /** Moves the cursor to the j-th column of the i-th row,
      *  and erases the character displayed there. */
-     
-
-     // TODO: need to test how its work
     function void moveCursor(int i, int j) {
-        let cursorX = j;
-        let cursorY = 32 * i;
+        let cursorX = j * charWidth;
+        let cursorY = i * lineHeight;
+        do Output.clampCursor();
         return;
     }
 
@@ -207,7 +218,7 @@ class Output {
         do Output.drawPixels(memAddress + 256, map[8]);
         do Output.drawPixels(memAddress + 288, map[9]);
         do Output.drawPixels(memAddress + 320, map[10]);
-        let cursorX = cursorX + 8;
+        do Output.transformCursor(1, 0);
         return;
     }
 
@@ -239,7 +250,7 @@ class Output {
             let char = s.charAt(i);
 
             if (char = 32) {
-                let cursorX = cursorX + 8;   // Handle space
+                do Output.transformCursor(1, 0); // Handle space
             }
             else{
                 do Output.printChar(char);
@@ -251,19 +262,76 @@ class Output {
         return;
     }
 
+    function void transformCursor(int x, int y){
+        let cursorX = cursorX + (x * charWidth);
+        let cursorY = cursorY + (y * lineHeight);
+        do OutputclampCursor();
+        return;
+    }
+
+    function void clampCursor() {
+
+        if (cursorX < 0) {
+            let cursorX = 0;
+            let cursorY = cursorY - lineHeight;
+        }
+
+        if (cursorX > 504) {
+            let cursorX = 0;
+            let cursorY = cursorY + lineHeight;
+        }
+
+        if (cursorY < 0) {
+            let cursorY = 0;
+        }
+
+        if (cursorY > 7744){
+            let cursorY = 0;
+        }
+
+        return;
+    }
+
     /** Displays the given integer starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printInt(int i) {
+        var int char, digitCount, n, digit;
+
+        if (i < 0) {
+            do Output.printChar(45);
+            let i = -i;
+        }
+
+        let n = i;
+        let digitCount = 0;
+
+        while (n > 0) {
+            let digitCount = digitCount + 1;
+            let n = n / 10;
+        }
+
+        while (digitCount > 0) {
+            let n = powerOfTens[digitCount - 1];
+            let digit = i/n;
+            let char = 48 + digit;
+            do Output.printChar(char);
+            let i = i - (digit * n);
+            let digitCount = digitCount - 1;
+        }
+
         return;
     }
 
     /** Advances the cursor to the beginning of the next line. */
     function void println() {
+        do Output.transformCursor(0, 1);
+        let cursorX = 0;
         return;
     }
 
     /** Moves the cursor one column back. */
     function void backSpace() {
+        do Output.transformCursor(-1, 0);
         return;
     }
 }
