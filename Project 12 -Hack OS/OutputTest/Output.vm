@@ -4,11 +4,15 @@ function Output.init 0
     push constant 16384
     pop static 0
     push constant 0
+    pop static 1
+    push constant 0
+    pop static 2
+    push constant 0
     return
 function Output.initMap 1
     push constant 127
     call Array.new 1
-    pop static 1
+    pop static 3
     push constant 0
     push constant 63
     push constant 63
@@ -1360,7 +1364,7 @@ function Output.create 1
     call Array.new 1
     pop local 0
     push argument 0
-    push static 1
+    push static 3
     add
     push local 0
     pop temp 0
@@ -1473,29 +1477,41 @@ function Output.getMap 0
 label Output_1
 label Output_0
     push argument 0
-    push static 1
+    push static 3
     add
     pop pointer 1
     push that 0
     return
 function Output.moveCursor 0
+    push argument 1
+    pop static 1
+    push constant 32
+    push argument 0
+    call Math.multiply 2
+    pop static 2
     push constant 0
     return
-function Output.printChar 3
+function Output.printChar 2
     push static 0
-    pop local 2
+    push static 2
+    add
+    push static 1
+    push constant 16
+    call Math.divide 2
+    add
+    pop local 1
     push argument 0
     call Output.getMap 1
     pop local 0
-    push local 2
+    push local 1
     push constant 0
     push local 0
     add
     pop pointer 1
     push that 0
-    call Memory.poke 2
+    call Output.drawPixels 2
     pop temp 0
-    push local 2
+    push local 1
     push constant 32
     add
     push constant 1
@@ -1503,9 +1519,9 @@ function Output.printChar 3
     add
     pop pointer 1
     push that 0
-    call Memory.poke 2
+    call Output.drawPixels 2
     pop temp 0
-    push local 2
+    push local 1
     push constant 64
     add
     push constant 2
@@ -1513,9 +1529,9 @@ function Output.printChar 3
     add
     pop pointer 1
     push that 0
-    call Memory.poke 2
+    call Output.drawPixels 2
     pop temp 0
-    push local 2
+    push local 1
     push constant 96
     add
     push constant 3
@@ -1523,9 +1539,9 @@ function Output.printChar 3
     add
     pop pointer 1
     push that 0
-    call Memory.poke 2
+    call Output.drawPixels 2
     pop temp 0
-    push local 2
+    push local 1
     push constant 128
     add
     push constant 4
@@ -1533,9 +1549,9 @@ function Output.printChar 3
     add
     pop pointer 1
     push that 0
-    call Memory.poke 2
+    call Output.drawPixels 2
     pop temp 0
-    push local 2
+    push local 1
     push constant 160
     add
     push constant 5
@@ -1543,9 +1559,9 @@ function Output.printChar 3
     add
     pop pointer 1
     push that 0
-    call Memory.poke 2
+    call Output.drawPixels 2
     pop temp 0
-    push local 2
+    push local 1
     push constant 192
     add
     push constant 6
@@ -1553,9 +1569,9 @@ function Output.printChar 3
     add
     pop pointer 1
     push that 0
-    call Memory.poke 2
+    call Output.drawPixels 2
     pop temp 0
-    push local 2
+    push local 1
     push constant 224
     add
     push constant 7
@@ -1563,9 +1579,9 @@ function Output.printChar 3
     add
     pop pointer 1
     push that 0
-    call Memory.poke 2
+    call Output.drawPixels 2
     pop temp 0
-    push local 2
+    push local 1
     push constant 256
     add
     push constant 8
@@ -1573,9 +1589,9 @@ function Output.printChar 3
     add
     pop pointer 1
     push that 0
-    call Memory.poke 2
+    call Output.drawPixels 2
     pop temp 0
-    push local 2
+    push local 1
     push constant 288
     add
     push constant 9
@@ -1583,9 +1599,9 @@ function Output.printChar 3
     add
     pop pointer 1
     push that 0
-    call Memory.poke 2
+    call Output.drawPixels 2
     pop temp 0
-    push local 2
+    push local 1
     push constant 320
     add
     push constant 10
@@ -1593,11 +1609,88 @@ function Output.printChar 3
     add
     pop pointer 1
     push that 0
+    call Output.drawPixels 2
+    pop temp 0
+    push static 1
+    push constant 8
+    add
+    pop static 1
+    push constant 0
+    return
+function Output.drawPixels 2
+    push argument 0
+    call Memory.peek 1
+    pop local 0
+    push constant 256
+    push constant 1
+    sub
+    not
+    pop local 1
+    push static 1
+    push constant 15
+    and
+    push constant 8
+    eq
+    not
+    if-goto Output_3
+    push argument 1
+    push constant 256
+    call Math.multiply 2
+    pop argument 1
+    push constant 256
+    push constant 1
+    sub
+    pop local 1
+    goto Output_2
+label Output_3
+label Output_2
+    push local 0
+    push local 1
+    and
+    push argument 1
+    or
+    pop local 0
+    push argument 0
+    push local 0
     call Memory.poke 2
     pop temp 0
     push constant 0
     return
-function Output.printString 0
+function Output.printString 3
+    push argument 0
+    call String.length 1
+    pop local 0
+label Output_4
+    push local 1
+    push local 0
+    lt
+    not
+    if-goto Output_5
+    push argument 0
+    push local 1
+    call String.charAt 2
+    pop local 2
+    push local 2
+    push constant 32
+    eq
+    not
+    if-goto Output_7
+    push static 1
+    push constant 8
+    add
+    pop static 1
+    goto Output_6
+label Output_7
+    push local 2
+    call Output.printChar 1
+    pop temp 0
+label Output_6
+    push local 1
+    push constant 1
+    add
+    pop local 1
+    goto Output_4
+label Output_5
     push constant 0
     return
 function Output.printInt 0

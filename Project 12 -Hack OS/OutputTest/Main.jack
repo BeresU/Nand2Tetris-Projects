@@ -10,7 +10,14 @@ class Main {
      *  methods of the Output class. */
     function void main() {
         //do Output.printChar(65);
-        do Output.printChar(65);
+        do Output.printChar(67);
+        // do Output.printString("AA A");
+        // do Output.printString("BB B");
+        // do Output.println();
+        // do Output.printChar(67);
+        // do Output.printString("AA A");
+        // do Output.printString("BB B");
+
         //var String s;
     
     	// let s = String.new(1);

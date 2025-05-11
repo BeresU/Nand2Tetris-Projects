@@ -16,13 +16,15 @@
 class Output {
 
     // Character map for displaying characters
-    static int screenBaseAddress;
+    static int screenBaseAddress, cursorX, cursorY;
     static Array charMaps; 
 
     /** Initializes the screen, and locates the cursor at the screen's top-left. */
     function void init() {
         do Output.initMap();
         let screenBaseAddress = 16384;
+        let cursorX = 0;
+        let cursorY = 0;
         return;
     }
 
@@ -178,35 +180,74 @@ class Output {
 
     /** Moves the cursor to the j-th column of the i-th row,
      *  and erases the character displayed there. */
+     
+
+     // TODO: need to test how its work
     function void moveCursor(int i, int j) {
+        let cursorX = j;
+        let cursorY = 32 * i;
         return;
     }
 
     /** Displays the given character at the cursor location,
      *  and advances the cursor one column forward. */
     function void printChar(char c) {
-        var Array map, i, memAddress;
-        let memAddress = screenBaseAddress;
+        var Array map, memAddress;
+        let memAddress = screenBaseAddress + cursorY + (cursorX / 16);
         let map = Output.getMap(c); 
 
-        do Memory.poke(memAddress, map[0]);
-        do Memory.poke(memAddress + 32, map[1]);
-        do Memory.poke(memAddress + 64, map[2]);
-        do Memory.poke(memAddress + 96, map[3]);
-        do Memory.poke(memAddress + 128, map[4]);
-        do Memory.poke(memAddress + 160, map[5]);
-        do Memory.poke(memAddress + 192, map[6]);
-        do Memory.poke(memAddress + 224, map[7]);
-        do Memory.poke(memAddress + 256, map[8]);
-        do Memory.poke(memAddress + 288, map[9]);
-        do Memory.poke(memAddress + 320, map[10]);
+        do Output.drawPixels(memAddress, map[0]);
+        do Output.drawPixels(memAddress + 32, map[1]);
+        do Output.drawPixels(memAddress + 64, map[2]);
+        do Output.drawPixels(memAddress + 96, map[3]);
+        do Output.drawPixels(memAddress + 128, map[4]);
+        do Output.drawPixels(memAddress + 160, map[5]);
+        do Output.drawPixels(memAddress + 192, map[6]);
+        do Output.drawPixels(memAddress + 224, map[7]);
+        do Output.drawPixels(memAddress + 256, map[8]);
+        do Output.drawPixels(memAddress + 288, map[9]);
+        do Output.drawPixels(memAddress + 320, map[10]);
+        let cursorX = cursorX + 8;
+        return;
+    }
 
+    function void drawPixels(int address, int value) {
+        var int pixelValue, bitsToKeep;
+
+        let pixelValue = Memory.peek(address);
+        let bitsToKeep = ~(256 - 1);
+
+        if (cursorX & 15 = 8) {
+            let value = value * 256; // value << 8
+            let bitsToKeep = 256 - 1;
+        }
+
+        let pixelValue = pixelValue & bitsToKeep | value;
+
+        do Memory.poke(address, pixelValue);
         return;
     }
 
     /** displays the given string starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printString(String s) {
+        var int length, i, char;
+        
+        let length = s.length();
+
+        while (i < length){ 
+            let char = s.charAt(i);
+
+            if (char = 32) {
+                let cursorX = cursorX + 8;   // Handle space
+            }
+            else{
+                do Output.printChar(char);
+            }
+
+            let i = i + 1;
+        }
+
         return;
     }
 
