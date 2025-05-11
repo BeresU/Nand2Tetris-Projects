@@ -16,10 +16,14 @@
 class Output {
 
     // Character map for displaying characters
+    static int screenBaseAddress;
     static Array charMaps; 
 
     /** Initializes the screen, and locates the cursor at the screen's top-left. */
     function void init() {
+        do Output.initMap();
+        let screenBaseAddress = 16384;
+        return;
     }
 
     // Initializes the character map array
@@ -70,7 +74,7 @@ class Output {
         do Output.create(64,30,51,51,59,59,59,27,3,30,0,0);  // @
         do Output.create(63,30,51,51,24,12,12,0,12,12,0,0);  // ?
 
-        do Output.create(65,0,0,0,0,0,0,0,0,0,0,0);          // A ** TO BE FILLED **
+        do Output.create(65,12,30,51,51,63,51,51,51,51,0,0); // A
         do Output.create(66,31,51,51,51,31,51,51,51,31,0,0); // B
         do Output.create(67,28,54,35,3,3,3,35,54,28,0,0);    // C
         do Output.create(68,15,27,51,51,51,51,51,27,15,0,0); // D
@@ -136,7 +140,7 @@ class Output {
         do Output.create(125,7,12,12,12,56,12,12,12,7,0,0);    // }
         do Output.create(126,38,45,25,0,0,0,0,0,0,0,0);        // ~
 
-	return;
+	    return;
     }
 
     // Creates the character map array of the given character index, using the given values.
@@ -175,28 +179,50 @@ class Output {
     /** Moves the cursor to the j-th column of the i-th row,
      *  and erases the character displayed there. */
     function void moveCursor(int i, int j) {
+        return;
     }
 
     /** Displays the given character at the cursor location,
      *  and advances the cursor one column forward. */
     function void printChar(char c) {
+        var Array map, i, memAddress;
+        let memAddress = screenBaseAddress;
+        let map = Output.getMap(c); 
+
+        do Memory.poke(memAddress, map[0]);
+        do Memory.poke(memAddress + 32, map[1]);
+        do Memory.poke(memAddress + 64, map[2]);
+        do Memory.poke(memAddress + 96, map[3]);
+        do Memory.poke(memAddress + 128, map[4]);
+        do Memory.poke(memAddress + 160, map[5]);
+        do Memory.poke(memAddress + 192, map[6]);
+        do Memory.poke(memAddress + 224, map[7]);
+        do Memory.poke(memAddress + 256, map[8]);
+        do Memory.poke(memAddress + 288, map[9]);
+        do Memory.poke(memAddress + 320, map[10]);
+
+        return;
     }
 
     /** displays the given string starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printString(String s) {
+        return;
     }
 
     /** Displays the given integer starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printInt(int i) {
+        return;
     }
 
     /** Advances the cursor to the beginning of the next line. */
     function void println() {
+        return;
     }
 
     /** Moves the cursor one column back. */
     function void backSpace() {
+        return;
     }
 }
