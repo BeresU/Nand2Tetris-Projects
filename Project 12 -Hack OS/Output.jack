@@ -254,12 +254,7 @@ class Output {
         while (i < length){ 
             let char = s.charAt(i);
 
-            if (char = 32) {
-                do Output.transformCursor(1, 0); // Handle space
-            }
-            else{
-                do Output.printChar(char);
-            }
+            do Output.printChar(char);
 
             let i = i + 1;
         }
