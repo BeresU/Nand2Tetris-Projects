@@ -43,7 +43,7 @@ class Keyboard {
      *  of the pressed key. */
     function char readChar() {
         var char keyPressed, c;
-
+        do Keyboard.DisplayCursor();
         while (keyPressed = 0) {
             let keyPressed = Keyboard.keyPressed();
         }
@@ -60,62 +60,58 @@ class Keyboard {
 
         return c;
     }
-
+    
     /**	Displays the message on the screen, reads from the keyboard the entered
      *  text until a newline character is detected, echoes the text to the screen,
      *  and returns its value. Also handles user backspaces. */
     function String readLine(String message) {
         var String str, temp;
         var char c;
-        var boolean loop;
-        var int i, length;
-        var int debug;
+        var int i;
 
-        let debug = 9000;
-        let loop = true;
-        let length = 1;
-        let str = String.new(length);   // Even though you define a length it will not return the actual length of the string
+        let str = String.new(1);   
 
         do Output.printString(message);
 
-        while (loop = true){
-
-            let debug[1] = length;
-            let debug[2] = str.length();
+        while (~(c= 128)) {
             let c = Keyboard.readChar();
+            let i = str.length();
 
-            if (c = 128) {
-                let loop = false;
-                do Output.println();
-                return str;
-            }
-      
-            if (c = 129 & length > 1) {
-                let debug[0] = length;
-                let length = length - 1;
+            if (c = 129 & str.length() > 0) {
                 do Output.backSpace();
-                do Output.printChar(0);
                 do str.eraseLastChar();
             }
 
-            if (length = str.length()) {
+            if (c > 31 & c < 128) {
                 let str = str.appendChar(c);
-                let length = length + 1;
             }
 
-            let temp = str;
-            let str = String.new(length);
-            let i = 0;
-            
-            while (i < temp.length()) {
-                let c = temp.charAt(i);
-                let str = str.appendChar(c);
-                let i = i + 1;
+            if (~(i = str.length())){
+                let temp = str;
+                let str = String.new(temp.length() + 1);
+                let i = 0;
+                
+                while (i < temp.length()) {
+                    let c = temp.charAt(i);
+                    let str = str.appendChar(c);
+                    let i = i + 1;
+                }
             }
         }
-
+        
+        do Output.printString(" "); // Hack: after exit the cursor left turned on 
+        do Output.println();
         return str;
     }   
+
+    // Simple hack to display the cursor
+    function void DisplayCursor() {
+                
+        do Output.printChar(0);
+        do Output.backSpace();
+
+        return;
+    }
 
     /** Displays the message on the screen, reads from the keyboard the entered
      *  text until a newline character is detected, echoes the text to the screen,
