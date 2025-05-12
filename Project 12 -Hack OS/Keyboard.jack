@@ -73,11 +73,11 @@ class Keyboard {
 
         do Output.printString(message);
 
-        while (~(c= 128)) {
+        while (~(c= String.newLine())) {
             let c = Keyboard.readChar();
             let i = str.length();
 
-            if (c = 129 & str.length() > 0) {
+            if (c = String.backSpace() & str.length() > 0) {
                 do Output.backSpace();
                 do str.eraseLastChar();
             }
