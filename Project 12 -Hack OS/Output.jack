@@ -203,10 +203,15 @@ class Output {
     /** Displays the given character at the cursor location,
      *  and advances the cursor one column forward. */
     function void printChar(char c) {
+        do Output.printCharInternal(c);
+        do Output.transformCursor(1, 0);
+        return;
+    }
+
+    function void printCharInternal(char c) {
         var Array map, memAddress;
         let memAddress = screenBaseAddress + cursorY + (cursorX / 16);
         let map = Output.getMap(c); 
-
         do Output.drawPixels(memAddress, map[0]);
         do Output.drawPixels(memAddress + 32, map[1]);
         do Output.drawPixels(memAddress + 64, map[2]);
@@ -218,7 +223,7 @@ class Output {
         do Output.drawPixels(memAddress + 256, map[8]);
         do Output.drawPixels(memAddress + 288, map[9]);
         do Output.drawPixels(memAddress + 320, map[10]);
-        do Output.transformCursor(1, 0);
+
         return;
     }
 
@@ -332,6 +337,7 @@ class Output {
     /** Moves the cursor one column back. */
     function void backSpace() {
         do Output.transformCursor(-1, 0);
+        do Output.printCharInternal(32);
         return;
     }
 }
