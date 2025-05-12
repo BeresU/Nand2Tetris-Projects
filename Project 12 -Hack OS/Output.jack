@@ -17,27 +17,16 @@ class Output {
 
     // Character map for displaying characters
     static int screenBaseAddress, cursorX, cursorY, lineHeight, charWidth;
-    static Array charMaps, powerOfTens; 
+    static Array charMaps; 
 
     /** Initializes the screen, and locates the cursor at the screen's top-left. */
     function void init() {
-        var int i;
         do Output.initMap();
         let screenBaseAddress = 16384;
         let cursorX = 0;
         let cursorY = 0;
         let lineHeight = 352;
         let charWidth = 8;
-
-        let powerOfTens = Array.new(5);
-        let powerOfTens[0] = 1;
-
-        let i = 1;
-
-        while(i < 5){
-            let powerOfTens[i] = powerOfTens[i - 1] * 10;
-            let i = i + 1;
-        }
         return;
     }
 
@@ -295,30 +284,11 @@ class Output {
     /** Displays the given integer starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printInt(int i) {
-        var int char, digitCount, n, digit;
+        var String s;
 
-        if (i < 0) {
-            do Output.printChar(45);
-            let i = -i;
-        }
-
-        let n = i;
-        let digitCount = 0;
-
-        while (n > 0) {
-            let digitCount = digitCount + 1;
-            let n = n / 10;
-        }
-
-        while (digitCount > 0) {
-            let n = powerOfTens[digitCount - 1];
-            let digit = i/n;
-            let char = 48 + digit;
-            do Output.printChar(char);
-            let i = i - (digit * n);
-            let digitCount = digitCount - 1;
-        }
-
+        let s = String.new(7);
+        do s.setInt(i);
+        do Output.printString(s);
         return;
     }
 
