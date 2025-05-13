@@ -138,7 +138,7 @@ class Screen {
 
     // Optimized method that draws the pixels in 16-bit batches 
     function void drawHorizontalLine(int x1, int x2, int y){
-        var int dx, steps, value, mod, address, rowAddress, color, pixels, temp, maxBits;
+        var int dx, steps, value, mod, address, rowAddress, color, pixels, temp, maxPixels;
 
         if (x1 = x2) {
             do Screen.drawPixel(x1, y);
@@ -159,13 +159,13 @@ class Screen {
         let mod = x1 & 15;
         let steps = 16 - mod; 
         let address = screenBaseAddress + (rowAddress + (x1 / 16));
-        let maxBits = Math.min(16, dx + mod + 1);
         let pixels = 0;
-
         let pixels = ~(powersOfTwo[mod] - 1);
 
-        if (~(maxBits > 15)) {
-            let pixels = pixels & (powersOfTwo[maxBits] - 1);
+        let maxPixels = dx + 1 + mod;
+
+        if (maxPixels < 16) {
+            let pixels = pixels & (powersOfTwo[maxPixels] - 1);
         } 
 
         let value = Memory.peek(address);
@@ -189,7 +189,7 @@ class Screen {
             let steps = steps + 16;
         }
 
-        // Handle last pixel batch 
+        // Handle last 16-bit batch 
         let mod = x2 & 15;
         let address = screenBaseAddress + (rowAddress + (x2 / 16));
         let value = Memory.peek(address);
