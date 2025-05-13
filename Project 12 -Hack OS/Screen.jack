@@ -159,12 +159,12 @@ class Screen {
         let mod = x1 & 15;
         let steps = 16 - mod; 
         let address = screenBaseAddress + (rowAddress + (x1 / 16));
-        let maxBits = Math.min(15, dx + mod + 1);
+        let maxBits = Math.min(16, dx + mod + 1);
         let pixels = 0;
 
         let pixels = ~(powersOfTwo[mod] - 1);
 
-        if (maxBits < 15) {
+        if (~(maxBits > 15)) {
             let pixels = pixels & (powersOfTwo[maxBits] - 1);
         } 
 
@@ -179,7 +179,7 @@ class Screen {
     
         do Memory.poke(address, value);
 
-        if (maxBits < 15) {return;}
+        if (~((16-mod)<(dx+1))) {return;} 
 
         // 16-bit batches drawing 
         while (~(steps > (dx - 16))){
