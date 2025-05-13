@@ -65,25 +65,35 @@ class Math {
         var int q;
         var boolean setSign;
 
-        let setSign = x < 0 | y < 0;
+        if (y = 0) {
+            do Sys.error(3);
+        }
+
+        let setSign = (x < 0 & y > 0) | (x > 0 & y < 0);
 
         let x = Math.abs(x);
         let y = Math.abs(y);
 
+        let q = Math.divide_internal(x, y);
+
+        if (setSign) {
+            let q = -q;
+        }
+
+        return q;
+    }
+
+    function int divide_internal(int x, int y){
+        var int q;
         if (y > x | y < 0) {return 0;}
         
         let q = Math.divide(x, y + y);
 
         if ((x - (q + q * y)) < y) {
-            
-            if (setSign){
-                let q = -q;
-            }
-
             return q + q;
         }
 
-        return q + q + 1;
+        return q + q + 1;        
     }
 
     /** Returns the integer part of the square root of x. */
