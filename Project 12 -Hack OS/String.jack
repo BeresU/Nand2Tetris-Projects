@@ -9,14 +9,17 @@
  * for appending a character to the string's end, and more typical
  * string-oriented operations.
  */
+
+// NOTE: The length of the string is stored at index 0 of the string array.
+// For some reason, this is the only way to make it work with the native Output.jack.
+// If you add more fields besides the string array, the string output won't appear as expected.
+// In my custom Output.jack implementation, everything works fine.
 class String {
     field Array str;
-
 
     /** constructs a new empty string with a maximum length of maxLength
      *  and initial length of 0. */
     constructor String new(int maxLength) {
-
         let str = Array.new(maxLength + 1);
         return this;
     }
@@ -30,9 +33,7 @@ class String {
 
     /** Returns the current length of this string. */
     method int length() {
-        var int length;
-        let length = str[0];
-        return length;
+        return str[0];
     }
 
     /** Returns the character at the j-th location of this string. */
@@ -49,17 +50,20 @@ class String {
     /** Appends c to this string's end and returns this string. */
     method String appendChar(char c) {
         var int length;
-        let length = str[0]; 
+        let length = length(); 
         let str[length+ 1] = c;
-        let str[0] = length+ 1;
+        let str[0] = length + 1;
         return this;
     }
 
     /** Erases the last character from this string. */
     method void eraseLastChar() {
         var int length;
+        let length = length();     
 
-        let length = str[0];
+        // NOTE: with my custom Ouput.jack implemention its working without this line, for some reason it'll not work with the native one
+        let str[length] = 0;
+
         let str[0] = length - 1;
         return;
     }
@@ -67,11 +71,68 @@ class String {
     /** Returns the integer value of this string, 
      *  until a non-digit character is detected. */
     method int intValue() {
-        return 0;
+        var int n, length, i, digit;
+        var char c;
+        var boolean invert;
+
+        let length = length();
+
+        if (charAt(i) = 45){
+            let invert = true;
+            let i = 1;
+            let length = Math.min(7, length);
+        }
+        else{
+            let length = Math.min(6, length);
+        }
+
+        while (i < length) {
+            let c = charAt(i);
+
+            if (c > 47 | c < 58) {   
+                let digit = c - 48;
+                let n = n * 10 + digit;
+                let i = i + 1;
+            }
+            else {
+                let i = length; // break 
+            }
+        }
+
+        if (invert) {
+            let n = -n;
+        }
+
+        return n;
     }
 
     /** Sets this string to hold a representation of the given value. */
     method void setInt(int val) {
+        var int length;
+        let length = 0;
+        let str[0] = length;
+
+        if (val < 0){
+            do appendChar(45);
+            let val = -val;
+        }
+
+        do appendInt(val);
+        return;
+    }
+
+    method void appendInt(int val) {
+        var int lastDigit;
+        var char c;
+
+        let lastDigit = String.mod(val, 10);
+
+        if (~(val < 10)){
+            do appendInt(val/10);
+        }
+        
+        let c = 48 + lastDigit;
+        do appendChar(c);
         return;
     }
 
@@ -88,5 +149,9 @@ class String {
     /** Returns the double quote (") character. */
     function char doubleQuote() {
         return 34;
+    }
+
+    function int mod (int a, int b) {
+        return  a - (b * (a / b));
     }
 }
